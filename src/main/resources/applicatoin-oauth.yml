@@ -9,3 +9,7 @@ security:
             - account_email
             - profile_image
             - phone_number
+
+jwt:
+  issuer: test@gmail.com
+  secret_key: test
