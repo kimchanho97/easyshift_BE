@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties("jwt")
-public class Jwtproperties {
+public class Jwtproperties { // jwt 생성시 사용할 페이로드?
     private String issuer;
     private String secretKey;
 }
