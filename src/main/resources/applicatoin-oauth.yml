@@ -1,0 +1,15 @@
+security:
+  oauth2:
+    client:
+      registration:
+        kakao:
+          client-id: 865319e0e9d63d0844b996ef30065deb
+          client-secret:
+          scope:
+            - account_email
+            - profile_image
+            - phone_number
+
+jwt:
+  issuer: test@gmail.com
+  secret_key: test
