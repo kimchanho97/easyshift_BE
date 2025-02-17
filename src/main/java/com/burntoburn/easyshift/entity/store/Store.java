@@ -21,6 +21,11 @@ public class Store {
     @Column(nullable = false)
     private String storeName;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, updatable = false)
     private UUID storeCode;
+
+    @PrePersist
+    private void initStoreCode() {
+        this.storeCode = UUID.randomUUID();
+    }
 }
