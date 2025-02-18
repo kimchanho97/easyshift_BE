@@ -2,7 +2,6 @@ package com.burntoburn.easyshift.config.jwt;
 
 import com.burntoburn.easyshift.entity.user.User;
 import io.jsonwebtoken.*;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,7 +9,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -20,12 +18,6 @@ import java.util.Set;
 public class TokenProvider {
 
     private final JwtProperties jwtproperties;
-    private String secretKey;
-
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(jwtproperties.getSecretKey().getBytes());
-    }
 
     // 토큰 생성시 만료기간을 설정하여 발급
     public String generateToken(User user, Duration expiredAt) {
@@ -44,7 +36,7 @@ public class TokenProvider {
                 .setExpiration(expiry)
                 .setSubject(user.getEmail())
                 .claim("id", user.getId())
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(SignatureAlgorithm.HS256, jwtproperties.getSecretKey())
                 .compact();
     }
 
