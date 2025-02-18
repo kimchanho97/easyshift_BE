@@ -3,7 +3,7 @@ package com.burntoburn.easyshift.config;
 import com.burntoburn.easyshift.config.jwt.JwtProperties;
 import com.burntoburn.easyshift.config.jwt.TokenProvider;
 import com.burntoburn.easyshift.entity.user.User;
-import com.burntoburn.easyshift.repository.UserRepository;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

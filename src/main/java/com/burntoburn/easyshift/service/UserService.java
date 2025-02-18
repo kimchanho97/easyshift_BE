@@ -2,11 +2,8 @@ package com.burntoburn.easyshift.service;
 
 import com.burntoburn.easyshift.dto.AddUserRequest;
 import com.burntoburn.easyshift.entity.user.User;
-import com.burntoburn.easyshift.repository.UserRepository;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
