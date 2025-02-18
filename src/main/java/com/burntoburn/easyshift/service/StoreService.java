@@ -2,7 +2,7 @@ package com.burntoburn.easyshift.service;
 
 import com.burntoburn.easyshift.dto.StoreCreateRequest;
 import com.burntoburn.easyshift.entity.store.Store;
-import com.burntoburn.easyshift.repository.StoreRepository;
+import com.burntoburn.easyshift.repository.store.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

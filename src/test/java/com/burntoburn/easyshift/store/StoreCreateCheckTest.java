@@ -2,7 +2,7 @@ package com.burntoburn.easyshift.store;
 
 import com.burntoburn.easyshift.dto.StoreCreateRequest;
 import com.burntoburn.easyshift.entity.store.Store;
-import com.burntoburn.easyshift.repository.StoreRepository;
+import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
