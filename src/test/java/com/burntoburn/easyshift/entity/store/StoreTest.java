@@ -1,5 +1,6 @@
 package com.burntoburn.easyshift.entity.store;
 
+import com.burntoburn.easyshift.repository.store.StoreRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Repository
-interface StoreRepository extends JpaRepository<Store, Long> {}
 
 @SpringBootTest
 class StoreTest {
