@@ -8,10 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/stores")
 @RequiredArgsConstructor
-public class StroeController {
+public class StoreController {
 
     private final StoreService storeService;
 
@@ -25,5 +27,11 @@ public class StroeController {
     public ResponseEntity<Store> createStore(@RequestBody StoreCreateRequest request) {
         Store createdStore = storeService.createStore(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStore);
+    }
+
+    @GetMapping("/by-user")
+    public ResponseEntity<List<String>> getStoreNamesByUserId(@RequestParam("userId") Long userId) {
+        List<String> storeNames = storeService.getStoreNamesByUserId(userId);
+        return ResponseEntity.ok(storeNames);
     }
 }
