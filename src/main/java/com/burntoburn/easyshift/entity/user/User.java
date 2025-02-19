@@ -20,6 +20,9 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String name;
+
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
