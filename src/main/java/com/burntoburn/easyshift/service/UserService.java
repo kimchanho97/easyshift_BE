@@ -12,7 +12,6 @@ public class UserService  {
 
     private final UserRepository userRepository;
 
-
     public User save(AddUserRequest request) throws Exception{
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new Exception("이미 존재하는 계정 입니다.");
@@ -26,5 +25,9 @@ public class UserService  {
                 .avatarUrl(request.getAvatarUrl())
                 .build();
         return userRepository.save(newUser);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("unexpected User"));
     }
 }
