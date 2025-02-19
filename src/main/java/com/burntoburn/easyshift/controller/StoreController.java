@@ -34,4 +34,15 @@ public class StoreController {
         List<String> storeNames = storeService.getStoreNamesByUserId(userId);
         return ResponseEntity.ok(storeNames);
     }
+
+    @PostMapping("/{storeId}/link")
+    public ResponseEntity<List<String>> linkStoreToUser(
+            @PathVariable("storeId") Long storeId,
+            @RequestHeader("Authorization") String token){
+        if(token.startsWith("Bearer ")){
+            token = token.substring(7);
+        }
+        List<String> storeNames = storeService.linkStoreToUser(token, storeId);
+        return ResponseEntity.ok(storeNames);
+    }
 }
