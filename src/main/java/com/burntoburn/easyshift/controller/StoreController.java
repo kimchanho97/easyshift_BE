@@ -31,6 +31,12 @@ public class StoreController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStore);
     }
 
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<String> deleteStore(@PathVariable("storeId") Long storeId){
+        storeService.deleteStore(storeId);
+        return ResponseEntity.ok("매장이 성공적으로 삭제되었습니다.");
+    }
+
     @GetMapping("/by-user")
     public ResponseEntity<List<String>> getStoreNamesByUserId(@RequestParam("userId") Long userId) {
         List<String> storeNames = storeService.getStoreNamesByUserId(userId);
