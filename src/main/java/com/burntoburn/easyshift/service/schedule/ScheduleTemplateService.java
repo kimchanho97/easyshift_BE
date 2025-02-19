@@ -2,19 +2,28 @@ package com.burntoburn.easyshift.service.schedule;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleTemplateResponse;
+import com.burntoburn.easyshift.entity.schedule.ScheduleTemplate;
 import java.util.List;
 
 public interface ScheduleTemplateService {
 
-    // 특정 매장의 모든 스케줄 템플릿 조회
-    List<ScheduleTemplateResponse> getScheduleTemplatesByStore(Long storeId);
-
     // 스케줄 템플릿 생성
-    ScheduleTemplateResponse createScheduleTemplate(ScheduleTemplateRequest request);
+    ScheduleTemplate createScheduleTemplate(ScheduleTemplate scheduleTemplate);
+
+    // ShiftTemplate 조회 - 단건
+    ScheduleTemplate getScheduleTemplateOne(Long id);
+
+    // ShiftTemplate 조회 - 전체
+    List<ScheduleTemplate> getAllScheduleTemplates();
 
     // 스케줄 템플릿 수정
-    ScheduleTemplateResponse updateScheduleTemplate(Long templateId, ScheduleTemplateRequest request);
+    ScheduleTemplate updateScheduleTemplate(Long id, ScheduleTemplate scheduleTemplate);
 
     // 스케줄 템플릿 삭제
-    void deleteScheduleTemplate(Long templateId);
+    void deleteScheduleTemplate(Long id);
+
+
+
+
+
 }
