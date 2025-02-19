@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.dto;
+package com.burntoburn.easyshift.dto.store.req;
 
 
 import lombok.AllArgsConstructor;

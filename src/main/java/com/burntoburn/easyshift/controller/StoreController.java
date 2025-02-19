@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.controller;
 
-import com.burntoburn.easyshift.dto.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.res.StoreResponse;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +19,22 @@ public class StoreController {
     private final StoreService storeService;
 
     @GetMapping
-    public ResponseEntity<Store> getStore(@RequestParam("storeId") Long storeId) {
+    public ResponseEntity<StoreResponse> getStore(@RequestParam("storeId") Long storeId) {
         Store store = storeService.getStoreById(storeId);
-        return ResponseEntity.ok(store);
+        StoreResponse response = new StoreResponse(store.getId(), store.getStoreName(), store.getStoreCode());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
     public ResponseEntity<Store> createStore(@RequestBody StoreCreateRequest request) {
         Store createdStore = storeService.createStore(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStore);
+    }
+
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<String> deleteStore(@PathVariable("storeId") Long storeId){
+        storeService.deleteStore(storeId);
+        return ResponseEntity.ok("매장이 성공적으로 삭제되었습니다.");
     }
 
     @GetMapping("/by-user")

@@ -1,7 +1,7 @@
 package com.burntoburn.easyshift.service;
 
 import com.burntoburn.easyshift.config.jwt.TokenProvider;
-import com.burntoburn.easyshift.dto.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.user.User;
@@ -38,6 +38,13 @@ public class StoreService {
         return storeRepository.save(store);
     }
 
+    public void deleteStore(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
+
+        storeRepository.delete(store);
+    }
+
     public List<String> getStoreNamesByUserId(Long userId) {
         List<UserStore> userStores = userStoreRepository.findAllByUserId(userId);
         if (userStores.isEmpty()) {
@@ -49,13 +56,13 @@ public class StoreService {
                 .collect(Collectors.toList());
     }
 
-    public List<String> linkStoreToUser(String token, Long storeId){
+    public List<String> linkStoreToUser(String token, Long storeId) {
         Long userId = tokenProvider.getUserIdFromToken(token);
 
         Store store = getStoreById(storeId);
 
         boolean exists = userStoreRepository.existsByUserIdAndStoreId(userId, storeId);
-        if(!exists){
+        if (!exists) {
             // 실제 DB 조회 없이 프록시 객체를 이용하여 연관관계 설정
             User user = userRepository.getReferenceById(userId);
 
