@@ -1,7 +1,7 @@
 package com.burntoburn.easyshift.service;
 
 import com.burntoburn.easyshift.config.jwt.TokenProvider;
-import com.burntoburn.easyshift.dto.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.user.User;

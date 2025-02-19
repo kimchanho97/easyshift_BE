@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.controller;
 
-import com.burntoburn.easyshift.dto.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.res.StoreResponse;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,10 @@ public class StoreController {
     private final StoreService storeService;
 
     @GetMapping
-    public ResponseEntity<Store> getStore(@RequestParam("storeId") Long storeId) {
+    public ResponseEntity<StoreResponse> getStore(@RequestParam("storeId") Long storeId) {
         Store store = storeService.getStoreById(storeId);
-        return ResponseEntity.ok(store);
+        StoreResponse response = new StoreResponse(store.getId(), store.getStoreName(), store.getStoreCode());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping

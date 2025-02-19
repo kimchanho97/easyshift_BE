@@ -3,7 +3,9 @@ package com.burntoburn.easyshift.entity.store;
 import com.burntoburn.easyshift.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -25,6 +27,10 @@ public class Store extends BaseEntity {
     @Column(unique = true, nullable = false)
     private UUID storeCode;
 
+    // Store와 연결된 UserStore 목록 (양방향 연관관계)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserStore> userStores;
+
     @PrePersist
     private void initStoreCode() {
         this.storeCode = UUID.randomUUID();
@@ -34,6 +40,4 @@ public class Store extends BaseEntity {
     public void updateStoreName(String newName) {
         this.storeName = newName;
     }
-
-
 }
