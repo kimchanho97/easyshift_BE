@@ -1,34 +1,31 @@
 package com.burntoburn.easyshift.config;
 
+import com.burntoburn.easyshift.config.jwt.JwtProperties;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
-import com.burntoburn.easyshift.config.jwt.JwtProperties;
+import io.jsonwebtoken.security.Keys;
 import lombok.Builder;
 import lombok.Getter;
 
-
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
 
-// test용 토큰 생성
 @Getter
 public class JwtFactory {
+
     private String subject = "test@email.com";
-
     private Date issuedAt = new Date();
-
-    private Date expiration = new Date(new Date().getTime() + Duration.ofDays(14).toMillis());
-
+    private Date expiration = new Date(System.currentTimeMillis() + Duration.ofDays(14).toMillis());
     private Map<String, Object> claims = emptyMap();
 
     @Builder
-    public JwtFactory(String subject, Date issuedAt, Date expiration,
-                      Map<String, Object> claims) {
+    public JwtFactory(String subject, Date issuedAt, Date expiration, Map<String, Object> claims) {
         this.subject = subject != null ? subject : this.subject;
         this.issuedAt = issuedAt != null ? issuedAt : this.issuedAt;
         this.expiration = expiration != null ? expiration : this.expiration;
@@ -40,14 +37,18 @@ public class JwtFactory {
     }
 
     public String createToken(JwtProperties jwtProperties) {
+        Key key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-                .setSubject(subject)
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                .setIssuer(jwtProperties.getIssuer())
-                .setIssuedAt(issuedAt)
-                .setExpiration(expiration)
-                .addClaims(claims)
-                .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
+                .header()
+                .empty()
+                .add("typ", "JWT")
+                .and()
+                .subject(subject)
+                .issuer(jwtProperties.getIssuer())
+                .issuedAt(issuedAt)
+                .expiration(expiration)
+                .claims(claims)
+                .signWith(key)
                 .compact();
     }
 }
