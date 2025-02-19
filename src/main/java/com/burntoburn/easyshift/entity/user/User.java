@@ -33,7 +33,8 @@ public class User extends BaseEntity {
     private String avatarUrl;
 
     // 이름 변경하는 메서드
-    public void updateEmail(String newEmail) {
-        this.email = newEmail;
+    public void update(String newName) {
+        this.name = newName;
+
     }
 }
