@@ -3,8 +3,6 @@ package com.burntoburn.easyshift.entity.store;
 import com.burntoburn.easyshift.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
-
 import java.util.List;
 import java.util.UUID;
 
