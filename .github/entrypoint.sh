@@ -3,8 +3,8 @@ set -e
 
 CONFIG_FILE="/app/config/application.properties"
 PROD_CONFIG_FILE="/app/config/application-production.properties"
+OAUTH_CONFIG_FILE="/app/config/application-oauth.yml"
 
-# Copy the production config file if it doesn't exist
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "spring.profiles.active=production" > "$CONFIG_FILE"
 elif grep -q "^spring.profiles.active" "$CONFIG_FILE"; then
@@ -13,7 +13,6 @@ else
   echo "spring.profiles.active=production" >> "$CONFIG_FILE"
 fi
 
-# Generate application-production.properties from env variables if provided
 if [ -n "$DB_URL" ] && [ -n "$SERVER_PORT" ] && [ -n "$DB_DIALECT" ] && [ -n "$DB_DRIVER" ] && [ -n "$DB_USERNAME" ] && [ -n "$DB_PASSWORD" ]; then
   cat > "$PROD_CONFIG_FILE" <<EOF
 server.port=$SERVER_PORT
@@ -28,5 +27,12 @@ else
   echo "Environment variables not set. Skipping production config generation."
 fi
 
-# Start the Spring Boot application with external config location
+if [ -n "$APPLICATION_OAUTH_CONFIG" ]; then
+  echo "$APPLICATION_OAUTH_CONFIG" | base64 --decode > "$OAUTH_CONFIG_FILE"
+  echo "Decoded OAuth config file from secret."
+else
+  echo "APPLICATION_OAUTH_CONFIG not provided, skipping OAuth config generation."
+fi
+
+
 exec java -jar app.jar --spring.config.additional-location=file:/app/config/

@@ -27,7 +27,7 @@ FROM bellsoft/liberica-openjdk-debian:21.0.4-cds
 
 # Install tools (for debugging)
 RUN apt-get update && apt-get install -y \
-    curl vim net-tools htop zip unzip \
+    curl net-tools htop zip unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy built jar from the builder stage
