@@ -1,6 +1,6 @@
 package com.burntoburn.easyshift.dto.schedule.req;
 
-import java.util.List;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ScheduleTemplateRequest {
-    private String scheduleTemplateName;
-    private List<ShiftTemplateRequest> shiftTemplates;
+public class ShiftTemplateRequest {
+    private String shiftTemplateName;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }

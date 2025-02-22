@@ -1,8 +1,8 @@
-package com.burntoburn.easyshift.service.shift.imp;
+package com.burntoburn.easyshift.service.templates.imp;
 
-import com.burntoburn.easyshift.entity.schedule.ShiftTemplate;
+import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.repository.schedule.ShiftTemplateRepository;
-import com.burntoburn.easyshift.service.shift.ShiftTemplateService;
+import com.burntoburn.easyshift.service.templates.ShiftTemplateService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;

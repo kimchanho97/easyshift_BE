@@ -1,6 +1,6 @@
-package com.burntoburn.easyshift.service.shift;
+package com.burntoburn.easyshift.service.templates;
 
-import com.burntoburn.easyshift.entity.schedule.ShiftTemplate;
+import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import java.util.List;
 
 public interface ShiftTemplateService {
