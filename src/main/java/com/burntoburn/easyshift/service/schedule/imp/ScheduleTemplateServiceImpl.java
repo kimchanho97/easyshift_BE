@@ -1,8 +1,8 @@
 package com.burntoburn.easyshift.service.schedule.imp;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
-import com.burntoburn.easyshift.entity.schedule.ScheduleTemplate;
-import com.burntoburn.easyshift.entity.schedule.ShiftTemplate;
+import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
+import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
@@ -32,18 +32,17 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
                 .store(store)
                 .build();
 
-        // ShiftTemplate 리스트 추가
+        // ShiftTemplate 리스트 추가 (scheduleTemplate 참조 X)
         List<ShiftTemplate> shiftTemplates = request.getShiftTemplates().stream()
                 .map(shiftTemplateRequest -> ShiftTemplate.builder()
                         .shiftTemplateName(shiftTemplateRequest.getShiftTemplateName())
                         .startTime(shiftTemplateRequest.getStartTime())
                         .endTime(shiftTemplateRequest.getEndTime())
-                        .scheduleTemplate(scheduleTemplate) // 연관관계 설정
-                        .build())
+                        .build()) // scheduleTemplate 참조 제거
                 .collect(Collectors.toList());
 
-        // ScheduleTemplate에 ShiftTemplates 설정
-        scheduleTemplate.getShiftTemplates().addAll(shiftTemplates);
+        // ShiftTemplates를 이용하여 추가 (일급 컬렉션 적용)
+        scheduleTemplate.getShiftTemplates().update(shiftTemplates);
 
         return scheduleTemplateRepository.save(scheduleTemplate);
     }
@@ -69,24 +68,20 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
         // 기존 ScheduleTemplate 조회
         ScheduleTemplate existingTemplate = getScheduleTemplateOne(scheduleTemplateId);
 
-        // 새로운 ShiftTemplates 리스트 추가
+        // 새로운 ShiftTemplates 리스트 추가 (scheduleTemplate 참조 X)
         List<ShiftTemplate> updatedShifts = request.getShiftTemplates().stream()
                 .map(shiftRequest -> ShiftTemplate.builder()
                         .shiftTemplateName(shiftRequest.getShiftTemplateName())
                         .startTime(shiftRequest.getStartTime())
                         .endTime(shiftRequest.getEndTime())
-                        .scheduleTemplate(existingTemplate) // 연관관계 설정
-                        .build())
+                        .build()) // scheduleTemplate 참조 제거
                 .toList();
 
-        // 정보 업데이트
+        // 일급 컬렉션 내부에서 관리
         existingTemplate.updateScheduleTemplate(request.getScheduleTemplateName(), updatedShifts);
 
-        scheduleTemplateRepository.save(existingTemplate); // Mock 환경에서 테스트를 위해서 save() 명시 [더티 체킹으로 없어질 수 있음]
-
-        return existingTemplate;
+        return scheduleTemplateRepository.save(existingTemplate); // Mock 환경에서 save() 호출함 [더티 체킹으로 전환힐 예정]
     }
-
 
     @Override
     public void deleteScheduleTemplate(Long id) {

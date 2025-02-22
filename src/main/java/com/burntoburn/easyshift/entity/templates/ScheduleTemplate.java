@@ -1,10 +1,10 @@
-package com.burntoburn.easyshift.entity.schedule;
+package com.burntoburn.easyshift.entity.templates;
 
 import com.burntoburn.easyshift.entity.store.Store;
+import com.burntoburn.easyshift.entity.templates.collection.ShiftTemplates;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,15 +27,13 @@ public class ScheduleTemplate {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @OneToMany(mappedBy = "scheduleTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default // 기본값 설정
-    private List<ShiftTemplate> shiftTemplates = new ArrayList<>();
+    @Embedded
+    @Builder.Default
+    private ShiftTemplates shiftTemplates = new ShiftTemplates(); // 일급 컬렉션 적용
 
-
-    // 엔티티 수정 메서드
+    // 스케줄 템플릿 수정 메서드
     public void updateScheduleTemplate(String scheduleTemplateName, List<ShiftTemplate> updatedShiftTemplates) {
         this.scheduleTemplateName = scheduleTemplateName;
-        this.shiftTemplates.clear();
-        this.shiftTemplates.addAll(updatedShiftTemplates);
+        this.shiftTemplates.update(updatedShiftTemplates); // ✅ 일급 컬렉션 내부에서 관리
     }
 }

@@ -1,8 +1,7 @@
 package com.burntoburn.easyshift.service.schedule;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
-import com.burntoburn.easyshift.dto.schedule.res.ScheduleTemplateResponse;
-import com.burntoburn.easyshift.entity.schedule.ScheduleTemplate;
+import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import java.util.List;
 
 public interface ScheduleTemplateService {

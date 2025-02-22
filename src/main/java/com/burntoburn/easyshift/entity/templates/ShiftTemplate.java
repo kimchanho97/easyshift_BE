@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.entity.schedule;
+package com.burntoburn.easyshift.entity.templates;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +27,5 @@ public class ShiftTemplate {
     @Column(nullable = false)
     private LocalTime endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_template_id", nullable = false)
-    private ScheduleTemplate scheduleTemplate;
+    // scheduleTemplate 참조 제거 (단방향 관계)
 }

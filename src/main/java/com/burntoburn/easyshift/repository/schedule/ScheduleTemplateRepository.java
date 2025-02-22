@@ -1,7 +1,6 @@
 package com.burntoburn.easyshift.repository.schedule;
 
-import com.burntoburn.easyshift.entity.schedule.ScheduleTemplate;
-import com.burntoburn.easyshift.entity.schedule.ShiftTemplate;
+import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
