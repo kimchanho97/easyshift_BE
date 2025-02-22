@@ -30,4 +30,12 @@ public class ScheduleTemplate {
     @OneToMany(mappedBy = "scheduleTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default // 기본값 설정
     private List<ShiftTemplate> shiftTemplates = new ArrayList<>();
+
+
+    // 엔티티 수정 메서드
+    public void updateScheduleTemplate(String scheduleTemplateName, List<ShiftTemplate> updatedShiftTemplates) {
+        this.scheduleTemplateName = scheduleTemplateName;
+        this.shiftTemplates.clear();
+        this.shiftTemplates.addAll(updatedShiftTemplates);
+    }
 }
