@@ -2,8 +2,8 @@ package com.burntoburn.easyshift.service.schedule.imp;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.dto.schedule.req.ShiftTemplateRequest;
-import com.burntoburn.easyshift.entity.schedule.ScheduleTemplate;
-import com.burntoburn.easyshift.entity.schedule.ShiftTemplate;
+import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
+import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,8 +59,9 @@ class ScheduleTemplateServiceImplTest {
                 .id(1L)
                 .scheduleTemplateName("Old Schedule")
                 .store(store)
-                .shiftTemplates(new ArrayList<>(List.of(shift1, shift2))) // 기존 ShiftTemplates 추가
                 .build();
+
+        existingTemplate.getShiftTemplates().addAll(List.of(shift1, shift2)); // ✅ ShiftTemplates 이용하여 추가
     }
 
     @Test
@@ -83,14 +83,14 @@ class ScheduleTemplateServiceImplTest {
                 .build();
 
         when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
-        when(scheduleTemplateRepository.save(any(ScheduleTemplate.class))).thenReturn(newTemplate); // ✅ 새로운 객체 반환하도록 변경
+        when(scheduleTemplateRepository.save(any(ScheduleTemplate.class))).thenReturn(newTemplate);
 
         // When
         ScheduleTemplate createdTemplate = scheduleTemplateService.createScheduleTemplate(1L, request);
 
         // Then
         assertNotNull(createdTemplate);
-        assertEquals("New Schedule", createdTemplate.getScheduleTemplateName()); // ✅ 여기서 기대값과 실제값 비교
+        assertEquals("New Schedule", createdTemplate.getScheduleTemplateName());
         verify(scheduleTemplateRepository, times(1)).save(any(ScheduleTemplate.class));
     }
 
@@ -145,9 +145,9 @@ class ScheduleTemplateServiceImplTest {
 
         // Then
         assertEquals("Updated Schedule", existingTemplate.getScheduleTemplateName());
-        assertEquals(2, existingTemplate.getShiftTemplates().size());
-        assertEquals("Updated Morning Shift", existingTemplate.getShiftTemplates().get(0).getShiftTemplateName());
-        assertEquals("Updated Evening Shift", existingTemplate.getShiftTemplates().get(1).getShiftTemplateName());
+        assertEquals(2, existingTemplate.getShiftTemplates().getList().size()); // ✅ 일급 컬렉션에서 리스트 가져오기
+        assertEquals("Updated Morning Shift", existingTemplate.getShiftTemplates().getList().get(0).getShiftTemplateName());
+        assertEquals("Updated Evening Shift", existingTemplate.getShiftTemplates().getList().get(1).getShiftTemplateName());
 
         // Mocking 환경에서는 save() 호출을 검증해야 한다.
         verify(scheduleTemplateRepository, times(1)).save(existingTemplate);
