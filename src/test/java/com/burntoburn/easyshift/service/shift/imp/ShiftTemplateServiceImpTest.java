@@ -2,7 +2,7 @@ package com.burntoburn.easyshift.service.shift.imp;
 
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.repository.schedule.ShiftTemplateRepository;
-import com.burntoburn.easyshift.service.shift.ShiftTemplateService;
+import com.burntoburn.easyshift.service.templates.ShiftTemplateService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

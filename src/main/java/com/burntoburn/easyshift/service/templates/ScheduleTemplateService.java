@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.service.schedule;
+package com.burntoburn.easyshift.service.templates;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;

@@ -7,7 +7,7 @@ import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
-import com.burntoburn.easyshift.service.schedule.ScheduleTemplateService;
+import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

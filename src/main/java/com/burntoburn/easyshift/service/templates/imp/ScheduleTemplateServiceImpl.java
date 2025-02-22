@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.service.schedule.imp;
+package com.burntoburn.easyshift.service.templates.imp;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
@@ -6,7 +6,7 @@ import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
-import com.burntoburn.easyshift.service.schedule.ScheduleTemplateService;
+import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;

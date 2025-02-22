@@ -2,7 +2,7 @@ package com.burntoburn.easyshift.controller.templateCt;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
-import com.burntoburn.easyshift.service.schedule.ScheduleTemplateService;
+import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
