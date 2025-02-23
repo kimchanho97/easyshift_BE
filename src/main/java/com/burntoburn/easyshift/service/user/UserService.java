@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.service;
+package com.burntoburn.easyshift.service.user;
 
 import com.burntoburn.easyshift.dto.user.AddUserRequest;
 import com.burntoburn.easyshift.entity.user.User;
@@ -29,5 +29,9 @@ public class UserService  {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("unexpected User"));
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Unexpected User"));
     }
 }

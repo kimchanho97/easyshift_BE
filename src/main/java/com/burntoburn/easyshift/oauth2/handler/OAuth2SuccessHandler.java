@@ -4,7 +4,7 @@ import com.burntoburn.easyshift.config.jwt.TokenProvider;
 import com.burntoburn.easyshift.entity.user.RefreshToken;
 import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.repository.user.RefreshTokenRepository;
-import com.burntoburn.easyshift.service.UserService;
+import com.burntoburn.easyshift.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
