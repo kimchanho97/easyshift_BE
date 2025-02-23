@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.entity.schedule;
 
 import com.burntoburn.easyshift.entity.BaseEntity;
+import com.burntoburn.easyshift.entity.schedule.collection.Shifts;
 import com.burntoburn.easyshift.entity.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,7 +39,13 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default // 기본값 설정
-    private List<Shift> shifts = new ArrayList<>();
+    private Shifts shifts = new Shifts(); // 일급 컬렉션 적용
+
+    // 스케줄 업데이트 메서드
+    public void updateSchedule(String scheduleName, String scheduleMonth, List<Shift> newShifts) {
+        this.scheduleName = scheduleName;
+        this.scheduleMonth = scheduleMonth;
+        this.shifts.update(newShifts); // 일급 컬렉션 내부에서 관리
+    }
 }
