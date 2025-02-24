@@ -1,7 +1,7 @@
 package com.burntoburn.easyshift.controller;
 
 import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
-import com.burntoburn.easyshift.dto.store.res.StoreResponse;
+import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.service.StoreService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,9 +20,14 @@ public class StoreController {
     private final StoreService storeService;
 
     @GetMapping
-    public ResponseEntity<StoreResponse> getStore(@RequestParam("storeId") Long storeId) {
+    public ResponseEntity<StoreScheduleResponseDTO> getStore(@RequestParam("storeId") Long storeId) {
         Store store = storeService.getStoreById(storeId);
-        StoreResponse response = new StoreResponse(store.getId(), store.getStoreName(), store.getStoreCode());
+        StoreScheduleResponseDTO response = StoreScheduleResponseDTO.builder()
+                .storeId(store.getId())
+                .storeName(store.getStoreName())
+                .schedules(new ArrayList<>())         // 실제 ScheduleSummaryDTO 리스트로 대체
+                .selectedSchedule(null)               // 실제 ScheduleDetailDTO 객체로 대체
+                .build();
         return ResponseEntity.ok(response);
     }
 

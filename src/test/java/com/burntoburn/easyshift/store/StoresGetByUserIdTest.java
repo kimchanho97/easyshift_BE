@@ -3,6 +3,7 @@ package com.burntoburn.easyshift.store;
 import com.burntoburn.easyshift.config.jwt.TokenProvider;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.store.UserStore;
+import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
@@ -24,13 +25,14 @@ public class StoresGetByUserIdTest {
     private UserStoreRepository userStoreRepository;
     private StoreService storeService;
     private TokenProvider tokenProvider;
+    private ScheduleRepository scheduleRepository;
 
     @BeforeEach
     void setUp(){
         // Repository 의존성 모킹
         storeRepository = mock(StoreRepository.class);
         userStoreRepository = mock(UserStoreRepository.class);
-        storeService = new StoreService(storeRepository, userRepository, userStoreRepository, tokenProvider);
+        storeService = new StoreService(storeRepository, userRepository, userStoreRepository, tokenProvider, scheduleRepository);
     }
 
     @Test
