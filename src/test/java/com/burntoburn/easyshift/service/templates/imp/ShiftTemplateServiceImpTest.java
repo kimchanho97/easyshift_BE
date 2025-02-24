@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.service.shift.imp;
+package com.burntoburn.easyshift.service.templates.imp;
 
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.repository.schedule.ShiftTemplateRepository;
