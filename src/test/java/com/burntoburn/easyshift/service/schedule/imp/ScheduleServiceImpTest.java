@@ -5,11 +5,12 @@ import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.ScheduleStatus;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
+import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
-import com.burntoburn.easyshift.service.schedule.ScheduleFactory;
 import com.burntoburn.easyshift.service.schedule.ScheduleService;
+import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,10 +29,7 @@ import static org.mockito.Mockito.*;
 class ScheduleServiceImpTest {
 
     @Autowired
-    private ScheduleService scheduleService; // 실제 서비스 객체 주입
-
-    @MockitoBean
-    private ScheduleFactory scheduleFactory;
+    private ScheduleService scheduleService; // ✅ 실제 서비스 객체 주입
 
     @MockitoBean
     private ScheduleTemplateRepository scheduleTemplateRepository;
@@ -48,19 +46,19 @@ class ScheduleServiceImpTest {
 
     @BeforeEach
     void setUp() {
-        // 더미 Store 생성
+        // ✅ Store 생성
         store = Store.builder()
                 .id(1L)
                 .build();
 
-        // 더미 ScheduleTemplate 생성
+        // ✅ ScheduleTemplate 생성
         scheduleTemplate = ScheduleTemplate.builder()
                 .id(1L)
                 .scheduleTemplateName("Morning Shift")
                 .store(store)
                 .build();
 
-        // 기존 스케줄
+        // ✅ 기존 스케줄 생성
         existingSchedule = Schedule.builder()
                 .id(1L)
                 .scheduleName("March Schedule")
@@ -71,7 +69,53 @@ class ScheduleServiceImpTest {
     }
 
     @Test
-    @DisplayName("스케줄 생성 테스트")
+    @DisplayName("스케줄 생성 테스트 - 빈 Shift 포함 검증")
+    void createScheduleWithShifts() {
+        // Given
+        ScheduleRequest request = ScheduleRequest.builder()
+                .scheduleName("March Schedule")
+                .scheduleMonth("2024-03")
+                .build();
+
+        // ✅ ShiftTemplates를 포함한 ScheduleTemplate 생성
+        ShiftTemplate shift1 = ShiftTemplate.builder()
+                .shiftTemplateName("Morning Shift")
+                .startTime(LocalTime.of(9, 0))
+                .endTime(LocalTime.of(17, 0))
+                .build();
+
+        ShiftTemplate shift2 = ShiftTemplate.builder()
+                .shiftTemplateName("Evening Shift")
+                .startTime(LocalTime.of(14, 0))
+                .endTime(LocalTime.of(22, 0))
+                .build();
+
+        scheduleTemplate.getShiftTemplates().addAll(List.of(shift1, shift2)); // ✅ ShiftTemplates에 추가
+
+        when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+        when(scheduleTemplateRepository.findById(1L)).thenReturn(Optional.of(scheduleTemplate));
+        when(scheduleRepository.saveAndFlush(any(Schedule.class))).thenReturn(existingSchedule);
+
+        // When
+        Schedule createdSchedule = scheduleService.createSchedule(1L, 1L, request);
+
+        // Then
+        assertNotNull(createdSchedule, "생성된 Schedule이 null이면 안 됩니다.");
+        assertEquals("March Schedule", createdSchedule.getScheduleName());
+        assertEquals("2024-03", createdSchedule.getScheduleMonth());
+
+        // ✅ 빈 Shift 생성 여부 검증
+        assertNotNull(createdSchedule.getShifts(), "Shifts 객체가 null이면 안 됩니다.");
+        assertFalse(createdSchedule.getShifts().getList().isEmpty(), "Shift 리스트가 비어있으면 안 됩니다.");
+        assertEquals(scheduleTemplate.getShiftTemplates().getList().size(), createdSchedule.getShifts().getList().size(), "Shift 개수가 일치해야 합니다.");
+
+        // ✅ 저장 메서드가 1번 호출되었는지 검증
+        verify(scheduleRepository, times(1)).save(any(Schedule.class));
+    }
+
+
+    @Test
+    @DisplayName("스케줄 생성 테스트 - 저장 검증")
     void createSchedule() {
         // Given
         ScheduleRequest request = ScheduleRequest.builder()
@@ -81,7 +125,6 @@ class ScheduleServiceImpTest {
 
         when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
         when(scheduleTemplateRepository.findById(1L)).thenReturn(Optional.of(scheduleTemplate));
-        when(scheduleFactory.createSchedule(store, scheduleTemplate, request)).thenReturn(existingSchedule);
         when(scheduleRepository.save(any(Schedule.class))).thenReturn(existingSchedule);
 
         // When
@@ -92,7 +135,7 @@ class ScheduleServiceImpTest {
         assertEquals("March Schedule", createdSchedule.getScheduleName());
         assertEquals("2024-03", createdSchedule.getScheduleMonth());
 
-        // 검증
+        // ✅ 저장 메서드가 호출되었는지 검증
         verify(scheduleRepository, times(1)).save(any(Schedule.class));
     }
 
@@ -128,7 +171,6 @@ class ScheduleServiceImpTest {
                 .build();
 
         when(scheduleRepository.findById(1L)).thenReturn(Optional.of(existingSchedule));
-        when(scheduleFactory.updateSchedule(existingSchedule, request)).thenReturn(updatedSchedule);
         when(scheduleRepository.save(any(Schedule.class))).thenReturn(updatedSchedule);
 
         // When

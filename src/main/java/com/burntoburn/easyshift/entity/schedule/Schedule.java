@@ -46,4 +46,9 @@ public class Schedule extends BaseEntity {
         this.scheduleMonth = scheduleMonth;
         this.shifts.update(newShifts); // 일급 컬렉션 내부에서 관리
     }
+
+    public void addShift(List<Shift> newShifts){
+        this.shifts.addAll(newShifts);
+    }
+
 }

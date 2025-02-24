@@ -27,12 +27,15 @@ public class ScheduleFactory {
 
         // ShiftTemplate을 기반으로 빈 Shift 목록 생성
         List<Shift> shifts = createShifts(schedule, scheduleTemplate);
-        schedule.getShifts().addAll(shifts);
+
+        schedule.addShift(shifts);
+
         return schedule;
     }
 
     // ScheduleTemplate 을 기반으로 Shift 생성
     public List<Shift> createShifts(Schedule schedule, ScheduleTemplate scheduleTemplate) {
+
         return scheduleTemplate.getShiftTemplates().getList().stream()
                 .map(shiftTemplate -> createShift(schedule, shiftTemplate))
                 .toList();

@@ -41,7 +41,8 @@ public class ScheduleServiceImp implements ScheduleService {
         Schedule schedule = scheduleFactory.createSchedule(store, scheduleTemplate, request);
 
         // 스케줄 저장 및 반환
-        return scheduleRepository.save(schedule);
+        scheduleRepository.save(schedule);
+        return schedule;
     }
 
     /**
