@@ -39,6 +39,7 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    @Embedded
     @Builder.Default // 기본값 설정
     private Shifts shifts = new Shifts(); // 일급 컬렉션 적용
 
