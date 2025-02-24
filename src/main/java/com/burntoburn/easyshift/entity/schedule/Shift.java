@@ -24,7 +24,7 @@ public class Shift extends BaseEntity {
     @Column(nullable = false)
     private String shiftName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate shiftDate;
 
     @Column(nullable = false)
