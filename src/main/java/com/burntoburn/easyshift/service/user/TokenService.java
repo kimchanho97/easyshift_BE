@@ -20,8 +20,8 @@ public class TokenService {
             throw new IllegalArgumentException("유효하지 않은 토큰 입니다.");
         }
 
-        Long userId = refreshTokenService.findByRefreshToken(refreshToken).getUserId();
-        User user = userService.findById(userId);
+        User user = refreshTokenService.findByRefreshToken(refreshToken).getUser();
+
 
         return tokenProvider.generateToken(user, Duration.ofHours(2));
     }
