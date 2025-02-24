@@ -18,7 +18,7 @@ public class UserApiController {
 
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/info")
     public ResponseEntity<User> signup(@RequestBody AddUserRequest request) throws Exception{
         User newUser = userService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
