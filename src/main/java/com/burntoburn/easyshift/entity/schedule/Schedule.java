@@ -6,7 +6,6 @@ import com.burntoburn.easyshift.entity.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -28,8 +27,6 @@ public class Schedule extends BaseEntity {
     // 예: "2024-11" 형식으로 월 정보를 저장
     @Column(nullable = false)
     private String scheduleMonth;
-
-    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
