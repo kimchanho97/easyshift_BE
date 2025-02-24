@@ -37,4 +37,8 @@ public class User extends BaseEntity {
         this.name = newName;
         return this;
     }
+
+    public void updateEmail(String newEmail) {
+        this.email = newEmail;
+    }
 }
