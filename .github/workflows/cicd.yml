@@ -76,10 +76,10 @@ jobs:
         include:
           - branch: main
             container: easyshift_prod
-            port: 80
+            port: 81
           - branch: develop
             container: easyshift_dev
-            port: 8080
+            port: 8081
     steps:
       - name: Deploy via SSH
         if: github.ref == format('refs/heads/{0}', matrix.branch)
