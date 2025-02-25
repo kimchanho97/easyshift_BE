@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/stores")
@@ -18,18 +18,6 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
-
-    @GetMapping
-    public ResponseEntity<StoreScheduleResponseDTO> getStore(@RequestParam("storeId") Long storeId) {
-        Store store = storeService.getStoreById(storeId);
-        StoreScheduleResponseDTO response = StoreScheduleResponseDTO.builder()
-                .storeId(store.getId())
-                .storeName(store.getStoreName())
-                .schedules(new ArrayList<>())         // 실제 ScheduleSummaryDTO 리스트로 대체
-                .selectedSchedule(null)               // 실제 ScheduleDetailDTO 객체로 대체
-                .build();
-        return ResponseEntity.ok(response);
-    }
 
     @PostMapping
     public ResponseEntity<Store> createStore(@RequestBody StoreCreateRequest request) {
@@ -58,5 +46,18 @@ public class StoreController {
         }
         List<String> storeNames = storeService.linkStoreToUser(token, storeId);
         return ResponseEntity.ok(storeNames);
+    }
+
+    /**
+     * 매장 조회: storeId와 선택된 scheduleId(Optional)를 받아,
+     * scheduleId가 없으면 첫 번째 스케줄을 반환합니다.
+     */
+    @GetMapping
+    public ResponseEntity<StoreScheduleResponseDTO> getStoreSchedule(
+            @RequestParam("storeId") Long storeId,
+            @RequestParam(value = "scheduleId", required = false) Long scheduleId) {
+        StoreScheduleResponseDTO response =
+                storeService.getStoreSchedule(storeId, Optional.ofNullable(scheduleId));
+        return ResponseEntity.ok(response);
     }
 }

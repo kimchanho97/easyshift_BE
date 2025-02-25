@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @Builder
 public class ShiftGroupDTO {
+    private Long shiftId;
     private String shiftName;
     private String startTime;
     private String endTime;

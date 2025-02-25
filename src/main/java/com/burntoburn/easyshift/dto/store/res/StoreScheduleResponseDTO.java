@@ -14,7 +14,6 @@ import java.util.List;
 public class StoreScheduleResponseDTO {
 
     private Long storeId;
-    private String storeName;
     private List<ScheduleSummaryDTO> schedules;
     private ScheduleDetailDTO selectedSchedule;
 

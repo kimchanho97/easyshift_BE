@@ -1,246 +1,200 @@
 package com.burntoburn.easyshift.store;
 
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
+import com.burntoburn.easyshift.dto.shift.res.AssignedShiftDTO;
+import com.burntoburn.easyshift.dto.shift.res.ShiftDateDTO;
+import com.burntoburn.easyshift.dto.shift.res.ShiftGroupDTO;
 import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
+import com.burntoburn.easyshift.entity.schedule.ScheduleStatus;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.schedule.collection.Shifts;
 import com.burntoburn.easyshift.entity.store.Store;
-import com.burntoburn.easyshift.entity.user.Role;
-import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
-import com.burntoburn.easyshift.repository.store.UserStoreRepository;
-import com.burntoburn.easyshift.repository.user.UserRepository;
-import com.burntoburn.easyshift.config.jwt.TokenProvider;
+import com.burntoburn.easyshift.service.StoreService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.burntoburn.easyshift.service.StoreService;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.time.YearMonth;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StoreFindTest {
 
-    @Mock
-    private StoreRepository storeRepository;
-    @Mock
-    private ScheduleRepository scheduleRepository;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private UserStoreRepository userStoreRepository;
-    @Mock
-    private TokenProvider tokenProvider;
-
     @InjectMocks
     private StoreService storeService;
 
+    @Mock
+    private StoreRepository storeRepository;
+
+    @Mock
+    private ScheduleRepository scheduleRepository;
+
     /**
-     * 성공 케이스: store는 존재하고 scheduleId가 제공되지 않으면
-     * store의 첫 번째 schedule을 선택하여 DTO를 반환해야 합니다.
+     * 더미 Store 생성.
+     * Store에는 두 개의 Schedule이 있으며, 각 Schedule은 Shifts 일급 컬렉션에 1개의 Shift를 포함합니다.
      */
-    @Test
-    void testGetStoreSchedule_success_default() {
-        // 더미 User
-        User user = User.builder()
-                .id(1L)
-                .email("user@example.com")
-                .name("John Doe")
-                .role(Role.WORKER)
-                .build();
-
-        // 더미 Shift: 동일한 그룹("2교대")의 서로 다른 날짜에 대한 근무 정보
-        Shift shift1 = Shift.builder()
-                .id(101L)
-                .shiftName("2교대")
-                .startTime(LocalTime.of(15, 0))
-                .endTime(LocalTime.of(18, 0))
-                .shiftDate(LocalDate.of(2024, 2, 10))
-                .user(user)
-                .build();
-
-        Shift shift2 = Shift.builder()
-                .id(102L)
-                .shiftName("2교대")
-                .startTime(LocalTime.of(15, 0))
-                .endTime(LocalTime.of(18, 0))
-                .shiftDate(LocalDate.of(2024, 2, 11))
-                .user(user)
-                .build();
-
-        // 더미 Schedule
-        Schedule schedule = Schedule.builder()
-                .id(201L)
-                .scheduleName("주간 근무")
-                .shifts((Shifts) Arrays.asList(shift1, shift2))
-                .build();
-
-        // 더미 Store: schedules 필드에 schedule 추가
+    private Store createDummyStore() {
+        // Store 생성
         Store store = Store.builder()
-                .id(301L)
-                .storeName("매장 A")
-                .schedules(Arrays.asList(schedule))
+                .storeName("Test Store")
                 .build();
+        ReflectionTestUtils.setField(store, "id", 1L);
 
-        when(storeRepository.findById(301L)).thenReturn(Optional.of(store));
+        // Schedule1 생성: "Schedule1", 2024-02, 상태 PENDING
+        Schedule schedule1 = Schedule.builder()
+                .scheduleName("Schedule1")
+                .scheduleMonth(YearMonth.of(2024, 2))
+                .scheduleStatus(ScheduleStatus.PENDING)
+                .build();
+        ReflectionTestUtils.setField(schedule1, "id", 101L);
+        Shifts shifts1 = new Shifts();
+        // Shift: "Morning Shift", 날짜 2024-02-10, 09:00~17:00
+        Shift shift1 = Shift.builder()
+                .shiftName("Morning Shift")
+                .shiftDate(LocalDate.of(2024, 2, 10))
+                .startTime(LocalTime.of(9, 0))
+                .endTime(LocalTime.of(17, 0))
+                .build();
+        ReflectionTestUtils.setField(shift1, "id", 1001L);
+        // 내부 필드 이름이 "shiftList"인 점을 반영하여 값 주입
+        ReflectionTestUtils.setField(shifts1, "shiftList", List.of(shift1));
+        ReflectionTestUtils.setField(schedule1, "shifts", shifts1);
 
-        // scheduleId 미제공 → Optional.empty()
-        Optional<Long> scheduleIdOptional = Optional.empty();
+        // Schedule2 생성: "Schedule2", 2024-02, 상태 PENDING
+        Schedule schedule2 = Schedule.builder()
+                .scheduleName("Schedule2")
+                .scheduleMonth(YearMonth.of(2024, 2))
+                .scheduleStatus(ScheduleStatus.PENDING)
+                .build();
+        ReflectionTestUtils.setField(schedule2, "id", 102L);
+        Shifts shifts2 = new Shifts();
+        // Shift: "Evening Shift", 날짜 2024-02-10, 18:00~22:00
+        Shift shift2 = Shift.builder()
+                .shiftName("Evening Shift")
+                .shiftDate(LocalDate.of(2024, 2, 10))
+                .startTime(LocalTime.of(18, 0))
+                .endTime(LocalTime.of(22, 0))
+                .build();
+        ReflectionTestUtils.setField(shift2, "id", 1002L);
+        ReflectionTestUtils.setField(shifts2, "shiftList", List.of(shift2));
+        ReflectionTestUtils.setField(schedule2, "shifts", shifts2);
 
-        StoreScheduleResponseDTO responseDTO = storeService.getStoreSchedule(301L, scheduleIdOptional);
-
-        // 검증
-        assertNotNull(responseDTO);
-        assertEquals(301L, responseDTO.getStoreId().longValue());
-        assertEquals("매장 A", responseDTO.getStoreName());
-        assertEquals(1, responseDTO.getSchedules().size());
-
-        ScheduleDetailDTO detailDTO = responseDTO.getSelectedSchedule();
-        assertNotNull(detailDTO);
-        assertEquals(201L, detailDTO.getScheduleId().longValue());
-        assertEquals("주간 근무", detailDTO.getScheduleName());
-        // shifts 그룹이 잘 구성되었는지 추가 검증 (예: 그룹 내 날짜 수)
-        assertFalse(detailDTO.getShifts().isEmpty());
+        // Store에 두 스케줄 주입
+        ReflectionTestUtils.setField(store, "schedules", List.of(schedule1, schedule2));
+        return store;
     }
 
-    /**
-     * 성공 케이스: store는 존재하고, 유효한 scheduleId가 제공되는 경우.
-     * scheduleRepository.findById를 통해 해당 스케줄을 직접 가져와서 DTO에 매핑해야 합니다.
-     */
+    // --- 성공 케이스 ---
+
     @Test
-    void testGetStoreSchedule_success_withScheduleId() {
-        // 더미 User
-        User user = User.builder()
-                .id(2L)
-                .email("jane@example.com")
-                .name("Jane Doe")
-                .role(Role.WORKER)
-                .build();
+    public void testGetStoreSchedule_WithScheduleId_Success() {
+        // arrange: storeId=1, scheduleId=102 (Schedule2)
+        Store dummyStore = createDummyStore();
+        when(storeRepository.findById(1L)).thenReturn(Optional.of(dummyStore));
 
-        // 더미 Shift: "3교대" 그룹의 근무 정보
-        Shift shift1 = Shift.builder()
-                .id(103L)
-                .shiftName("3교대")
-                .startTime(LocalTime.of(18, 0))
-                .endTime(LocalTime.of(21, 0))
-                .shiftDate(LocalDate.of(2024, 2, 10))
-                .user(user)
-                .build();
+        // act: scheduleId 제공 시 해당 스케줄 반환
+        StoreScheduleResponseDTO response = storeService.getStoreSchedule(1L, Optional.of(102L));
 
-        Shift shift2 = Shift.builder()
-                .id(104L)
-                .shiftName("3교대")
-                .startTime(LocalTime.of(18, 0))
-                .endTime(LocalTime.of(21, 0))
-                .shiftDate(LocalDate.of(2024, 2, 11))
-                .user(user)
-                .build();
+        // assert
+        assertNotNull(response);
+        assertEquals(1L, response.getStoreId());
+        // 스케줄 목록은 2개여야 함
+        assertEquals(2, response.getSchedules().size());
 
-        // 더미 Schedule (야간 근무)
-        Schedule schedule = Schedule.builder()
-                .id(202L)
-                .scheduleName("야간 근무")
-                .shifts((Shifts) Arrays.asList(shift1, shift2))
-                .build();
+        ScheduleDetailDTO selectedSchedule = response.getSelectedSchedule();
+        assertNotNull(selectedSchedule);
+        assertEquals(102L, selectedSchedule.getScheduleId());
+        assertEquals("Schedule2", selectedSchedule.getScheduleName());
 
-        // 다른 Schedule도 포함한 Store
-        Schedule otherSchedule = Schedule.builder()
-                .id(203L)
-                .scheduleName("추가 근무")
-                .shifts((Shifts) Collections.emptyList())
-                .build();
-
-        Store store = Store.builder()
-                .id(302L)
-                .storeName("매장 B")
-                .schedules(Arrays.asList(otherSchedule, schedule))
-                .build();
-
-        when(storeRepository.findById(302L)).thenReturn(Optional.of(store));
-        when(scheduleRepository.findById(202L)).thenReturn(Optional.of(schedule));
-
-        Optional<Long> scheduleIdOptional = Optional.of(202L);
-
-        StoreScheduleResponseDTO responseDTO = storeService.getStoreSchedule(302L, scheduleIdOptional);
-
-        // 검증
-        assertNotNull(responseDTO);
-        assertEquals(302L, responseDTO.getStoreId().longValue());
-        assertEquals("매장 B", responseDTO.getStoreName());
-        assertEquals(2, responseDTO.getSchedules().size());
-
-        ScheduleDetailDTO detailDTO = responseDTO.getSelectedSchedule();
-        assertNotNull(detailDTO);
-        assertEquals(202L, detailDTO.getScheduleId().longValue());
-        assertEquals("야간 근무", detailDTO.getScheduleName());
-        assertFalse(detailDTO.getShifts().isEmpty());
+        // Schedule2의 Shifts: 그룹화 로직에 따라 ShiftGroupDTO 하나로 묶임
+        List<ShiftGroupDTO> shiftGroups = selectedSchedule.getShifts();
+        assertNotNull(shiftGroups);
+        assertEquals(1, shiftGroups.size());
+        ShiftGroupDTO group = shiftGroups.get(0);
+        assertEquals("Evening Shift", group.getShiftName());
+        // 그룹 내 날짜별 그룹화: 2024-02-10
+        List<ShiftDateDTO> shiftDates = group.getDates();
+        assertNotNull(shiftDates);
+        assertEquals(1, shiftDates.size());
+        ShiftDateDTO dateDTO = shiftDates.get(0);
+        assertEquals("2024-02-10", dateDTO.getDate());
+        // AssignedShiftDTO 확인 (shift id, user 정보는 null)
+        List<AssignedShiftDTO> assignedShifts = dateDTO.getAssignedShifts();
+        assertNotNull(assignedShifts);
+        assertEquals(1, assignedShifts.size());
+        AssignedShiftDTO assigned = assignedShifts.get(0);
+        assertEquals(1002L, assigned.getAssignedShiftId());
     }
 
-    /**
-     * 실패 케이스: storeId에 해당하는 매장이 존재하지 않는 경우.
-     */
     @Test
-    void testGetStoreSchedule_failure_storeNotFound() {
+    public void testGetStoreSchedule_NoScheduleId_Success() {
+        // arrange: scheduleId 미제공 시 첫 번째 스케줄(Schedule1) 반환
+        Store dummyStore = createDummyStore();
+        when(storeRepository.findById(1L)).thenReturn(Optional.of(dummyStore));
+
+        // act
+        StoreScheduleResponseDTO response = storeService.getStoreSchedule(1L, Optional.empty());
+
+        // assert
+        assertNotNull(response);
+        ScheduleDetailDTO selectedSchedule = response.getSelectedSchedule();
+        assertNotNull(selectedSchedule);
+        assertEquals(101L, selectedSchedule.getScheduleId());
+        assertEquals("Schedule1", selectedSchedule.getScheduleName());
+        // Schedule1의 Shift 정보 확인: "Morning Shift", 2024-02-10
+        List<ShiftGroupDTO> shiftGroups = selectedSchedule.getShifts();
+        assertNotNull(shiftGroups);
+        assertEquals(1, shiftGroups.size());
+        ShiftGroupDTO group = shiftGroups.get(0);
+        assertEquals("Morning Shift", group.getShiftName());
+        List<ShiftDateDTO> shiftDates = group.getDates();
+        assertNotNull(shiftDates);
+        assertEquals(1, shiftDates.size());
+        ShiftDateDTO dateDTO = shiftDates.get(0);
+        assertEquals("2024-02-10", dateDTO.getDate());
+        List<AssignedShiftDTO> assignedShifts = dateDTO.getAssignedShifts();
+        assertNotNull(assignedShifts);
+        assertEquals(1, assignedShifts.size());
+        AssignedShiftDTO assigned = assignedShifts.get(0);
+        assertEquals(1001L, assigned.getAssignedShiftId());
+    }
+
+    // --- 실패 케이스 ---
+
+    @Test
+    public void testGetStoreSchedule_StoreNotFound_Failure() {
+        // arrange: 존재하지 않는 storeId 사용
         when(storeRepository.findById(999L)).thenReturn(Optional.empty());
-        Optional<Long> scheduleIdOptional = Optional.empty();
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            storeService.getStoreSchedule(999L, scheduleIdOptional);
-        });
-        assertTrue(exception.getMessage().contains("매장을 찾을 수 없습니다."));
+        // act & assert
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                storeService.getStoreSchedule(999L, Optional.empty())
+        );
+        assertTrue(exception.getMessage().contains("해당 매장을 찾을 수 없습니다"));
     }
 
-    /**
-     * 실패 케이스: scheduleId가 제공되었으나 해당 스케줄이 존재하지 않는 경우.
-     */
     @Test
-    void testGetStoreSchedule_failure_scheduleNotFound() {
-        // 더미 Store (스케줄 목록에 단 하나의 스케줄만 존재)
-        User user = User.builder()
-                .id(3L)
-                .email("bob@example.com")
-                .name("Bob")
-                .role(Role.WORKER)
-                .build();
+    public void testGetStoreSchedule_ScheduleNotFound_Failure() {
+        // arrange: store는 존재하지만, 요청된 scheduleId가 목록에 없음
+        Store dummyStore = createDummyStore();
+        when(storeRepository.findById(1L)).thenReturn(Optional.of(dummyStore));
 
-        Shift shift = Shift.builder()
-                .id(105L)
-                .shiftName("2교대")
-                .startTime(LocalTime.of(15, 0))
-                .endTime(LocalTime.of(18, 0))
-                .shiftDate(LocalDate.of(2024, 2, 12))
-                .user(user)
-                .build();
-
-        Schedule schedule = Schedule.builder()
-                .id(204L)
-                .scheduleName("주간 근무")
-                .shifts((Shifts) Arrays.asList(shift))
-                .build();
-
-        Store store = Store.builder()
-                .id(303L)
-                .storeName("매장 C")
-                .schedules(Arrays.asList(schedule))
-                .build();
-
-        when(storeRepository.findById(303L)).thenReturn(Optional.of(store));
-        when(scheduleRepository.findById(999L)).thenReturn(Optional.empty());
-
-        Optional<Long> scheduleIdOptional = Optional.of(999L);
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            storeService.getStoreSchedule(303L, scheduleIdOptional);
-        });
-        assertTrue(exception.getMessage().contains("스케줄을 찾을 수 없습니다."));
+        // act & assert
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                storeService.getStoreSchedule(1L, Optional.of(999L))
+        );
+        assertTrue(exception.getMessage().contains("선택한 스케줄을 찾을 수 없습니다"));
     }
 }

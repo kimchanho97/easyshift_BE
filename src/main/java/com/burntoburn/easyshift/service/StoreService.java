@@ -35,6 +35,7 @@ public class StoreService {
     private final TokenProvider tokenProvider;
     // 추가: 스케줄 관련 조회를 위해 필요함
     private final ScheduleRepository scheduleRepository;
+
     public Store getStoreById(Long storeId) {
         return storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
@@ -91,95 +92,98 @@ public class StoreService {
                 .collect(Collectors.toList());
     }
 
-    // -----------------------------------------
-    // 매장 스케줄 조회 기능
-    // storeId와 (선택적) scheduleId를 받아서
-    // 매장 정보, 전체 스케줄 목록, 그리고 선택된 스케줄의 상세 정보를 반환합니다.
-    // -----------------------------------------
-    public StoreScheduleResponseDTO getStoreSchedule(Long storeId, Optional<Long> scheduleIdOptional) {
-        // 1. 매장 조회
+    /**
+     * 매장 조회 시 storeId와 선택된 scheduleId(Optional)를 받아 응답 DTO를 생성합니다.
+     * scheduleId가 없으면 해당 매장의 첫 번째 스케줄을 선택합니다.
+     */
+    public StoreScheduleResponseDTO getStoreSchedule(Long storeId, Optional<Long> scheduleId) {
         Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("매장을 찾을 수 없습니다. id: " + storeId));
+                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
 
-        // 2. 전체 스케줄 목록 구성 (드롭다운에 사용)
-        List<ScheduleSummaryDTO> scheduleSummaries = store.getSchedules().stream()
-                .map(schedule -> ScheduleSummaryDTO.builder()
-                        .scheduleId(schedule.getId())
-                        .scheduleName(schedule.getScheduleName())
+        List<ScheduleSummaryDTO> scheduleSummaries = mapToScheduleSummaries(store);
+        Schedule targetSchedule = selectSchedule(store, scheduleId);
+        ScheduleDetailDTO scheduleDetailDTO = mapToScheduleDetailDTO(targetSchedule);
+
+        return StoreScheduleResponseDTO.builder()
+                .storeId(store.getId())
+                .schedules(scheduleSummaries)
+                .selectedSchedule(scheduleDetailDTO)
+                .build();
+    }
+
+    private List<ScheduleSummaryDTO> mapToScheduleSummaries(Store store) {
+        return store.getSchedules().stream()
+                .map(s -> ScheduleSummaryDTO.builder()
+                        .scheduleId(s.getId())
+                        .scheduleName(s.getScheduleName())
                         .build())
                 .collect(Collectors.toList());
+    }
 
-        // 3. 선택된 스케줄 결정: 요청에 scheduleId가 있으면 해당 스케줄, 없으면 첫 번째 스케줄 선택
-        Schedule selectedSchedule;
-        if (scheduleIdOptional.isPresent()) {
-            selectedSchedule = scheduleRepository.findById(scheduleIdOptional.get())
-                    .orElseThrow(() -> new RuntimeException("스케줄을 찾을 수 없습니다. id: " + scheduleIdOptional.get()));
-        } else {
-            selectedSchedule = store.getSchedules().get(0);
-        }
+    private Schedule selectSchedule(Store store, Optional<Long> scheduleId) {
+        return scheduleId
+                .map(id -> store.getSchedules().stream()
+                        .filter(s -> s.getId().equals(id))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("선택한 스케줄을 찾을 수 없습니다.")))
+                .orElseGet(() -> store.getSchedules().stream()
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("매장에 스케줄이 존재하지 않습니다.")));
+    }
 
-        // 4. 선택된 스케줄 내 Shift 데이터 매핑
-        List<Shift> shifts = selectedSchedule.getShifts().getList();
+    private ScheduleDetailDTO mapToScheduleDetailDTO(Schedule schedule) {
+        // Shifts 일급 컬렉션 내부의 Shift 리스트는 getList()를 통해 가져옵니다.
+        List<Shift> shifts = schedule.getShifts().getList();
+        Map<ShiftKey, List<Shift>> groupedByKey = groupShiftsByKey(shifts);
 
-        // 그룹화 기준: 같은 shiftName, startTime, endTime 인 Shift들을 하나의 그룹으로 묶습니다.
-        Map<ShiftKey, List<Shift>> groupedByShiftType = shifts.stream()
+        List<ShiftGroupDTO> shiftGroups = groupedByKey.entrySet().stream()
+                .map(entry -> mapShiftGroupToDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
+        return ScheduleDetailDTO.builder()
+                .scheduleId(schedule.getId())
+                .scheduleName(schedule.getScheduleName())
+                .shifts(shiftGroups)
+                .build();
+    }
+
+    private Map<ShiftKey, List<Shift>> groupShiftsByKey(List<Shift> shifts) {
+        return shifts.stream()
                 .collect(Collectors.groupingBy(
                         shift -> new ShiftKey(shift.getShiftName(), shift.getStartTime(), shift.getEndTime())
                 ));
+    }
 
-        List<ShiftGroupDTO> shiftGroupDTOs = new ArrayList<>();
-        for (Map.Entry<ShiftKey, List<Shift>> entry : groupedByShiftType.entrySet()) {
-            ShiftKey key = entry.getKey();
-            List<Shift> shiftGroup = entry.getValue();
+    private ShiftGroupDTO mapShiftGroupToDTO(ShiftKey key, List<Shift> shifts) {
+        // 그룹의 식별자는 그룹 내 첫 번째 Shift의 id 사용
+        Long groupShiftId = shifts.get(0).getId();
+        Map<LocalDate, List<Shift>> groupedByDate = shifts.stream()
+                .collect(Collectors.groupingBy(Shift::getShiftDate));
 
-            // 같은 shift 그룹 내에서 날짜별로 그룹화
-            Map<LocalDate, List<Shift>> dateGrouped = shiftGroup.stream()
-                    .collect(Collectors.groupingBy(Shift::getShiftDate));
+        List<ShiftDateDTO> shiftDateDTOList = groupedByDate.entrySet().stream()
+                .map(entry -> mapDateGroupToDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
 
-            List<ShiftDateDTO> shiftDateDTOs = new ArrayList<>();
-            for (Map.Entry<LocalDate, List<Shift>> dateEntry : dateGrouped.entrySet()) {
-                LocalDate date = dateEntry.getKey();
-                List<AssignedShiftDTO> assignedShifts = dateEntry.getValue().stream()
-                        .map(shift -> AssignedShiftDTO.builder()
-                                .shiftId(shift.getId())
-                                .userId(shift.getUser().getId())
-                                .userName(shift.getUser().getName())
-                                .build())
-                        .collect(Collectors.toList());
-
-                ShiftDateDTO shiftDateDTO = ShiftDateDTO.builder()
-                        .date(date.toString()) // 필요에 따라 포맷 변환 가능
-                        .assignedShifts(assignedShifts)
-                        .build();
-
-                shiftDateDTOs.add(shiftDateDTO);
-            }
-            // 날짜별 데이터 정렬 (예: 오름차순)
-            shiftDateDTOs.sort(Comparator.comparing(ShiftDateDTO::getDate));
-
-            ShiftGroupDTO shiftGroupDTO = ShiftGroupDTO.builder()
-                    .shiftName(key.getShiftName())
-                    .startTime(key.getStartTime().toString())
-                    .endTime(key.getEndTime().toString())
-                    .dates(shiftDateDTOs)
-                    .build();
-
-            shiftGroupDTOs.add(shiftGroupDTO);
-        }
-
-        // 5. 선택된 스케줄 상세 DTO 구성
-        ScheduleDetailDTO scheduleDetailDTO = ScheduleDetailDTO.builder()
-                .scheduleId(selectedSchedule.getId())
-                .scheduleName(selectedSchedule.getScheduleName())
-                .shifts(shiftGroupDTOs)
+        return ShiftGroupDTO.builder()
+                .shiftId(groupShiftId)
+                .shiftName(key.getShiftName())
+                .startTime(key.getStartTime().toString())
+                .endTime(key.getEndTime().toString())
+                .dates(shiftDateDTOList)
                 .build();
+    }
 
-        // 6. 최종 응답 DTO 구성 (매장 정보, 전체 스케줄 목록, 선택된 스케줄 상세 정보)
-        return StoreScheduleResponseDTO.builder()
-                .storeId(store.getId())
-                .storeName(store.getStoreName())
-                .schedules(scheduleSummaries)
-                .selectedSchedule(scheduleDetailDTO)
+    private ShiftDateDTO mapDateGroupToDTO(LocalDate date, List<Shift> shiftsOnDate) {
+        List<AssignedShiftDTO> assignedShiftDTOList = shiftsOnDate.stream()
+                .map(s -> AssignedShiftDTO.builder()
+                        .assignedShiftId(s.getId())
+                        .userId(s.getUser() != null ? s.getUser().getId() : null)
+                        .userName(s.getUser() != null ? s.getUser().getName() : null)
+                        .build())
+                .collect(Collectors.toList());
+        return ShiftDateDTO.builder()
+                .date(date.toString())
+                .assignedShifts(assignedShiftDTOList)
                 .build();
     }
 }
