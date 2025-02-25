@@ -31,7 +31,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private String getAccessToken(String autholrizationHeader) {
+    private String getAccessToken(String authorizationHeader) {
         if (autholrizationHeader != null && autholrizationHeader.startsWith("TOKEN_PREFIX")) {
             return autholrizationHeader.substring(TOKEN_PREFIX.length());
         }
