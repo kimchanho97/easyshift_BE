@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.entity.store;
 
 import com.burntoburn.easyshift.entity.BaseEntity;
+import com.burntoburn.easyshift.entity.schedule.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -24,6 +25,10 @@ public class Store extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private UUID storeCode;
+
+    // 매장에 속한 스케줄 목록
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules;
 
     // Store와 연결된 UserStore 목록 (양방향 연관관계)
     @OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE, orphanRemoval = true)
