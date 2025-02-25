@@ -53,7 +53,6 @@ class EntityCreationTest {
         schedule = scheduleRepository.save(Schedule.builder()
                 .scheduleName("Test Schedule")
                 .scheduleMonth("2024-11")
-                .description("Test Description")
                 .scheduleStatus(com.burntoburn.easyshift.entity.schedule.ScheduleStatus.PENDING)
                 .store(store)
                 .build());

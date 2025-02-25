@@ -24,7 +24,7 @@ public class Shift extends BaseEntity {
     @Column(nullable = false)
     private String shiftName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate shiftDate;
 
     @Column(nullable = false)
@@ -38,6 +38,6 @@ public class Shift extends BaseEntity {
     private Schedule schedule;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true) // 초기 스케줄 생성시 user 정보는 음
     private User user;
 }
