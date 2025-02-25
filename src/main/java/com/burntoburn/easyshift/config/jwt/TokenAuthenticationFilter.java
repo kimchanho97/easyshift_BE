@@ -22,9 +22,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String autholrizationHeader = request.getHeader("HEADER_AUTHORIZATION");
+        String authorizationHeader = request.getHeader("HEADER_AUTHORIZATION");
 
-        String accessToken = getAccessToken(autholrizationHeader);
+        String accessToken = getAccessToken(authorizationHeader);
         // access token 을 검증하고 유효하다면 인증정보를 security context에 저장
         if (tokenProvider.validToken(accessToken)) {
             Authentication authentication = tokenProvider.getAuthentication(accessToken);
@@ -33,8 +33,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getAccessToken(String authorizationHeader) {
-        if (autholrizationHeader != null && autholrizationHeader.startsWith("TOKEN_PREFIX")) {
-            return autholrizationHeader.substring(TOKEN_PREFIX.length());
+        if (authorizationHeader != null && authorizationHeader.startsWith("TOKEN_PREFIX")) {
+            return authorizationHeader.substring(TOKEN_PREFIX.length());
         }
         return null;
     }
