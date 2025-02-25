@@ -1,6 +1,6 @@
 package com.burntoburn.easyshift.service.templates.imp;
 
-import com.burntoburn.easyshift.dto.schedule.req.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;

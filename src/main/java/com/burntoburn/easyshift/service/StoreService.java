@@ -119,7 +119,7 @@ public class StoreService {
         }
 
         // 4. 선택된 스케줄 내 Shift 데이터 매핑
-        List<Shift> shifts = selectedSchedule.getShifts();
+        List<Shift> shifts = selectedSchedule.getShifts().getList();
 
         // 그룹화 기준: 같은 shiftName, startTime, endTime 인 Shift들을 하나의 그룹으로 묶습니다.
         Map<ShiftKey, List<Shift>> groupedByShiftType = shifts.stream()

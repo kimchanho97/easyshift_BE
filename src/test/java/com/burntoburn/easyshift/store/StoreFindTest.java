@@ -4,6 +4,7 @@ import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
 import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.Shift;
+import com.burntoburn.easyshift.entity.schedule.collection.Shifts;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.user.Role;
 import com.burntoburn.easyshift.entity.user.User;
@@ -80,7 +81,7 @@ class StoreFindTest {
         Schedule schedule = Schedule.builder()
                 .id(201L)
                 .scheduleName("주간 근무")
-                .shifts(Arrays.asList(shift1, shift2))
+                .shifts((Shifts) Arrays.asList(shift1, shift2))
                 .build();
 
         // 더미 Store: schedules 필드에 schedule 추가
@@ -148,14 +149,14 @@ class StoreFindTest {
         Schedule schedule = Schedule.builder()
                 .id(202L)
                 .scheduleName("야간 근무")
-                .shifts(Arrays.asList(shift1, shift2))
+                .shifts((Shifts) Arrays.asList(shift1, shift2))
                 .build();
 
         // 다른 Schedule도 포함한 Store
         Schedule otherSchedule = Schedule.builder()
                 .id(203L)
                 .scheduleName("추가 근무")
-                .shifts(Collections.emptyList())
+                .shifts((Shifts) Collections.emptyList())
                 .build();
 
         Store store = Store.builder()
@@ -223,7 +224,7 @@ class StoreFindTest {
         Schedule schedule = Schedule.builder()
                 .id(204L)
                 .scheduleName("주간 근무")
-                .shifts(Arrays.asList(shift))
+                .shifts((Shifts) Arrays.asList(shift))
                 .build();
 
         Store store = Store.builder()

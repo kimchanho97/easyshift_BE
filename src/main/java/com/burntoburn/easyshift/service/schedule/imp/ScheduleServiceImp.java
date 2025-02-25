@@ -1,11 +1,13 @@
 package com.burntoburn.easyshift.service.schedule.imp;
 
-import com.burntoburn.easyshift.dto.schedule.req.ScheduleRequest;
+import com.burntoburn.easyshift.dto.schedule.req.scheduleCreate.ScheduleRequest;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
+import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
+import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.service.schedule.ScheduleFactory;
 import com.burntoburn.easyshift.service.schedule.ScheduleService;
@@ -22,19 +24,20 @@ public class ScheduleServiceImp implements ScheduleService {
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final ScheduleRepository scheduleRepository;
     private final StoreRepository storeRepository;
+    private final ShiftRepository shiftRepository;
 
     /**
      * 스케줄 생성
      */
     @Transactional
     @Override
-    public Schedule createSchedule(Long storeId, Long scheduleTemplateId, ScheduleRequest request) {
+    public Schedule createSchedule(Long storeId, ScheduleRequest request) {
         // Store 확인
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NoSuchElementException("Store not found"));
 
         // scheduleTemplate 확인
-        ScheduleTemplate scheduleTemplate = scheduleTemplateRepository.findById(scheduleTemplateId)
+        ScheduleTemplate scheduleTemplate = scheduleTemplateRepository.findById(request.getScheduleTemplateId())
                 .orElseThrow(() -> new NoSuchElementException("ScheduleTemplate not found"));
 
         // 스케줄 생성 (ScheduleFactory 활용)
@@ -42,6 +45,7 @@ public class ScheduleServiceImp implements ScheduleService {
 
         // 스케줄 저장 및 반환
         scheduleRepository.save(schedule);
+        shiftRepository.saveAll(schedule.getShifts().getList());
         return schedule;
     }
 
