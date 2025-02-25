@@ -36,4 +36,18 @@ public class LeaveRequest extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
+
+    // 명시적으로 Update 매서드 추가
+    public LeaveRequest updateDate(LocalDate newDate) {
+        this.date = newDate;
+        return this;
+    }
+
+    public void approvedRequest(){
+        this.approvalStatus = ApprovalStatus.APPROVED;
+    }
+
+    public void rejectRequest(){
+        this.approvalStatus = ApprovalStatus.REJECTED;
+    }
 }
