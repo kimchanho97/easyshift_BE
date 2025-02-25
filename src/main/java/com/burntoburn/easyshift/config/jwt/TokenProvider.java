@@ -98,4 +98,8 @@ public class TokenProvider {
                 .build().parseSignedClaims(token).getPayload();
     }
 
+    // 토큰에서 사용자 ID를 추출하는 public 메서드
+    public Long getUserIdFromToken(String token) {
+        return getClaims(token).get("id", Long.class);
+    }
 }
