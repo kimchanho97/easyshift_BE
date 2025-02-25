@@ -32,13 +32,13 @@ public class User extends BaseEntity {
 
     private String avatarUrl;
 
-    // 이름 변경하는 메서드
-    public User update(String newName) {
-        this.name = newName;
+    public User update(String newEmail){
+        this.email = newEmail;
         return this;
     }
 
-    public void updateEmail(String newEmail) {
-        this.email = newEmail;
+    // 이름 변경하는 메서드
+    public void updateName(String newName) {
+        this.name = newName;
     }
 }
