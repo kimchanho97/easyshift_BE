@@ -3,6 +3,7 @@ package com.burntoburn.easyshift.service.leave;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import java.time.LocalDate;
 import java.time.YearMonth;
+
 import java.util.List;
 
 // 관리자 기능
@@ -16,4 +17,5 @@ public interface LeaveRequestAdminService {
 
     // 한 달 단위로 휴뮤 조회
     List<LeaveRequest> getLeaveRequestsByMonth(YearMonth scheduleMonth);
+
 }

@@ -7,6 +7,7 @@ import com.burntoburn.easyshift.service.leave.LeaveRequestAdminService;
 import com.burntoburn.easyshift.service.leave.LeaveRequestFactory;
 import java.time.LocalDate;
 import java.time.YearMonth;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.NoSuchElementException;
@@ -81,6 +82,7 @@ class LeaveRequestAdminServiceImpTest {
     void getLeaveRequestsByMonth() {
         // Given
         YearMonth scheduleMonth = YearMonth.of(2024,3);
+
         when(leaveRequestRepository.findAllByScheduleMonth(scheduleMonth)).thenReturn(List.of(leaveRequest));
 
         // When
