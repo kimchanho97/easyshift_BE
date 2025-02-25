@@ -2,8 +2,10 @@ package com.burntoburn.easyshift.entity.schedule;
 
 import com.burntoburn.easyshift.entity.BaseEntity;
 import com.burntoburn.easyshift.entity.schedule.collection.Shifts;
+import com.burntoburn.easyshift.entity.schedule.converter.YearMonthConverter;
 import com.burntoburn.easyshift.entity.store.Store;
 import jakarta.persistence.*;
+import java.time.YearMonth;
 import lombok.*;
 
 import java.util.List;
@@ -26,7 +28,8 @@ public class Schedule extends BaseEntity {
 
     // 예: "2024-11" 형식으로 월 정보를 저장
     @Column(nullable = false)
-    private String scheduleMonth;
+    @Convert(converter = YearMonthConverter.class)
+    private YearMonth scheduleMonth;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -41,7 +44,7 @@ public class Schedule extends BaseEntity {
     private Shifts shifts = new Shifts(); // 일급 컬렉션 적용
 
     // 스케줄 업데이트 메서드
-    public void updateSchedule(String scheduleName, String scheduleMonth, List<Shift> newShifts) {
+    public void updateSchedule(String scheduleName, YearMonth scheduleMonth, List<Shift> newShifts) {
         this.scheduleName = scheduleName;
         this.scheduleMonth = scheduleMonth;
         this.shifts.update(newShifts); // 일급 컬렉션 내부에서 관리

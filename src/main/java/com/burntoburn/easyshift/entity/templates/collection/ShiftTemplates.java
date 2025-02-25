@@ -35,6 +35,14 @@ public class ShiftTemplates {
         this.shiftTemplateList.clear();
     }
 
+    // 특정 ID로 ShiftTemplate 찾기
+    public ShiftTemplate findById(Long shiftTemplateId) {
+        return shiftTemplateList.stream()
+                .filter(st -> st.getId().equals(shiftTemplateId))
+                .findFirst()
+                .orElse(null);
+    }
+
     // Getter 추가 (테스트에서 사용 가능하도록)
     public List<ShiftTemplate> getList() {
         return new ArrayList<>(shiftTemplateList); // 방어적 복사 (원본 리스트 보호)

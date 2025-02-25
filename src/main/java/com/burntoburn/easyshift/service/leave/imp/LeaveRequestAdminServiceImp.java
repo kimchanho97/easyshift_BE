@@ -5,6 +5,8 @@ import com.burntoburn.easyshift.repository.leave.LeaveRequestRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
 import com.burntoburn.easyshift.service.leave.LeaveRequestAdminService;
 import com.burntoburn.easyshift.service.leave.LeaveRequestFactory;
+import java.time.YearMonth;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,8 @@ public class LeaveRequestAdminServiceImp implements LeaveRequestAdminService {
     }
 
     @Override
-    public List<LeaveRequest> getLeaveRequestsByMonth(String scheduleMonth) {
+    public List<LeaveRequest> getLeaveRequestsByMonth(YearMonth scheduleMonth) {
+
         return leaveRequestRepository.findAllByScheduleMonth(scheduleMonth);
     }
 }

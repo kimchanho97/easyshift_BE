@@ -12,6 +12,7 @@ import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
+import java.time.YearMonth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class EntityCreationTest {
 
         schedule = scheduleRepository.save(Schedule.builder()
                 .scheduleName("Test Schedule")
-                .scheduleMonth("2024-11")
+                .scheduleMonth(YearMonth.of(2024, 11))
                 .scheduleStatus(com.burntoburn.easyshift.entity.schedule.ScheduleStatus.PENDING)
                 .store(store)
                 .build());

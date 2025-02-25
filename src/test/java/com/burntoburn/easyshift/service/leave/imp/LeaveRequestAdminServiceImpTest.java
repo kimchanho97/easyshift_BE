@@ -6,6 +6,8 @@ import com.burntoburn.easyshift.repository.leave.LeaveRequestRepository;
 import com.burntoburn.easyshift.service.leave.LeaveRequestAdminService;
 import com.burntoburn.easyshift.service.leave.LeaveRequestFactory;
 import java.time.LocalDate;
+import java.time.YearMonth;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.NoSuchElementException;
@@ -79,7 +81,8 @@ class LeaveRequestAdminServiceImpTest {
     @DisplayName("특정 월의 휴가 신청 조회 테스트")
     void getLeaveRequestsByMonth() {
         // Given
-        String scheduleMonth = "2024-03";
+        YearMonth scheduleMonth = YearMonth.of(2024,3);
+
         when(leaveRequestRepository.findAllByScheduleMonth(scheduleMonth)).thenReturn(List.of(leaveRequest));
 
         // When
