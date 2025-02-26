@@ -1,6 +1,6 @@
 package com.burntoburn.easyshift.controller.template;
 
-import com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
 import lombok.RequiredArgsConstructor;

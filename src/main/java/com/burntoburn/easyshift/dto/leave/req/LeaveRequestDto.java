@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.dto.schedule.req;
+package com.burntoburn.easyshift.dto.leave.req;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
