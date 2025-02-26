@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ShiftTemplateRequest {
-    private String shiftTemplateName;
+    private String shiftName;
     private LocalTime startTime;
     private LocalTime endTime;
 }
