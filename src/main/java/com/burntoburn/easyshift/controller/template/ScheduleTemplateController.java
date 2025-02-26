@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.controller.template;
 
 import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.res.ScheduleTemplateResponse;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,19 @@ public class ScheduleTemplateController {
 
     /**
      * 스케줄 템플릿 생성 API
+     * @param storeId 매장 ID (PathVariable)
+     * @param request 생성할 스케줄 템플릿 정보 (RequestBody)
+     * @return 생성된 스케줄 템플릿 정보를 포함한 DTO 응답
      */
     @PostMapping("/{storeId}")
-    public ResponseEntity<ScheduleTemplate> createScheduleTemplate(
+    public ResponseEntity<ScheduleTemplateResponse> createScheduleTemplate(
             @PathVariable Long storeId,
             @RequestBody ScheduleTemplateRequest request) {
         ScheduleTemplate createdTemplate = scheduleTemplateService.createScheduleTemplate(storeId, request);
-        return ResponseEntity.ok(createdTemplate);
+        ScheduleTemplateResponse dto = createdTemplate.toDTO();
+        return ResponseEntity.ok(dto);
     }
+
+
+
 }
