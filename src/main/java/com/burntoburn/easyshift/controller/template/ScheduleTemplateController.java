@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/schedule-templates")
+@RequestMapping("/api")
 public class ScheduleTemplateController {
     private final ScheduleTemplateService scheduleTemplateService;
 
@@ -28,7 +28,7 @@ public class ScheduleTemplateController {
      * @param request 생성할 스케줄 템플릿 정보 (RequestBody)
      * @return 생성된 스케줄 템플릿 정보를 포함한 DTO 응답
      */
-    @PostMapping("/{storeId}")
+    @PostMapping("/stores/{storeId}/schedule-templates")
     public ResponseEntity<ScheduleTemplateResponse> createScheduleTemplate(
             @PathVariable Long storeId,
             @RequestBody ScheduleTemplateRequest request) {
@@ -41,7 +41,7 @@ public class ScheduleTemplateController {
      * @param @param storeId 매장 ID
      * @return 해당 매장의 스케줄 템플릿 리스트 (DTO 변환 후 반환)
      **/
-    @GetMapping("/{storeId}")
+    @GetMapping("/stores/{store_id}/schedule-templates")
     public ResponseEntity<AllScheduleTemplateResponse> getScheduleTemplate(@PathVariable Long storeId) {
         AllScheduleTemplateResponse allScheduleTemplatesByStore = scheduleTemplateService
                 .getAllScheduleTemplatesByStore(storeId);
@@ -53,7 +53,7 @@ public class ScheduleTemplateController {
      * @param scheduleTemplateId 삭제할 스케줄 템플릿 ID (PathVariable)*
      * @return 삭제 후 204 No Content 응답 반환
     **/
-    @DeleteMapping("/{scheduleTemplateId}")
+    @DeleteMapping("/schedule-templates/{scheduleTemplateId}")
     public ResponseEntity<Void> deleteScheduleTemplate(@PathVariable Long scheduleTemplateId){
         scheduleTemplateService.deleteScheduleTemplate(scheduleTemplateId);
         return ResponseEntity.noContent().build();
