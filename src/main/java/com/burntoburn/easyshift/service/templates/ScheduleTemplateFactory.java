@@ -36,7 +36,7 @@ public class ScheduleTemplateFactory {
                 .orElse(Collections.emptyList()) // null 방지
                 .stream()
                 .map(shiftRequest -> ShiftTemplate.builder()
-                        .shiftTemplateName(shiftRequest.getShiftTemplateName())
+                        .shiftTemplateName(shiftRequest.getShiftName())
                         .startTime(shiftRequest.getStartTime())
                         .endTime(shiftRequest.getEndTime())
                         .build())
