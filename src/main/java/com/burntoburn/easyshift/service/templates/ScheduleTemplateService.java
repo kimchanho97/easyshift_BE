@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.service.templates;
 
 import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.res.AllScheduleTemplateResponse;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface ScheduleTemplateService {
     ScheduleTemplate getScheduleTemplateOne(Long id);
 
     // ShiftTemplate 조회 - 전체
-    List<ScheduleTemplate> getAllScheduleTemplates();
+    AllScheduleTemplateResponse getAllScheduleTemplatesByStore(Long storeId);
 
     // 스케줄 템플릿 수정
     ScheduleTemplate updateScheduleTemplate(Long storeId, Long scheduleTemplateId, ScheduleTemplateRequest request);

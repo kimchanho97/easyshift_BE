@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.service.templates.imp;
 
 import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.res.AllScheduleTemplateResponse;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;
@@ -43,9 +44,14 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
                 .orElseThrow(() -> new NoSuchElementException("ScheduleTemplate not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<ScheduleTemplate> getAllScheduleTemplates() {
-        return scheduleTemplateRepository.findAll();
+    public AllScheduleTemplateResponse getAllScheduleTemplatesByStore(Long storeId) {
+        List<ScheduleTemplate> scheduleTemplateList = scheduleTemplateRepository.findAllByStoreId(storeId)
+                .orElseThrow(() -> new NoSuchElementException("not found StoreId"));
+
+        return AllScheduleTemplateResponse
+                .fromEntityList(scheduleTemplateList);
     }
 
     @Transactional
