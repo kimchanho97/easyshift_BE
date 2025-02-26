@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class AssignedShiftDTO {
-    private Long shiftId;
+    private Long assignedShiftId;
     private Long userId;
     private String userName;
 }
