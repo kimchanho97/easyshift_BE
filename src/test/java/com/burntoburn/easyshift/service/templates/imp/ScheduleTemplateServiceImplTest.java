@@ -115,7 +115,7 @@ class ScheduleTemplateServiceImplTest {
     void getAllScheduleTemplatesByStore() {
         // Given
         List<ScheduleTemplate> templates = List.of(existingTemplate);
-        when(scheduleTemplateRepository.findAllByStoreId(1L)).thenReturn(Optional.of(templates));
+        when(scheduleTemplateRepository.findAllByStoreId(1L)).thenReturn((templates));
 
         // When
         AllScheduleTemplateResponse result = scheduleTemplateService.getAllScheduleTemplatesByStore(

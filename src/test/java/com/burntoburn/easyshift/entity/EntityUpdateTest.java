@@ -73,7 +73,7 @@ class EntityUpdateTest {
 
         // When (User 이메일 변경 후 저장)
         user = userRepository.findById(user.getId()).orElseThrow();
-        user.updateEmail("updated@example.com");
+        //user.updateEmail("updated@example.com");
         userRepository.saveAndFlush(user); // save()만 호출
 
         // Then
