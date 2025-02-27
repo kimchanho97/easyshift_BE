@@ -3,12 +3,11 @@ package com.burntoburn.easyshift.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * TODO: 나중에 삭제할 클래스
- */
-@RestController("/api/test")
+@RestController
+@RequestMapping("/api/test")
 public class TestController {
     
     @Operation(
@@ -19,7 +18,7 @@ public class TestController {
     public ResponseEntity<TestResponse> testEndpoint() {
         return ResponseEntity.ok(new TestResponse("테스트 성공"));
     }
-
+    
     
     public record TestResponse(String message) {}
     
