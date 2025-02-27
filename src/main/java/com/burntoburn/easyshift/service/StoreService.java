@@ -8,6 +8,7 @@ import com.burntoburn.easyshift.dto.shift.res.ShiftDateDTO;
 import com.burntoburn.easyshift.dto.shift.res.ShiftGroupDTO;
 import com.burntoburn.easyshift.dto.shift.res.ShiftKey;
 import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.res.StoreDto;
 import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.Shift;
@@ -57,14 +58,17 @@ public class StoreService {
         storeRepository.delete(store);
     }
 
-    public List<String> getStoreNamesByUserId(Long userId) {
+    public List<StoreDto> getStoreNamesByUserId(Long userId) {
         List<UserStore> userStores = userStoreRepository.findAllByUserId(userId);
         if (userStores.isEmpty()) {
             throw new RuntimeException("해당 사용자와 연결된 매장이 없습니다.");
         }
 
         return userStores.stream()
-                .map(userStore -> userStore.getStore().getStoreName())
+                .map(userStore -> {
+                    Store store = userStore.getStore();
+                    return new StoreDto(store.getId(), store.getStoreName());
+                })
                 .collect(Collectors.toList());
     }
 

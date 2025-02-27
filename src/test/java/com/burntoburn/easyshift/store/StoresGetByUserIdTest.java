@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.store;
 
 import com.burntoburn.easyshift.config.jwt.TokenProvider;
+import com.burntoburn.easyshift.dto.store.res.StoreDto;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
@@ -65,7 +66,7 @@ public class StoresGetByUserIdTest {
         when(userStoreRepository.findAllByUserId(userId)).thenReturn(userStores);
 
         // then
-        List<String> storeNames = storeService.getStoreNamesByUserId(userId);
+        List<StoreDto> storeNames = storeService.getStoreNamesByUserId(userId);
         assertNotNull(storeNames);
         assertEquals(2, storeNames.size());
         assertTrue(storeNames.contains("Store A"));

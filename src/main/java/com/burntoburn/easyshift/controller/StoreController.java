@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.controller;
 
 import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.res.StoreDto;
 import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.service.StoreService;
@@ -32,8 +33,8 @@ public class StoreController {
     }
 
     @GetMapping("/by-user")
-    public ResponseEntity<List<String>> getStoreNamesByUserId(@RequestParam("userId") Long userId) {
-        List<String> storeNames = storeService.getStoreNamesByUserId(userId);
+    public ResponseEntity<List<StoreDto>> getStoreNamesByUserId(@RequestParam("userId") Long userId) {
+        List<StoreDto> storeNames = storeService.getStoreNamesByUserId(userId);
         return ResponseEntity.ok(storeNames);
     }
 
