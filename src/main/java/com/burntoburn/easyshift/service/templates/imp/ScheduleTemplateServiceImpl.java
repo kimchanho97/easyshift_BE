@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.service.templates.imp;
 
-import com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.res.AllScheduleTemplateResponse;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;
@@ -21,20 +22,18 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
     private final StoreRepository storeRepository;
     private final ScheduleTemplateFactory scheduleTemplateFactory;
 
+
     @Override
+    @Transactional
     public ScheduleTemplate createScheduleTemplate(Long storeId, ScheduleTemplateRequest request) {
         // Store 조회
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new NoSuchElementException("Store not found with id: " + storeId));
 
         // ScheduleTemplate 생성
-        ScheduleTemplate scheduleTemplate = scheduleTemplateFactory.createScheduleTemplate(store,request);
+        ScheduleTemplate scheduleTemplate = scheduleTemplateFactory.createScheduleTemplate(store, request);
 
-        // ShiftTemplate 리스트 추가 (scheduleTemplate 참조 X)
-        List<ShiftTemplate> shiftTemplates = scheduleTemplateFactory.createShiftTemplates(request.getShiftTemplates());
 
-        // ShiftTemplates를 이용하여 추가 (일급 컬렉션 적용)
-        scheduleTemplate.getShiftTemplates().update(shiftTemplates);
 
         return scheduleTemplateRepository.save(scheduleTemplate);
     }
@@ -45,9 +44,13 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
                 .orElseThrow(() -> new NoSuchElementException("ScheduleTemplate not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<ScheduleTemplate> getAllScheduleTemplates() {
-        return scheduleTemplateRepository.findAll();
+    public AllScheduleTemplateResponse getAllScheduleTemplatesByStore(Long storeId) {
+        List<ScheduleTemplate> scheduleTemplateList = scheduleTemplateRepository.findAllByStoreId(storeId);
+
+        return AllScheduleTemplateResponse
+                .fromEntityList(scheduleTemplateList);
     }
 
     @Transactional

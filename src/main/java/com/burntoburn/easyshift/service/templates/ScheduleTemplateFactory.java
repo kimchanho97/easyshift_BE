@@ -1,7 +1,7 @@
 package com.burntoburn.easyshift.service.templates;
 
-import com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate.ScheduleTemplateRequest;
-import com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate.ShiftTemplateRequest;
+import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.req.ShiftTemplateRequest;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.templates.collection.ShiftTemplates;
@@ -36,7 +36,7 @@ public class ScheduleTemplateFactory {
                 .orElse(Collections.emptyList()) // null 방지
                 .stream()
                 .map(shiftRequest -> ShiftTemplate.builder()
-                        .shiftTemplateName(shiftRequest.getShiftTemplateName())
+                        .shiftTemplateName(shiftRequest.getShiftName())
                         .startTime(shiftRequest.getStartTime())
                         .endTime(shiftRequest.getEndTime())
                         .build())

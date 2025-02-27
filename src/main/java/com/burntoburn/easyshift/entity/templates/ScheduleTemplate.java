@@ -1,5 +1,7 @@
 package com.burntoburn.easyshift.entity.templates;
 
+import com.burntoburn.easyshift.dto.template.res.ScheduleTemplateResponse;
+import com.burntoburn.easyshift.dto.template.res.ShiftTemplateResponse;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.collection.ShiftTemplates;
 import jakarta.persistence.*;
@@ -36,4 +38,17 @@ public class ScheduleTemplate {
         this.scheduleTemplateName = scheduleTemplateName;
         this.shiftTemplates.update(updatedShiftTemplates); // ✅ 일급 컬렉션 내부에서 관리
     }
+
+    public ScheduleTemplateResponse toDTO() {
+        return ScheduleTemplateResponse.builder()
+                .id(this.id)
+                .scheduleTemplateName(this.scheduleTemplateName)
+                .storeId(this.store.getId()) // ✅ Lazy Loading 문제 방지: ID만 반환
+                .shiftTemplates(this.shiftTemplates.getList().stream()
+                        .map(ShiftTemplateResponse::fromEntity) // ✅ ShiftTemplate 변환
+                        .toList())
+                .build();
+    }
+
+
 }

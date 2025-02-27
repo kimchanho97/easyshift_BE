@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate;
+package com.burntoburn.easyshift.dto.template.res;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ScheduleTemplateRequest {
+public class ScheduleTemplateResponse {
+    private Long id;
     private String scheduleTemplateName;
-    private List<ShiftTemplateRequest> shiftTemplates;
+    private Long storeId;
+    private List<ShiftTemplateResponse> shiftTemplates;
 }

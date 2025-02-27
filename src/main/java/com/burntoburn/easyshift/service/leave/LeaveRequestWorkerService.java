@@ -1,6 +1,6 @@
 package com.burntoburn.easyshift.service.leave;
 
-import com.burntoburn.easyshift.dto.schedule.req.LeaveRequestDto;
+import com.burntoburn.easyshift.dto.leave.req.LeaveRequestDto;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import java.util.List;
 
