@@ -1,7 +1,8 @@
 package com.burntoburn.easyshift.service.templates.imp;
 
-import com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate.ScheduleTemplateRequest;
-import com.burntoburn.easyshift.dto.schedule.req.scheduleTemplate.ShiftTemplateRequest;
+import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
+import com.burntoburn.easyshift.dto.template.req.ShiftTemplateRequest;
+import com.burntoburn.easyshift.dto.template.res.AllScheduleTemplateResponse;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.store.Store;
@@ -61,7 +62,7 @@ class ScheduleTemplateServiceImplTest {
                 .store(store)
                 .build();
 
-        existingTemplate.getShiftTemplates().addAll(List.of(shift1, shift2)); // ✅ ShiftTemplates 이용하여 추가
+        existingTemplate.getShiftTemplates().addAll(List.of(shift1, shift2)); // ✅ 일급 컬렉션 이용하여 추가
     }
 
     @Test
@@ -110,19 +111,20 @@ class ScheduleTemplateServiceImplTest {
     }
 
     @Test
-    @DisplayName("스케줄 템플릿 전체 조회")
-    void getAllScheduleTemplates() {
+    @DisplayName("특정 매장의 모든 스케줄 템플릿 조회")
+    void getAllScheduleTemplatesByStore() {
         // Given
         List<ScheduleTemplate> templates = List.of(existingTemplate);
-        when(scheduleTemplateRepository.findAll()).thenReturn(templates);
+        when(scheduleTemplateRepository.findAllByStoreId(1L)).thenReturn(Optional.of(templates));
 
         // When
-        List<ScheduleTemplate> result = scheduleTemplateService.getAllScheduleTemplates();
+        AllScheduleTemplateResponse result = scheduleTemplateService.getAllScheduleTemplatesByStore(
+                1L);
 
         // Then
         assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(scheduleTemplateRepository, times(1)).findAll();
+        assertEquals(1, result.getScheduleTemplateResponses().size());
+        verify(scheduleTemplateRepository, times(1)).findAllByStoreId(1L);
     }
 
     @Test

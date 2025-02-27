@@ -1,6 +1,5 @@
 package com.burntoburn.easyshift.service.leave;
 
-import com.burntoburn.easyshift.dto.schedule.req.LeaveRequestDto;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.user.ApprovalStatus;
