@@ -4,7 +4,6 @@ import com.burntoburn.easyshift.dto.schedule.req.scheduleCreate.ScheduleRequest;
 import com.burntoburn.easyshift.dto.schedule.req.scheduleCreate.ShiftRequest;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.ScheduleStatus;
-import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -128,8 +128,8 @@ class ScheduleServiceImpTest {
         assertFalse(createdSchedule.getShifts().getList().isEmpty(), "Shift 리스트가 비어있으면 안 됩니다.");
         assertEquals(expectedShifts, createdSchedule.getShifts().getList().size(), "Shift 개수가 일치해야 합니다.");
 
-        // ✅ Shift 저장 여부 검증
-        verify(shiftRepository, times(1)).saveAll(anyList()); // ShiftRepository가 1번 호출되었는지 확인
+        // 변경 감지 방식을 사용하는 경우 shiftRepository.saveAll() 호출이 발생하지 않으므로 아래 검증을 주석 처리합니다.
+        // verify(shiftRepository, times(1)).saveAll(anyList());
 
         // ✅ Schedule 저장 여부 검증
         verify(scheduleRepository, times(1)).save(any(Schedule.class));
@@ -167,19 +167,21 @@ class ScheduleServiceImpTest {
                 .store(store)
                 .build();
 
-        when(scheduleRepository.findById(1L)).thenReturn(Optional.of(existingSchedule));
-        when(scheduleRepository.save(any(Schedule.class))).thenReturn(updatedSchedule);
+        // storeId와 scheduleId를 함께 조회하도록 스텁 설정
+        when(scheduleRepository.findByIdAndStoreId(1L, 1L)).thenReturn(Optional.of(existingSchedule));
+        // 변경 감지를 통해 업데이트를 진행하므로, save 호출은 발생하지 않습니다.
+        // when(scheduleRepository.save(any(Schedule.class))).thenReturn(updatedSchedule);
 
-        // When
-        Schedule result = scheduleService.updateSchedule(1L, request);
+        // When: 올바른 파라미터(1L, 1L, request)로 메서드 호출
+        Schedule result = scheduleService.updateSchedule(1L, 1L, request);
 
         // Then
         assertNotNull(result);
         assertEquals("Updated March Schedule", result.getScheduleName());
 
-        verify(scheduleRepository, times(1)).save(any(Schedule.class));
+        // scheduleRepository.save(...) 호출 검증 제거
+        // verify(scheduleRepository, times(1)).save(any(Schedule.class));
     }
-
     @Test
     @DisplayName("존재하지 않는 스케줄 삭제 시 예외 발생")
     void deleteSchedule_NotFound() {
@@ -202,6 +204,6 @@ class ScheduleServiceImpTest {
         when(scheduleRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(NoSuchElementException.class, () -> scheduleService.updateSchedule(1L, request));
+        assertThrows(NoSuchElementException.class, () -> scheduleService.updateSchedule(1L, 1L,request));
     }
 }
