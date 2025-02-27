@@ -96,6 +96,7 @@ public class StoreService {
                     var user = userStore.getUser();
                     return UserDTO.builder()
                             .id(user.getId())
+                            .name(user.getName())
                             .email(user.getEmail())
                             .phoneNumber(user.getPhoneNumber())
                             .avatarUrl(user.getAvatarUrl())
