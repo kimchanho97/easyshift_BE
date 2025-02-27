@@ -54,6 +54,7 @@ public class StoreDeleteTest {
         user = userRepository.save(
                 User.builder()
                         .email("test@example.com")
+                        .name("홍길동")
                         .phoneNumber("010-1234-5678")
                         .role(Role.WORKER)  // 예제 기준으로 WORKER 역할
                         .build()
