@@ -41,7 +41,7 @@ public class ScheduleTemplateController {
      * @param @param storeId 매장 ID
      * @return 해당 매장의 스케줄 템플릿 리스트 (DTO 변환 후 반환)
      **/
-    @GetMapping("/stores/{store_id}/schedule-templates")
+    @GetMapping("/stores/{storeId}/schedule-templates")
     public ResponseEntity<AllScheduleTemplateResponse> getScheduleTemplate(@PathVariable Long storeId) {
         AllScheduleTemplateResponse allScheduleTemplatesByStore = scheduleTemplateService
                 .getAllScheduleTemplatesByStore(storeId);
