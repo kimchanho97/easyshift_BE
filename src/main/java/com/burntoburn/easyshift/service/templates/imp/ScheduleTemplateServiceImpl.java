@@ -47,8 +47,7 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
     @Transactional(readOnly = true)
     @Override
     public AllScheduleTemplateResponse getAllScheduleTemplatesByStore(Long storeId) {
-        List<ScheduleTemplate> scheduleTemplateList = scheduleTemplateRepository.findAllByStoreId(storeId)
-                .orElseThrow(() -> new NoSuchElementException("not found StoreId"));
+        List<ScheduleTemplate> scheduleTemplateList = scheduleTemplateRepository.findAllByStoreId(storeId);
 
         return AllScheduleTemplateResponse
                 .fromEntityList(scheduleTemplateList);
