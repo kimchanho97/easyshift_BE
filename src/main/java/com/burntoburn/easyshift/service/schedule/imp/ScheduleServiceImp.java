@@ -1,8 +1,9 @@
 package com.burntoburn.easyshift.service.schedule.imp;
 
 import com.burntoburn.easyshift.dto.schedule.req.scheduleCreate.ScheduleRequest;
+import com.burntoburn.easyshift.dto.schedule.res.ScheduleWithShifts.ScheduleWithShiftsDto;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
-import com.burntoburn.easyshift.entity.schedule.Shift;
+import com.burntoburn.easyshift.entity.schedule.collection.Shifts;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
@@ -13,6 +14,7 @@ import com.burntoburn.easyshift.service.schedule.ScheduleFactory;
 import com.burntoburn.easyshift.service.schedule.ScheduleService;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,6 @@ public class ScheduleServiceImp implements ScheduleService {
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final ScheduleRepository scheduleRepository;
     private final StoreRepository storeRepository;
-    private final ShiftRepository shiftRepository;
 
     /**
      * 스케줄 생성
@@ -45,7 +46,6 @@ public class ScheduleServiceImp implements ScheduleService {
 
         // 스케줄 저장 및 반환
         scheduleRepository.save(schedule);
-        shiftRepository.saveAll(schedule.getShifts().getList());
         return schedule;
     }
 
@@ -63,18 +63,24 @@ public class ScheduleServiceImp implements ScheduleService {
     /**
      * 스케줄 수정
      */
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public Schedule updateSchedule(Long scheduleId, ScheduleRequest request) {
+    public Schedule updateSchedule(Long storeId, Long scheduleId, ScheduleRequest request) {
+        // 스케줄이 속해있는 매장 검증
+
         // 기존 스케줄 조회
-        Schedule existingSchedule = scheduleRepository.findById(scheduleId)
+        Schedule existingSchedule = scheduleRepository.findByIdAndStoreId(storeId, scheduleId)
                 .orElseThrow(() -> new NoSuchElementException("Schedule not found"));
 
-        // ScheduleFactory를 사용하여 업데이트 적용
-        Schedule updatedSchedule = scheduleFactory.updateSchedule(existingSchedule, request);
-
         // 변경 감지를 통해 자동 반영
-        return scheduleRepository.save(updatedSchedule);
+        return scheduleFactory.updateSchedule(existingSchedule, request);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Schedule getScheduleWithShifts(Long scheduleId) {
+        return scheduleRepository.findByIdWithShifts(scheduleId)
+                .orElseThrow(() -> new NoSuchElementException("Schedule not found"));
     }
 
     /**
@@ -84,4 +90,5 @@ public class ScheduleServiceImp implements ScheduleService {
     public List<Schedule> getSchedulesByStore(Long storeId) {
         return scheduleRepository.findByStoreId(storeId);
     }
+
 }

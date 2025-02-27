@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ShiftTemplateResponse {
-    private Long id;
+    private Long shiftTemplateId;
     private String shiftName;
     private LocalTime startTime;
     private LocalTime endTime;
 
     public static ShiftTemplateResponse fromEntity(ShiftTemplate shiftTemplate) {
         return ShiftTemplateResponse.builder()
-                .id(shiftTemplate.getId())
+                .shiftTemplateId(shiftTemplate.getId())
                 .shiftName(shiftTemplate.getShiftTemplateName())
                 .startTime(shiftTemplate.getStartTime())
                 .endTime(shiftTemplate.getEndTime())
