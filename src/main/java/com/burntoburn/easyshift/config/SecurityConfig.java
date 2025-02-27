@@ -1,19 +1,14 @@
 package com.burntoburn.easyshift.config;
 
-import com.burntoburn.easyshift.config.jwt.TokenAuthenticationFilter;
 import com.burntoburn.easyshift.config.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -40,9 +35,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests((request) -> { //회원 가입과 가입시 유저 정보 입력을 제외하곤 모두 인증된 사용자만 허용
                     request.requestMatchers("/","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**").permitAll();
                     request.requestMatchers("/api/user/info","/api/user/login").permitAll();
-                    request.anyRequest().authenticated();
+                    request.anyRequest().permitAll();
                 });
 
+/*
         // 헤더를 확인할 커스텀 필터 추가
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -53,12 +49,13 @@ public class SecurityConfig {
             exceptionHandlingConfigurer.defaultAuthenticationEntryPointFor(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),new AntPathRequestMatcher("/api/**"));
         });
+*/
 
         return http.build();
     }
 
-    @Bean
+/*    @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter(tokenProvider);
-    }
+    }*/
 }
