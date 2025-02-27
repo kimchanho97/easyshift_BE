@@ -58,6 +58,14 @@ public class StoreService {
         storeRepository.delete(store);
     }
 
+    public Store updateStore(Long storeId, String newStoreName) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
+
+        store.setStoreName(newStoreName);
+        return storeRepository.save(store);
+    }
+
     public List<StoreDto> getStoreNamesByUserId(Long userId) {
         List<UserStore> userStores = userStoreRepository.findAllByUserId(userId);
         if (userStores.isEmpty()) {

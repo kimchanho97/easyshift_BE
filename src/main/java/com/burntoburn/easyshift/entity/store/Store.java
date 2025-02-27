@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "store") // 테이블명 명시
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
