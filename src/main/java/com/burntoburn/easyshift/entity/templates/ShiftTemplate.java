@@ -28,5 +28,7 @@ public class ShiftTemplate {
     @Column(nullable = false)
     private LocalTime endTime;
 
-    // scheduleTemplate 참조 제거 (단방향 관계)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_template_id", nullable = false)
+    private ScheduleTemplate scheduleTemplate;
 }
