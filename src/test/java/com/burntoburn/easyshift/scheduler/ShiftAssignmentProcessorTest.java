@@ -35,11 +35,11 @@ class ShiftAssignmentProcessorTest {
     void setUp() {
         // 정렬되지 않은 Shift 데이터 생성 (정렬 테스트 목적)
         shifts = new ArrayList<>(List.of(
-                new Shift(4L, "Afternoon Shift", LocalDate.of(2024, 11, 3), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null),
-                new Shift(2L, "Morning Shift", LocalDate.of(2024, 11, 1), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null),
-                new Shift(5L, "Evening Shift", LocalDate.of(2024, 11, 2), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null),
-                new Shift(1L, "Morning Shift", LocalDate.of(2024, 11, 1), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null),
-                new Shift(3L, "Afternoon Shift", LocalDate.of(2024, 11, 2), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null)
+                new Shift(4L, "Afternoon Shift", LocalDate.of(2024, 11, 3), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null, null),
+                new Shift(2L, "Morning Shift", LocalDate.of(2024, 11, 1), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null, null),
+                new Shift(5L, "Evening Shift", LocalDate.of(2024, 11, 2), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null, null),
+                new Shift(1L, "Morning Shift", LocalDate.of(2024, 11, 1), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null, null),
+                new Shift(3L, "Afternoon Shift", LocalDate.of(2024, 11, 2), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null, null)
         ));
 
         // APPROVED된 LeaveRequest만 생성
