@@ -14,14 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.burntoburn.easyshift.entity.user.Role.WORKER;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class EntityUpdateTest {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private StoreRepository storeRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private StoreRepository storeRepository;
 
     private Store store;
     private User user;
@@ -37,7 +40,7 @@ class EntityUpdateTest {
                 .email("test@example.com")
                 .name("홍길동")
                 .phoneNumber("010-1234-5678")
-                .role(com.burntoburn.easyshift.entity.user.Role.WORKER)
+                .role(WORKER)
                 .avatarUrl("https://example.com/avatar.png")
                 .build());
     }
@@ -76,7 +79,7 @@ class EntityUpdateTest {
 
         // When (User 이메일 변경 후 저장)
         user = userRepository.findById(user.getId()).orElseThrow();
-      
+
         user.update("updated@example.com");
         userRepository.saveAndFlush(user); // save()만 호출
 

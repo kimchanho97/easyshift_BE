@@ -3,6 +3,7 @@ package com.burntoburn.easyshift.entity;
 import com.burntoburn.easyshift.entity.leave.ApprovalStatus;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
+import com.burntoburn.easyshift.entity.schedule.ScheduleStatus;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.user.User;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.UUID;
 
+import static com.burntoburn.easyshift.entity.user.Role.WORKER;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Transactional
@@ -54,14 +56,14 @@ class EntityCreationTest {
                 .name("test")
                 .email("test@example.com")
                 .phoneNumber("010-1234-5678")
-                .role(com.burntoburn.easyshift.entity.user.Role.WORKER)
+                .role(WORKER)
                 .avatarUrl("https://example.com/avatar.png")
                 .build());
 
         schedule = scheduleRepository.save(Schedule.builder()
                 .scheduleName("Test Schedule")
                 .scheduleMonth(YearMonth.of(2024, 11))
-                .scheduleStatus(com.burntoburn.easyshift.entity.schedule.ScheduleStatus.PENDING)
+                .scheduleStatus(ScheduleStatus.PENDING)
                 .store(store)
                 .build());
     }
