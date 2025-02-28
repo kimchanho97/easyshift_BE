@@ -8,7 +8,10 @@ import com.burntoburn.easyshift.dto.shift.res.ShiftDateDTO;
 import com.burntoburn.easyshift.dto.shift.res.ShiftGroupDTO;
 import com.burntoburn.easyshift.dto.shift.res.ShiftKey;
 import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.res.StoreDto;
 import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
+import com.burntoburn.easyshift.dto.store.res.StoreUserDTO;
+import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
@@ -20,6 +23,7 @@ import com.burntoburn.easyshift.repository.store.UserStoreRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -57,16 +61,57 @@ public class StoreService {
         storeRepository.delete(store);
     }
 
-    public List<String> getStoreNamesByUserId(Long userId) {
+    public Store updateStore(Long storeId, String newStoreName) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
+
+        store.setStoreName(newStoreName);
+        return storeRepository.save(store);
+    }
+
+    public List<StoreDto> getStoreNamesByUserId(Long userId) {
         List<UserStore> userStores = userStoreRepository.findAllByUserId(userId);
         if (userStores.isEmpty()) {
             throw new RuntimeException("해당 사용자와 연결된 매장이 없습니다.");
         }
 
         return userStores.stream()
-                .map(userStore -> userStore.getStore().getStoreName())
+                .map(userStore -> {
+                    Store store = userStore.getStore();
+                    return new StoreDto(store.getId(), store.getStoreName());
+                })
                 .collect(Collectors.toList());
     }
+
+
+    @Transactional
+    public StoreUserDTO getStoreUser(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
+
+        // store.getUserStores()를 통해 연관된 사용자 엔티티를 가져오고, UserDTO로 매핑합니다.
+        // 주의: lazy 로딩 문제를 피하기 위해 fetch join 등을 고려할 수 있습니다.
+        var users = store.getUserStores().stream()
+                .map(userStore -> {
+                    var user = userStore.getUser();
+                    return UserDTO.builder()
+                            .id(user.getId())
+                            .name(user.getName())
+                            .email(user.getEmail())
+                            .phoneNumber(user.getPhoneNumber())
+                            .avatarUrl(user.getAvatarUrl())
+                            .role(user.getRole().toString().toLowerCase()) // 예: "worker", "administrator"
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return StoreUserDTO.builder()
+                .storeId(store.getId())
+                .storeName(store.getStoreName())
+                .users(users)
+                .build();
+    }
+
 
     public List<String> linkStoreToUser(String token, Long storeId) {
         Long userId = tokenProvider.getUserIdFromToken(token);

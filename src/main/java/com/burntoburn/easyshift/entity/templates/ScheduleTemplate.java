@@ -41,7 +41,7 @@ public class ScheduleTemplate {
 
     public ScheduleTemplateResponse toDTO() {
         return ScheduleTemplateResponse.builder()
-                .id(this.id)
+                .ScheduleTemplateId(this.id)
                 .scheduleTemplateName(this.scheduleTemplateName)
                 .storeId(this.store.getId()) // ✅ Lazy Loading 문제 방지: ID만 반환
                 .shiftTemplates(this.shiftTemplates.getList().stream()

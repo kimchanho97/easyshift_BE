@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ScheduleTemplateResponse {
-    private Long id;
+    private Long ScheduleTemplateId;
     private String scheduleTemplateName;
     private Long storeId;
     private List<ShiftTemplateResponse> shiftTemplates;
