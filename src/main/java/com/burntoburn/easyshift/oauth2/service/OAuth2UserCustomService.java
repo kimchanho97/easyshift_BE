@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.oauth2.service;
 
 import com.burntoburn.easyshift.entity.user.User;
+import com.burntoburn.easyshift.oauth2.user.KakaoOAuth2User;
 import com.burntoburn.easyshift.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -29,13 +31,17 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     // 유저가 있으면 업데이트, 없으면 유저 생성
     private void saveOrUpdate(OAuth2User oAuth2User) {
-        Map<String, Object> attributes = oAuth2User.getAttributes();
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
+       KakaoOAuth2User kakaoOAuth2User = new KakaoOAuth2User(oAuth2User.getAttributes());
+        String email = kakaoOAuth2User.getEmail();
 
         User user= userRepository.findByEmail(email)
                 .map(entity -> entity.update(email))
-                .orElse(User.builder().email(email).name(name).build());
+                .orElse(User.builder()
+                        .email(email)
+                        .name(kakaoOAuth2User.getName())
+                        .avatarUrl(kakaoOAuth2User.getProfileImageUrl())
+                        .phoneNumber(kakaoOAuth2User.getProfileImageUrl())
+                        .build());
 
         userRepository.save(user);
     }
