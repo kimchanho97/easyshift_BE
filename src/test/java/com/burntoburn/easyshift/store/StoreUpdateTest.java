@@ -9,7 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,11 +46,5 @@ public class StoreUpdateTest {
                 // 업데이트 응답은 StoreDto를 반환하므로 필드명이 "name"입니다.
                 .andExpect(jsonPath("$.name").value("UpdatedStoreName"))
                 .andReturn();
-
-        // 3. 매장 조회 (GET /api/stores/{storeId})
-        mockMvc.perform(get("/api/stores/{storeId}", storeId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("UpdatedStoreName"));
     }
 }

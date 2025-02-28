@@ -1,12 +1,14 @@
 package com.burntoburn.easyshift.controller;
 
+import com.burntoburn.easyshift.common.response.ApiResponse;
 import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
 import com.burntoburn.easyshift.dto.store.res.StoreDto;
+import com.burntoburn.easyshift.dto.store.res.StoreInfoResponse;
 import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.dto.store.res.StoreUserDTO;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.service.StoreService;
-import com.burntoburn.easyshift.service.store.StoreQueryService;
+import com.burntoburn.easyshift.service.store.StoreServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,7 @@ import java.util.Optional;
 public class StoreController {
 
     private final StoreService storeService;
-    private final StoreQueryService storeQueryService;
+    private final StoreServiceImpl storeServiceImpl;
 
     // ========================================
 
@@ -30,15 +32,13 @@ public class StoreController {
      * 매장 조회 API
      */
     @GetMapping("/{storeId}")
-    public ResponseEntity<Void> getStore(@PathVariable Long storeId) {
+    public ResponseEntity<ApiResponse<StoreInfoResponse>> getStore(@PathVariable Long storeId) {
         // UserId는 spring security의 @AuthenticationPrincipal로 받아올 수 있음
         // Long userId = userDetails.getUserId();
 
         Long userId = 1L; // 여기서는 임의로 1로 설정
-        storeQueryService.getStoreInfo(storeId, userId);
-
-
-        return ResponseEntity.ok().build();
+        StoreInfoResponse response = storeServiceImpl.getStoreInfo(storeId, userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
     // ========================================
 
