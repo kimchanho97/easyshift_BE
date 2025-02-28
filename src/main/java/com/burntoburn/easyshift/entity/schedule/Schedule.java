@@ -42,10 +42,6 @@ public class Schedule extends BaseEntity {
     private String description;
     private Long scheduleTemplateId;
 
-    /**
-     * ??? 이거 일급 컬랙션을 쓰는 이유가 뭔가요?
-     * -> JPA에서는 컬렉션을 저장하지 못하는데, @Transient를 써서 서비스 계층에서만 사용하는 용도로 수정해야 하는거 아닌가요?
-     */
     @Embedded
     @Builder.Default // 기본값 설정
     private Shifts shifts = new Shifts(); // 일급 컬렉션 적용
