@@ -4,6 +4,7 @@ import com.burntoburn.easyshift.dto.schedule.req.scheduleCreate.ScheduleRequest;
 import com.burntoburn.easyshift.entity.leave.ApprovalStatus;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
+import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.exception.schedule.ScheduleException;
