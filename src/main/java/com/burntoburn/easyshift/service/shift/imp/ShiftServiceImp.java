@@ -1,20 +1,37 @@
 package com.burntoburn.easyshift.service.shift.imp;
 
+import com.burntoburn.easyshift.dto.shift.req.ShiftUpload;
+import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.Shift;
+import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.service.shift.ShiftService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ShiftServiceImp implements ShiftService {
     private final ShiftRepository shiftRepository;
+    private final ScheduleRepository scheduleRepository;
 
+    @Transactional
     @Override
-    public Shift createShift(Shift shift) {
+    public Shift createShift(Long scheduleId, ShiftUpload shiftUpload) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new NoSuchElementException("not found schedule"));
+
+        Shift shift = Shift.builder()
+                .shiftName(shiftUpload.getShiftName())
+                .shiftDate(shiftUpload.getShiftDate())
+                .startTime(shiftUpload.getStartTime())
+                .endTime(shiftUpload.getEndTime())
+                .schedule(schedule)
+                .build();
+
         return shiftRepository.save(shift);
     }
 
@@ -23,31 +40,32 @@ public class ShiftServiceImp implements ShiftService {
                 .orElseThrow(() -> new NoSuchElementException("Shift not found with id: " + id));
     }
 
+
     @Override
     public List<Shift> getAllShifts() {
         return shiftRepository.findAll();
     }
 
+    @Transactional
     @Override
-    public Shift updateShift(Long id, Shift shiftDetails) {
+    public Shift updateShift(Long shiftId, ShiftUpload shiftUpload) {
         // 기존 Shift 찾기 (없으면 예외 발생)
-        Shift existingShift = getShiftOne(id);
+        Shift existingShift = getShiftOne(shiftId);
 
         // 새로운 값으로 업데이트
-        existingShift = Shift.builder()
-                .id(existingShift.getId()) // 기존 ID 유지
-                .shiftName(shiftDetails.getShiftName()) // 새로운 Shift 이름
-                .shiftDate(shiftDetails.getShiftDate()) // 새로운 날짜
-                .startTime(shiftDetails.getStartTime()) // 새로운 시작 시간
-                .endTime(shiftDetails.getEndTime()) // 새로운 종료 시간
-                .schedule(shiftDetails.getSchedule()) // 새로운 Schedule
-                .user(shiftDetails.getUser()) // 새로운 User
-                .build();
-
-        // 저장 후 반환
-        return shiftRepository.save(existingShift);
+        return existingShift.updateShift(
+                shiftUpload.getShiftName(),
+                shiftUpload.getShiftDate(),
+                shiftUpload.getStartTime(),
+                shiftUpload.getEndTime());
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Shift getShiftWithUser(Long ShiftId) {
+        return shiftRepository.findByIdWithUser(ShiftId)
+                .orElseThrow(() -> new NoSuchElementException("not found shift"));
+    }
 
     @Override
     public void deleteShift(Long id) {
