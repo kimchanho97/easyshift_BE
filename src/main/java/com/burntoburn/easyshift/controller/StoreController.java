@@ -6,6 +6,7 @@ import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.dto.store.res.StoreUserDTO;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.service.StoreService;
+import com.burntoburn.easyshift.service.store.StoreQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +22,25 @@ import java.util.Optional;
 public class StoreController {
 
     private final StoreService storeService;
+    private final StoreQueryService storeQueryService;
 
+    // ========================================
+
+    /**
+     * 매장 조회 API
+     */
     @GetMapping("/{storeId}")
-    public ResponseEntity<StoreDto> getStore(@PathVariable Long storeId) {
-        Store store = storeService.getStoreById(storeId);
-        StoreDto dto = new StoreDto(store.getId(), store.getStoreName());
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<Void> getStore(@PathVariable Long storeId) {
+        // UserId는 spring security의 @AuthenticationPrincipal로 받아올 수 있음
+        // Long userId = userDetails.getUserId();
+
+        Long userId = 1L; // 여기서는 임의로 1로 설정
+        storeQueryService.getStoreInfo(storeId, userId);
+
+
+        return ResponseEntity.ok().build();
     }
+    // ========================================
 
     @PostMapping
     public ResponseEntity<Store> createStore(@RequestBody StoreCreateRequest request) {
@@ -48,7 +61,7 @@ public class StoreController {
     }
 
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<String> deleteStore(@PathVariable("storeId") Long storeId){
+    public ResponseEntity<String> deleteStore(@PathVariable("storeId") Long storeId) {
         storeService.deleteStore(storeId);
         return ResponseEntity.ok("매장이 성공적으로 삭제되었습니다.");
     }
@@ -62,8 +75,8 @@ public class StoreController {
     @PostMapping("/{storeId}/link")
     public ResponseEntity<List<String>> linkStoreToUser(
             @PathVariable("storeId") Long storeId,
-            @RequestHeader("Authorization") String token){
-        if(token.startsWith("Bearer ")){
+            @RequestHeader("Authorization") String token) {
+        if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
         List<String> storeNames = storeService.linkStoreToUser(token, storeId);
