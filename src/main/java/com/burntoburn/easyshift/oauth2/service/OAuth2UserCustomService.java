@@ -11,8 +11,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,6 +21,9 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+
+        log.info("CustomOAuth2UserService.loadUser() 실행 - OAuth2 로그인 요청 진입");
+
         OAuth2User oAuth2User = super.loadUser(userRequest);
         // 요청을 바탕으로 유저 정보를 담은 객체 반환
         saveOrUpdate(oAuth2User);
