@@ -4,6 +4,7 @@ import com.burntoburn.easyshift.entity.BaseEntity;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE) // id는 Builder에서 설정 불가
+    @Column(name = "store_id")
     private Long id;
 
     @Column(nullable = false)

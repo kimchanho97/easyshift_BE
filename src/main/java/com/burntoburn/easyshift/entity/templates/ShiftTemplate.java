@@ -16,6 +16,7 @@ public class ShiftTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
+    @Column(name = "shift_template_id")
     private Long id;
 
     @Column(nullable = false)
