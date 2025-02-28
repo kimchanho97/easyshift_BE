@@ -25,7 +25,7 @@ public class ScheduleTemplateFactory {
 
         // ✅ ShiftTemplate 리스트를 생성하는 별도 메서드 활용
         List<ShiftTemplate> shiftTemplates = createShiftTemplates(request.getShiftTemplates());
-        scheduleTemplate.getShiftTemplates().update(shiftTemplates);
+        scheduleTemplate.getShiftTemplates().addAll(shiftTemplates);
 
         return scheduleTemplate;
     }
