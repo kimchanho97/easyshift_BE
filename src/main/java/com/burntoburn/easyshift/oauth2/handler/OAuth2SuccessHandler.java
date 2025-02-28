@@ -21,7 +21,6 @@ import com.burntoburn.easyshift.util.CookieUtil;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -72,6 +71,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 리프레시 토큰 생성
         String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
         saveToken(user.getId(), refreshToken);
+        addRefreshTokenToCookie(request, response, refreshToken);
 
         // 로그인 성공 메시지와 access token 을 반환
         String targetUrl = UriComponentsBuilder.fromUriString(FRONTEND_CALLBACK_URL)
