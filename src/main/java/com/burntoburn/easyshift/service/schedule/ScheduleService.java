@@ -1,8 +1,8 @@
 package com.burntoburn.easyshift.service.schedule;
 
 import com.burntoburn.easyshift.dto.schedule.req.scheduleCreate.ScheduleRequest;
-import com.burntoburn.easyshift.dto.schedule.res.ScheduleWithShifts.ScheduleWithShiftsDto;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
+
 import java.util.List;
 
 public interface ScheduleService {
@@ -21,4 +21,7 @@ public interface ScheduleService {
 
     // 특정 스케줄 조회 (Shift 포함)
     Schedule getScheduleWithShifts(Long scheduleId);
+
+    // 스케줄 자동 배정
+    void autoAssignSchedule(Long scheduleId);
 }
