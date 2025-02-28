@@ -56,7 +56,7 @@ public class ScheduleFactory {
         List<Shift> shifts = new ArrayList<>();
         Map<Long, ShiftTemplate> uniqueTemplates = new HashMap<>();
 
-        for (ShiftTemplate shiftTemplate : scheduleTemplate.getShiftTemplates().getList()) {
+        for (ShiftTemplate shiftTemplate : scheduleTemplate.getShiftTemplates()) {
             uniqueTemplates.putIfAbsent(shiftTemplate.getId(), shiftTemplate);
         }
 

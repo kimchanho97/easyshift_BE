@@ -3,10 +3,10 @@ package com.burntoburn.easyshift.entity.templates;
 import com.burntoburn.easyshift.dto.template.res.ScheduleTemplateResponse;
 import com.burntoburn.easyshift.dto.template.res.ShiftTemplateResponse;
 import com.burntoburn.easyshift.entity.store.Store;
-import com.burntoburn.easyshift.entity.templates.collection.ShiftTemplates;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -30,33 +30,22 @@ public class ScheduleTemplate {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    /**
-     * -> 이거 값 타입으로 하면 연관관계 매핑 안됩니다.
-     * -> 값 타입은 애초에 배열을 가질 수 없어요.
-     * -> 그리고 조인도 안 됩니다.
-     * 양방향 매핑을 고려하는 방향 또는 ShiftTemplate 으로 조회하는 방법을 고려!
-     * 또는 사용하고 싶으면 @Transient를 사용해서 서비스 계층에서만 사용하는 용도로 수정해야 합니다.
-     */
-    @Embedded
-    @Builder.Default
-    private ShiftTemplates shiftTemplates = new ShiftTemplates(); // 일급 컬렉션 적용
+    @OneToMany(mappedBy = "scheduleTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ShiftTemplate> shiftTemplates = new ArrayList<>();
 
-    // 스케줄 템플릿 수정 메서드
-    public void updateScheduleTemplate(String scheduleTemplateName, List<ShiftTemplate> updatedShiftTemplates) {
-        this.scheduleTemplateName = scheduleTemplateName;
-        this.shiftTemplates.update(updatedShiftTemplates); // ✅ 일급 컬렉션 내부에서 관리
-    }
-
+    // 엔티티 내부에 DTO 변환 로직이 있으면 안 됩니다!!
     public ScheduleTemplateResponse toDTO() {
         return ScheduleTemplateResponse.builder()
                 .ScheduleTemplateId(this.id)
                 .scheduleTemplateName(this.scheduleTemplateName)
                 .storeId(this.store.getId()) // ✅ Lazy Loading 문제 방지: ID만 반환
-                .shiftTemplates(this.shiftTemplates.getList().stream()
+                .shiftTemplates(this.shiftTemplates.stream()
                         .map(ShiftTemplateResponse::fromEntity) // ✅ ShiftTemplate 변환
                         .toList())
                 .build();
     }
 
-
+    public void addShiftTemplate(ShiftTemplate shiftTemplate) {
+        this.shiftTemplates.add(shiftTemplate);
+    }
 }
