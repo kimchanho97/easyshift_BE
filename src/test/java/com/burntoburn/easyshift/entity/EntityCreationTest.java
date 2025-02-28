@@ -51,6 +51,7 @@ class EntityCreationTest {
                 .build());
 
         user = userRepository.saveAndFlush(User.builder()
+                .name("test")
                 .email("test@example.com")
                 .phoneNumber("010-1234-5678")
                 .role(com.burntoburn.easyshift.entity.user.Role.WORKER)
