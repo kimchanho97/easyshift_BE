@@ -30,6 +30,13 @@ public class ScheduleTemplate {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    /**
+     * -> 이거 값 타입으로 하면 연관관계 매핑 안됩니다.
+     * -> 값 타입은 애초에 배열을 가질 수 없어요.
+     * -> 그리고 조인도 안 됩니다.
+     * 양방향 매핑을 고려하는 방향 또는 ShiftTemplate 으로 조회하는 방법을 고려!
+     * 또는 사용하고 싶으면 @Transient를 사용해서 서비스 계층에서만 사용하는 용도로 수정해야 합니다.
+     */
     @Embedded
     @Builder.Default
     private ShiftTemplates shiftTemplates = new ShiftTemplates(); // 일급 컬렉션 적용

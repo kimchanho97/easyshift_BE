@@ -28,6 +28,7 @@ public class Store extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private UUID storeCode;
+    private String description;
 
     // 매장에 속한 스케줄 목록
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
