@@ -3,6 +3,7 @@ package com.burntoburn.easyshift.entity.templates.collection;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
@@ -10,14 +11,26 @@ import java.util.List;
 
 @Embeddable
 public class ShiftTemplates {
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "schedule_template_id") // 단방향 연관관계 유지
-    private final List<ShiftTemplate> shiftTemplateList = new ArrayList<>();
+    private List<ShiftTemplate> shiftTemplateList = new ArrayList<>();
 
-    // 새로운 ShiftTemplate 목록으로 업데이트
     public void update(List<ShiftTemplate> newShifts) {
-        this.shiftTemplateList.clear();
-        this.shiftTemplateList.addAll(newShifts);
+        for (ShiftTemplate newShift : newShifts) {
+            if (newShift.getId() != null) {
+                ShiftTemplate existing = findById(newShift.getId());
+                if (existing != null) {
+                    // 기존 엔티티의 필드만 업데이트 (id는 그대로 유지)
+                    existing.updateShiftTemplate(newShift);
+                } else {
+                    // 만약 해당 id가 기존 컬렉션에 없으면, 신규 항목으로 추가할 수도 있음.
+                    shiftTemplateList.add(newShift);
+                }
+            } else {
+                // id가 없는 경우 신규 항목으로 간주하여 추가
+                shiftTemplateList.add(newShift);
+            }
+        }
     }
 
     // 새로운 ShiftTemplate 추가
