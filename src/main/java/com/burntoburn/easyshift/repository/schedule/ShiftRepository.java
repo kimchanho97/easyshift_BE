@@ -18,4 +18,6 @@ public interface ShiftRepository extends JpaRepository<Shift, Long> {
     @Query("SELECT s FROM Shift s LEFT JOIN FETCH s.user WHERE s.id = :id")
     Optional<Shift> findByIdWithUser(@Param("id") Long id);
 
+    List<Shift> findAllBySchedule(Schedule schedule);
+    
 }

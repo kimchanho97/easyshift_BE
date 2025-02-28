@@ -47,9 +47,9 @@ public class Shift extends BaseEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         return this;
+    }
 
     public void assignUser(User user) {
         this.user = user;
-
     }
 }
