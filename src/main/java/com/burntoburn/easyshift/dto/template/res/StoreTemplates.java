@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ScheduleTemplateResponse {
+public class StoreTemplates {
     private Long ScheduleTemplateId;
     private String scheduleTemplateName;
     private Long storeId;
