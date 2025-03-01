@@ -1,55 +1,61 @@
-package com.burntoburn.easyshift.service;
-
-import com.burntoburn.easyshift.config.jwt.TokenProvider;
-import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
-import com.burntoburn.easyshift.dto.schedule.res.ScheduleSummaryDTO;
-import com.burntoburn.easyshift.dto.shift.res.AssignedShiftDTO;
-import com.burntoburn.easyshift.dto.shift.res.ShiftDateDTO;
-import com.burntoburn.easyshift.dto.shift.res.ShiftGroupDTO;
-import com.burntoburn.easyshift.dto.shift.res.ShiftKey;
-import com.burntoburn.easyshift.dto.store.StoreDto;
-import com.burntoburn.easyshift.dto.store.StoreScheduleResponseDTO;
-import com.burntoburn.easyshift.dto.store.StoreUserDTO;
-import com.burntoburn.easyshift.dto.user.UserDTO;
-import com.burntoburn.easyshift.entity.schedule.Schedule;
-import com.burntoburn.easyshift.entity.schedule.Shift;
-import com.burntoburn.easyshift.entity.store.Store;
-import com.burntoburn.easyshift.entity.store.UserStore;
-import com.burntoburn.easyshift.entity.user.User;
-import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
-import com.burntoburn.easyshift.repository.store.StoreRepository;
-import com.burntoburn.easyshift.repository.store.UserStoreRepository;
-import com.burntoburn.easyshift.repository.user.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-@Service
-@RequiredArgsConstructor
-public class StoreService {
-
-    private final StoreRepository storeRepository;
-    private final UserRepository userRepository;
-    private final UserStoreRepository userStoreRepository;
-    private final TokenProvider tokenProvider;
-    // 추가: 스케줄 관련 조회를 위해 필요함
-    private final ScheduleRepository scheduleRepository;
-
-    public Store getStoreById(Long storeId) {
-        return storeRepository.findById(storeId)
-                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
-    }
-
-//    public Store createStore(StoreCreateRequest request) {
-//        Store store = Store.builder()
-//                .storeName(request.getStoreName())
-//                .storeCode(UUID.randomUUID())
-//                .build();
+//package com.burntoburn.easyshift.service;
 //
+//import com.burntoburn.easyshift.config.jwt.TokenProvider;
+//import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
+//import com.burntoburn.easyshift.dto.schedule.res.ScheduleSummaryDTO;
+//import com.burntoburn.easyshift.dto.shift.res.AssignedShiftDTO;
+//import com.burntoburn.easyshift.dto.shift.res.ShiftDateDTO;
+//import com.burntoburn.easyshift.dto.shift.res.ShiftGroupDTO;
+//import com.burntoburn.easyshift.dto.shift.res.ShiftKey;
+//import com.burntoburn.easyshift.dto.store.StoreResponse;
+//import com.burntoburn.easyshift.dto.store.StoreScheduleResponseDTO;
+//import com.burntoburn.easyshift.dto.store.StoreUserDTO;
+//import com.burntoburn.easyshift.dto.user.UserDTO;
+//import com.burntoburn.easyshift.entity.schedule.Schedule;
+//import com.burntoburn.easyshift.entity.schedule.Shift;
+//import com.burntoburn.easyshift.entity.store.Store;
+//import com.burntoburn.easyshift.entity.store.UserStore;
+//import com.burntoburn.easyshift.entity.user.User;
+//import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
+//import com.burntoburn.easyshift.repository.store.StoreRepository;
+//import com.burntoburn.easyshift.repository.store.UserStoreRepository;
+//import com.burntoburn.easyshift.repository.user.UserRepository;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.stereotype.Service;
+//import org.springframework.transaction.annotation.Transactional;
+//
+//import java.time.LocalDate;
+//import java.util.*;
+//import java.util.stream.Collectors;
+//
+//@Service
+//@RequiredArgsConstructor
+//public class StoreService {
+//
+//    private final StoreRepository storeRepository;
+//    private final UserRepository userRepository;
+//    private final UserStoreRepository userStoreRepository;
+//    private final TokenProvider tokenProvider;
+//    // 추가: 스케줄 관련 조회를 위해 필요함
+//    private final ScheduleRepository scheduleRepository;
+//
+//    public Store getStoreById(Long storeId) {
+//        return storeRepository.findById(storeId)
+//                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
+//    }
+//
+//    public void deleteStore(Long storeId) {
+//        Store store = storeRepository.findById(storeId)
+//                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
+//
+//        storeRepository.delete(store);
+//    }
+//
+//    public Store updateStore(Long storeId, String newStoreName) {
+//        Store store = storeRepository.findById(storeId)
+//                .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
+//
+//        store.setStoreName(newStoreName);
 //        return storeRepository.save(store);
 //    }
 
@@ -177,7 +183,7 @@ public class StoreService {
 
     private ScheduleDetailDTO mapToScheduleDetailDTO(Schedule schedule) {
         // Shifts 일급 컬렉션 내부의 Shift 리스트는 getList()를 통해 가져옵니다.
-        List<Shift> shifts = schedule.getShifts();
+        List<Shift> shifts = schedule.getShifts().getList();
         Map<ShiftKey, List<Shift>> groupedByKey = groupShiftsByKey(shifts);
 
         List<ShiftGroupDTO> shiftGroups = groupedByKey.entrySet().stream()
