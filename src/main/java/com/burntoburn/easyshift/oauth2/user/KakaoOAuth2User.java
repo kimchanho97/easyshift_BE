@@ -22,7 +22,7 @@ public class KakaoOAuth2User {
 
             this.id = ((Long) attributes.get("id")).toString();
             this.email = (String) kakaoAccount.get("email");
-            this.name = (String)  kakaoProfile.get("nickname");
+            this.name = (String)  kakaoAccount.get("name");
             this.phoneNumber = (String) kakaoAccount.get("phone_number");
 
             this.profileImageUrl = (String) kakaoProfile.get("profile_image_url");
