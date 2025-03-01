@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.dto.store;
+package com.burntoburn.easyshift.dto.store.use;
 
 import lombok.Getter;
 

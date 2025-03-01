@@ -1,6 +1,10 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.dto.store.*;
+import com.burntoburn.easyshift.dto.store.use.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.use.StoreCreateResponse;
+import com.burntoburn.easyshift.dto.store.use.StoreInfoResponse;
+import com.burntoburn.easyshift.dto.store.use.UserStoresResponse;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
