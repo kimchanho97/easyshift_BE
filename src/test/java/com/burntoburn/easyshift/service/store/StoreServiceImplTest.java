@@ -1,27 +1,33 @@
 package com.burntoburn.easyshift.service.store;
 
-import com.burntoburn.easyshift.dto.store.ScheduleTemplateDto;
-import com.burntoburn.easyshift.dto.store.SelectedScheduleTemplateDto;
-import com.burntoburn.easyshift.dto.store.ShiftTemplateDto;
-import com.burntoburn.easyshift.dto.store.StoreInfoResponse;
+import com.burntoburn.easyshift.dto.store.*;
+import com.burntoburn.easyshift.entity.BaseEntity;
 import com.burntoburn.easyshift.entity.schedule.Shift;
+import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
+import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,9 +42,39 @@ class StoreServiceImplTest {
     @Mock
     private UserStoreRepository userStoreRepository;
     @Mock
+    private StoreRepository storeRepository;
+    @Mock
     private ScheduleTemplateRepository scheduleTemplateRepository;
     @Mock
     private ShiftRepository shiftRepository;
+
+    @Test
+    @DisplayName("스토어 생성 성공 테스트")
+    void testCreateStoreSuccess(){
+        // given
+        StoreCreateRequest request = new StoreCreateRequest();
+        ReflectionTestUtils.setField(request, "storeName", "Test Store");
+        ReflectionTestUtils.setField(request, "description", "Test Description");
+
+        Store savedStore = Store.builder()
+                .storeName(request.getStoreName())
+                .storeCode(UUID.randomUUID())
+                .description(request.getDescription())
+                .build();
+        ReflectionTestUtils.setField(savedStore, "id", 1L);
+
+        when(storeRepository.save(any(Store.class))).thenReturn(savedStore);
+
+        // when
+        StoreCreateResponse response = storeService.createStore(request);
+
+        // then
+        assertNotNull(response);
+        assertEquals(1L, response.getStoreId());
+        assertEquals("Test Store", response.getStoreName());
+        assertNotNull(response.getStoreCode());
+    }
+
 
     @Test
     @DisplayName("스케줄 템플릿이 없는 경우 빈 응답 반환")

@@ -1,12 +1,16 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.common.util.DateUtil;
+import com.burntoburn.easyshift.dto.store.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.StoreCreateResponse;
 import com.burntoburn.easyshift.dto.store.StoreInfoResponse;
 import com.burntoburn.easyshift.entity.schedule.Shift;
+import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
+import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,19 @@ public class StoreServiceImpl {
     private final UserStoreRepository userStoreRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final ShiftRepository shiftRepository;
+    private final StoreRepository storeRepository;
+
+
+    public StoreCreateResponse createStore(StoreCreateRequest request){
+        Store store = Store.builder()
+                .storeName(request.getStoreName())
+                .storeCode(UUID.randomUUID())
+                .description(request.getDescription())
+                .build();
+
+        Store savedStore = storeRepository.save(store);
+        return new StoreCreateResponse(savedStore.getId(), savedStore.getStoreName(), savedStore.getStoreCode());
+    }
 
     public StoreInfoResponse getStoreInfo(Long storeId, Long userId) {
         // 1. 사용자 매장 접근 권한 확인
