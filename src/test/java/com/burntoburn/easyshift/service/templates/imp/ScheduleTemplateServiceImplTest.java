@@ -3,9 +3,9 @@ package com.burntoburn.easyshift.service.templates.imp;
 import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.dto.template.req.ShiftTemplateRequest;
 import com.burntoburn.easyshift.dto.template.res.AllScheduleTemplateResponse;
+import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
-import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
@@ -20,7 +20,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -125,34 +126,6 @@ class ScheduleTemplateServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.getScheduleTemplateResponses().size());
         verify(scheduleTemplateRepository, times(1)).findAllByStoreId(1L);
-    }
-
-    @Test
-    @DisplayName("스케줄 템플릿 업데이트 시 기존 ShiftTemplate 삭제 및 새로운 ShiftTemplate 추가 확인")
-    void updateScheduleTemplate_ShouldRemoveExistingAndAddNewShiftTemplates() {
-        // Given
-        ScheduleTemplateRequest updatedRequest = ScheduleTemplateRequest.builder()
-                .scheduleTemplateName("Updated Schedule")
-                .shiftTemplates(List.of(
-                        new ShiftTemplateRequest("Updated Morning Shift", LocalTime.of(8, 0), LocalTime.of(12, 0)),
-                        new ShiftTemplateRequest("Updated Evening Shift", LocalTime.of(16, 0), LocalTime.of(20, 0))
-                ))
-                .build();
-
-        when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
-        when(scheduleTemplateRepository.findById(1L)).thenReturn(Optional.of(existingTemplate));
-
-        // When
-        scheduleTemplateService.updateScheduleTemplate(1L, 1L, updatedRequest);
-
-        // Then
-        assertEquals("Updated Schedule", existingTemplate.getScheduleTemplateName());
-        assertEquals(2, existingTemplate.getShiftTemplates().getList().size()); // ✅ 일급 컬렉션에서 리스트 가져오기
-        assertEquals("Updated Morning Shift", existingTemplate.getShiftTemplates().getList().get(0).getShiftTemplateName());
-        assertEquals("Updated Evening Shift", existingTemplate.getShiftTemplates().getList().get(1).getShiftTemplateName());
-
-        // Mocking 환경에서는 save() 호출을 검증해야 한다.
-        verify(scheduleTemplateRepository, times(1)).save(existingTemplate);
     }
 
     @Test

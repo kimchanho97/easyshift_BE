@@ -1,7 +1,9 @@
 package com.burntoburn.easyshift.entity.schedule.collection;
 
 import com.burntoburn.easyshift.entity.schedule.Shift;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;

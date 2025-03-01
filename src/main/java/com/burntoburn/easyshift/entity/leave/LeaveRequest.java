@@ -19,6 +19,7 @@ public class LeaveRequest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE) // ID는 자동 생성되므로 Builder에서 제외
+    @Column(name = "leave_request_id")
     private Long id;
 
     @Column(nullable = false)

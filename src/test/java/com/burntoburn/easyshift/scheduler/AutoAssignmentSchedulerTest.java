@@ -35,9 +35,9 @@ class AutoAssignmentSchedulerTest {
     void setUp() {
         // 정렬된 Shift 데이터
         shifts = new ArrayList<>(List.of(
-                new Shift(1L, "Morning Shift", LocalDate.of(2024, 11, 1), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null),
-                new Shift(2L, "Afternoon Shift", LocalDate.of(2024, 11, 1), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null),
-                new Shift(3L, "Evening Shift", LocalDate.of(2024, 11, 1), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null)
+                new Shift(1L, "Morning Shift", LocalDate.of(2024, 11, 1), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null, null),
+                new Shift(2L, "Afternoon Shift", LocalDate.of(2024, 11, 1), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null, null),
+                new Shift(3L, "Evening Shift", LocalDate.of(2024, 11, 1), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null, null)
         ));
         users = new ArrayList<>(List.of(userA, userB, userC));
 
@@ -125,13 +125,13 @@ class AutoAssignmentSchedulerTest {
     void shouldAssignShiftsWhileRespectingDailyUserLeaves() {
         // 11월 2일과 11월 3일에 추가적인 Shift 동적으로 추가
         shifts.addAll(List.of(
-                new Shift(4L, "Morning Shift", LocalDate.of(2024, 11, 2), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null),
-                new Shift(5L, "Afternoon Shift", LocalDate.of(2024, 11, 2), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null),
-                new Shift(6L, "Evening Shift", LocalDate.of(2024, 11, 2), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null),
+                new Shift(4L, "Morning Shift", LocalDate.of(2024, 11, 2), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null, null),
+                new Shift(5L, "Afternoon Shift", LocalDate.of(2024, 11, 2), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null, null),
+                new Shift(6L, "Evening Shift", LocalDate.of(2024, 11, 2), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null, null),
 
-                new Shift(7L, "Morning Shift", LocalDate.of(2024, 11, 3), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null),
-                new Shift(8L, "Afternoon Shift", LocalDate.of(2024, 11, 3), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null),
-                new Shift(9L, "Evening Shift", LocalDate.of(2024, 11, 3), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null)
+                new Shift(7L, "Morning Shift", LocalDate.of(2024, 11, 3), LocalTime.of(9, 0), LocalTime.of(12, 0), null, null, null),
+                new Shift(8L, "Afternoon Shift", LocalDate.of(2024, 11, 3), LocalTime.of(13, 0), LocalTime.of(16, 0), null, null, null),
+                new Shift(9L, "Evening Shift", LocalDate.of(2024, 11, 3), LocalTime.of(17, 0), LocalTime.of(20, 0), null, null, null)
         ));
 
         // userD를 추가하여 4명으로 확장

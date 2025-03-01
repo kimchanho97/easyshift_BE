@@ -5,9 +5,9 @@ import com.burntoburn.easyshift.entity.schedule.collection.Shifts;
 import com.burntoburn.easyshift.entity.schedule.converter.YearMonthConverter;
 import com.burntoburn.easyshift.entity.store.Store;
 import jakarta.persistence.*;
-import java.time.YearMonth;
 import lombok.*;
 
+import java.time.YearMonth;
 import java.util.List;
 
 @Getter
@@ -21,6 +21,7 @@ public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE) // ID는 자동 생성되므로 Builder에서 제외
+    @Column(name = "schedule_id")
     private Long id;
 
     @Column(nullable = false)
@@ -38,6 +39,8 @@ public class Schedule extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
+    private String description;
+    private Long scheduleTemplateId;
 
     @Embedded
     @Builder.Default // 기본값 설정
@@ -50,7 +53,7 @@ public class Schedule extends BaseEntity {
         this.shifts.update(newShifts); // 일급 컬렉션 내부에서 관리
     }
 
-    public void addShift(List<Shift> newShifts){
+    public void addShift(List<Shift> newShifts) {
         this.shifts.addAll(newShifts);
     }
 
