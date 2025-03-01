@@ -27,5 +27,9 @@ public class ShiftTemplate {
     @Column(nullable = false)
     private LocalTime endTime;
 
-    // scheduleTemplate 참조 제거 (단방향 관계)
+    public void updateShiftTemplate(ShiftTemplate newData) {
+        this.shiftTemplateName = newData.getShiftTemplateName();
+        this.startTime = newData.getStartTime();
+        this.endTime = newData.getEndTime();
+    }
 }
