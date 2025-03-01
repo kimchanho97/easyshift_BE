@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class AllScheduleTemplateResponse {
-    private List<StoreTemplates> storeTemplateRespons;
+    private List<ScheduleTemplateResponse> scheduleTemplateResponses;
 
     // ✅ 리스트 변환을 위한 정적 메서드 추가
     public static AllScheduleTemplateResponse fromEntityList(List<ScheduleTemplate> scheduleTemplates) {
-        List<StoreTemplates> responseList = scheduleTemplates.stream()
+        List<ScheduleTemplateResponse> responseList = scheduleTemplates.stream()
                 .map(ScheduleTemplate::toDTO) // 각 엔티티를 DTO로 변환
                 .toList();
         return new AllScheduleTemplateResponse(responseList);
