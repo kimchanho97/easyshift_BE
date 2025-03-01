@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.dto.store.res;
+package com.burntoburn.easyshift.dto.store;
 
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleSummaryDTO;

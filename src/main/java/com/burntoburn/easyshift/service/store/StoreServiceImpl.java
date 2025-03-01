@@ -1,7 +1,7 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.common.util.DateUtil;
-import com.burntoburn.easyshift.dto.store.res.StoreInfoResponse;
+import com.burntoburn.easyshift.dto.store.StoreInfoResponse;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.exception.store.StoreException;

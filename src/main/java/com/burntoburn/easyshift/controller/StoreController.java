@@ -1,11 +1,11 @@
 package com.burntoburn.easyshift.controller;
 
 import com.burntoburn.easyshift.common.response.ApiResponse;
-import com.burntoburn.easyshift.dto.store.req.StoreCreateRequest;
-import com.burntoburn.easyshift.dto.store.res.StoreDto;
-import com.burntoburn.easyshift.dto.store.res.StoreInfoResponse;
-import com.burntoburn.easyshift.dto.store.res.StoreScheduleResponseDTO;
-import com.burntoburn.easyshift.dto.store.res.StoreUserDTO;
+import com.burntoburn.easyshift.dto.store.StoreCreateRequest;
+import com.burntoburn.easyshift.dto.store.StoreDto;
+import com.burntoburn.easyshift.dto.store.StoreInfoResponse;
+import com.burntoburn.easyshift.dto.store.StoreScheduleResponseDTO;
+import com.burntoburn.easyshift.dto.store.StoreUserDTO;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.service.StoreService;
 import com.burntoburn.easyshift.service.store.StoreServiceImpl;
