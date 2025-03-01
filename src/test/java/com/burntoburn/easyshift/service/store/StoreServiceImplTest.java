@@ -1,9 +1,9 @@
 package com.burntoburn.easyshift.service.store;
 
-import com.burntoburn.easyshift.dto.store.res.ScheduleTemplateDto;
-import com.burntoburn.easyshift.dto.store.res.SelectedScheduleTemplateDto;
-import com.burntoburn.easyshift.dto.store.res.ShiftTemplateDto;
-import com.burntoburn.easyshift.dto.store.res.StoreInfoResponse;
+import com.burntoburn.easyshift.dto.store.ScheduleTemplateDto;
+import com.burntoburn.easyshift.dto.store.SelectedScheduleTemplateDto;
+import com.burntoburn.easyshift.dto.store.ShiftTemplateDto;
+import com.burntoburn.easyshift.dto.store.StoreInfoResponse;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
