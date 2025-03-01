@@ -7,7 +7,6 @@ import com.burntoburn.easyshift.dto.shift.res.AssignedShiftDTO;
 import com.burntoburn.easyshift.dto.shift.res.ShiftDateDTO;
 import com.burntoburn.easyshift.dto.shift.res.ShiftGroupDTO;
 import com.burntoburn.easyshift.dto.shift.res.ShiftKey;
-import com.burntoburn.easyshift.dto.store.StoreCreateRequest;
 import com.burntoburn.easyshift.dto.store.StoreDto;
 import com.burntoburn.easyshift.dto.store.StoreScheduleResponseDTO;
 import com.burntoburn.easyshift.dto.store.StoreUserDTO;
@@ -45,14 +44,14 @@ public class StoreService {
                 .orElseThrow(() -> new RuntimeException("해당 매장을 찾을 수 없습니다. id: " + storeId));
     }
 
-    public Store createStore(StoreCreateRequest request) {
-        Store store = Store.builder()
-                .storeName(request.getStoreName())
-                .storeCode(UUID.randomUUID())
-                .build();
-
-        return storeRepository.save(store);
-    }
+//    public Store createStore(StoreCreateRequest request) {
+//        Store store = Store.builder()
+//                .storeName(request.getStoreName())
+//                .storeCode(UUID.randomUUID())
+//                .build();
+//
+//        return storeRepository.save(store);
+//    }
 
     public void deleteStore(Long storeId) {
         Store store = storeRepository.findById(storeId)
