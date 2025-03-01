@@ -1,9 +1,7 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.common.util.DateUtil;
-import com.burntoburn.easyshift.dto.store.StoreCreateRequest;
-import com.burntoburn.easyshift.dto.store.StoreCreateResponse;
-import com.burntoburn.easyshift.dto.store.StoreInfoResponse;
+import com.burntoburn.easyshift.dto.store.*;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
@@ -20,6 +18,9 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.burntoburn.easyshift.common.exception.CommonErrorCode.NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +42,11 @@ public class StoreServiceImpl {
 
         Store savedStore = storeRepository.save(store);
         return new StoreCreateResponse(savedStore.getId(), savedStore.getStoreName(), savedStore.getStoreCode());
+    }
+
+    public UserStoresResponse getUserStores(Long userId){
+        List<Store> userStores = userStoreRepository.findStoresByUserId(userId);
+        return UserStoresResponse.fromEntity(userStores);
     }
 
     public StoreInfoResponse getStoreInfo(Long storeId, Long userId) {

@@ -10,8 +10,6 @@ import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,11 +20,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -47,7 +47,7 @@ class StoreServiceImplTest {
 
     @Test
     @DisplayName("스토어 생성 성공 테스트")
-    void testCreateStoreSuccess(){
+    void testCreateStoreSuccess() {
         // given
         StoreCreateRequest request = new StoreCreateRequest();
         ReflectionTestUtils.setField(request, "storeName", "Test Store");
@@ -72,6 +72,61 @@ class StoreServiceImplTest {
         assertNotNull(response.getStoreCode());
     }
 
+    @Test
+    public void testGetUserStores_whenStoresExist_returnsUserStoresResponse() {
+        // given
+        Long userId = 1L;
+
+        // Store 엔티티는 Builder를 통해 생성하지만, id 필드는 @Setter(AccessLevel.NONE)로 되어 있으므로 ReflectionTestUtils를 사용합니다.
+        Store store1 = Store.builder()
+                .storeName("Store 101")
+                .description("Description 101")
+                .build();
+        ReflectionTestUtils.setField(store1, "id", 101L);
+
+        Store store2 = Store.builder()
+                .storeName("Store 201")
+                .description("Description 201")
+                .build();
+        ReflectionTestUtils.setField(store2, "id", 201L);
+
+        List<Store> storeList = Arrays.asList(store1, store2);
+
+        when(userStoreRepository.findStoresByUserId(userId)).thenReturn(storeList);
+
+        // when
+        UserStoresResponse response = storeService.getUserStores(userId);
+
+        // then
+        assertNotNull(response, "Response should not be null");
+        assertEquals(2, response.getStores().size(), "Store list size should be 2");
+
+        // 첫 번째 매장 검증
+        StoreResponse storeResponse1 = response.getStores().get(0);
+        assertEquals(101L, storeResponse1.getStoreId());
+        assertEquals("Store 101", storeResponse1.getStoreName());
+        assertEquals("Description 101", storeResponse1.getDescription());
+
+        // 두 번째 매장 검증
+        StoreResponse storeResponse2 = response.getStores().get(1);
+        assertEquals(201L, storeResponse2.getStoreId());
+        assertEquals("Store 201", storeResponse2.getStoreName());
+        assertEquals("Description 201", storeResponse2.getDescription());
+    }
+
+    @Test
+    public void testGetUserStores_whenNoStoresExist_returnsEmptyUserStoresResponse() {
+        // given
+        Long userId = 1L;
+        when(userStoreRepository.findStoresByUserId(userId)).thenReturn(Collections.emptyList());
+
+        // when
+        UserStoresResponse response = storeService.getUserStores(userId);
+
+        // then
+        assertNotNull(response, "Response should not be null even if no stores exist");
+        assertTrue(response.getStores().isEmpty(), "Store list should be empty");
+    }
 
     @Test
     @DisplayName("스케줄 템플릿이 없는 경우 빈 응답 반환")
