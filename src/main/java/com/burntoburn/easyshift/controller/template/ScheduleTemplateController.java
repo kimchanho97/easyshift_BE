@@ -45,7 +45,7 @@ public class ScheduleTemplateController {
      * @return 삭제 후 204 No Content 응답 반환
      **/
     @PatchMapping("/stores/{storeId}/schedule-templates/{scheduleTemplateId}")
-    public ResponseEntity<StoreTemplates> updateScheduleTemplate(@PathVariable Long storeId,
+    public ResponseEntity<Void> updateScheduleTemplate(@PathVariable Long storeId,
                                                                  @PathVariable Long scheduleTemplateId,
                                                                  @RequestBody ScheduleTemplateUpdate request){
         scheduleTemplateService.updateScheduleTemplate(storeId, scheduleTemplateId, request);
@@ -71,7 +71,7 @@ public class ScheduleTemplateController {
      **/
     @GetMapping("/schedule-templates/{scheduleTemplateId}")
     public ResponseEntity<StoreTemplates> getShiftTemplatesByScheduleTemplate(@PathVariable Long scheduleTemplateId){
-        ScheduleTemplate scheduleTemplateOne = scheduleTemplateService.getScheduleTemplateOne(scheduleTemplateId);
+        ScheduleTemplate scheduleTemplateOne = scheduleTemplateService.getShiftTemplateByScheduleTemplateId(scheduleTemplateId);
         StoreTemplates scheduleTemplate = scheduleTemplateOne.toDTO();
         return ResponseEntity.ok(scheduleTemplate);
     }

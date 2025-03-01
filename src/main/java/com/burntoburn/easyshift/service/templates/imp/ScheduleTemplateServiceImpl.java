@@ -64,7 +64,9 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
                 .orElseThrow(() -> new NoSuchElementException("Store not found with id: " + storeId));
 
         // 기존 ScheduleTemplate 조회
-        ScheduleTemplate existingTemplate = getScheduleTemplateOne(scheduleTemplateId);
+        // getScheduleTemplateOne()로도 가능
+        ScheduleTemplate existingTemplate = scheduleTemplateRepository.findById(scheduleTemplateId)
+                .orElseThrow(() -> new NoSuchElementException("ScheduleTemplate not found with id: " + scheduleTemplateId));
 
         // 수정 요청의 ShiftTemplateUpdate DTO를 엔티티 객체로 변환
         List<ShiftTemplate> updatedShifts = request.getShiftTemplates()
@@ -85,12 +87,11 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ScheduleTemplate getShiftTemplateByScheduleTemplateId(Long scheduleTemplateId) {
-        ScheduleTemplate scheduleTemplate = scheduleTemplateRepository.findByIdWithShiftTemplates(scheduleTemplateId)
-                .orElseThrow(() -> new NoSuchElementException("not found scheduleTemplateId"));
 
-        return scheduleTemplate;
+        return scheduleTemplateRepository.findByIdWithShiftTemplates(scheduleTemplateId)
+                .orElseThrow(() -> new NoSuchElementException("not found scheduleTemplateId"));
     }
 
     @Override

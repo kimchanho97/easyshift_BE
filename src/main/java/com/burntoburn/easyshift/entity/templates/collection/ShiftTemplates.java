@@ -11,7 +11,7 @@ import java.util.List;
 
 @Embeddable
 public class ShiftTemplates {
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_template_id") // 단방향 연관관계 유지
     private List<ShiftTemplate> shiftTemplateList = new ArrayList<>();
 
