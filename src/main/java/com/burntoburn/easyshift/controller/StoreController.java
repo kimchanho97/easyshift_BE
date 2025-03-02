@@ -51,6 +51,17 @@ public class StoreController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    // ========================================
+
+    /**
+     * 매장 삭제 API
+     */
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Void>> deleteStore(@RequestParam Long storeId) {
+        storeService.deleteStore(storeId);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
 
     // ========================================
 

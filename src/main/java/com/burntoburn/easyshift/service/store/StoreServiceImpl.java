@@ -46,6 +46,13 @@ public class StoreServiceImpl {
         store.setDescription(request.getDescription());
     }
 
+    @Transactional
+    public void deleteStore(Long storeId){
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+
+        storeRepository.delete(store);
+    }
+
     public UserStoresResponse getUserStores(Long userId) {
         List<Store> userStores = userStoreRepository.findStoresByUserId(userId);
         return UserStoresResponse.fromEntity(userStores);
