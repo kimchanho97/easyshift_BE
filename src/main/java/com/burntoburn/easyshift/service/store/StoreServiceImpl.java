@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StoreServiceImpl {
+public class StoreServiceImpl implements StoreSerivce{
 
     private final UserStoreRepository userStoreRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
@@ -29,6 +29,7 @@ public class StoreServiceImpl {
     private final StoreRepository storeRepository;
 
 
+    @Override
     @Transactional
     public StoreCreateResponse createStore(StoreCreateRequest request) {
         Store store = StoreCreateRequest.toEntity(request.getStoreName(), request.getDescription());
@@ -37,7 +38,7 @@ public class StoreServiceImpl {
         return new StoreCreateResponse(savedStore.getId(), savedStore.getStoreName(), savedStore.getStoreCode());
     }
 
-
+    @Override
     @Transactional
     public void updateStore(Long storeId, StoreUpdateRequest request) {
         Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
@@ -46,6 +47,7 @@ public class StoreServiceImpl {
         store.setDescription(request.getDescription());
     }
 
+    @Override
     @Transactional
     public void deleteStore(Long storeId){
         Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
@@ -53,11 +55,13 @@ public class StoreServiceImpl {
         storeRepository.delete(store);
     }
 
+    @Override
     public UserStoresResponse getUserStores(Long userId) {
         List<Store> userStores = userStoreRepository.findStoresByUserId(userId);
         return UserStoresResponse.fromEntity(userStores);
     }
 
+    @Override
     public StoreInfoResponse getStoreInfo(Long storeId, Long userId) {
         // 1. 사용자 매장 접근 권한 확인
         boolean isAuthorizedForStore = userStoreRepository.existsByUserIdAndStoreId(userId, storeId);

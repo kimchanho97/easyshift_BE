@@ -125,8 +125,8 @@ class ScheduleServiceImpTest {
                 .sum();
 
         assertNotNull(createdSchedule.getShifts(), "Shifts 객체가 null이면 안 됩니다.");
-        assertFalse(createdSchedule.getShifts().getList().isEmpty(), "Shift 리스트가 비어있으면 안 됩니다.");
-        assertEquals(expectedShifts, createdSchedule.getShifts().getList().size(), "Shift 개수가 일치해야 합니다.");
+        assertFalse(createdSchedule.getShifts().isEmpty(), "Shift 리스트가 비어있으면 안 됩니다.");
+        assertEquals(expectedShifts, createdSchedule.getShifts().size(), "Shift 개수가 일치해야 합니다.");
 
         // 변경 감지 방식을 사용하는 경우 shiftRepository.saveAll() 호출이 발생하지 않으므로 아래 검증을 주석 처리합니다.
         // verify(shiftRepository, times(1)).saveAll(anyList());
