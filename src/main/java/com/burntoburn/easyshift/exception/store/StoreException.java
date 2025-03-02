@@ -12,4 +12,6 @@ public class StoreException extends BusinessException {
     public static StoreException storeAccessDenied() {
         return new StoreException(StoreErrorCode.STORE_ACCESS_DENIED);
     }
+    public static StoreException storeNotFound() {return new StoreException(StoreErrorCode.STORE_NOT_FOUND);}
+
 }

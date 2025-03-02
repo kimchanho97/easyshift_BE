@@ -1,10 +1,7 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.dto.store.*;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateRequest;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateResponse;
-import com.burntoburn.easyshift.dto.store.use.StoreInfoResponse;
-import com.burntoburn.easyshift.dto.store.use.UserStoresResponse;
+import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
@@ -24,16 +21,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StoreServiceImplTest {
@@ -50,7 +44,7 @@ class StoreServiceImplTest {
     private ShiftRepository shiftRepository;
 
     @Test
-    @DisplayName("스토어 생성 성공 테스트")
+    @DisplayName("매장 생성 성공 테스트")
     void testCreateStoreSuccess() {
         // given
         StoreCreateRequest request = new StoreCreateRequest();
@@ -76,7 +70,85 @@ class StoreServiceImplTest {
         assertNotNull(response.getStoreCode());
     }
 
+
     @Test
+    @DisplayName("매장 수정 성공 테스트")
+    void updateStore_success() {
+        // given
+        Long storeId = 1L;
+        StoreUpdateRequest request = new StoreUpdateRequest("New Store Name", "New Description");
+
+        // 기존 스토어 객체 생성 (필요한 초기값 세팅)
+        Store store = Store.builder()
+                .storeName("Old Store Name")
+                .description("Old Description")
+                .build();
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+
+        // when
+        storeService.updateStore(storeId, request);
+
+        // then: store의 필드가 요청에 맞게 업데이트 되었는지 확인
+        assertEquals("New Store Name", store.getStoreName());
+        assertEquals("New Description", store.getDescription());
+        // findById가 호출된 것을 검증 (추가 검증)
+        verify(storeRepository, times(1)).findById(storeId);
+    }
+
+    @Test
+    @DisplayName("매장 수정 실패 테스트")
+    void updateStore_storeNotFound() {
+        // given
+        Long storeId = 1L;
+        StoreUpdateRequest request = new StoreUpdateRequest("New Store Name", "New Description");
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.empty());
+
+        // when & then: store가 없으면 StoreException (storeNotFound 예외)가 발생해야 함
+        assertThrows(StoreException.class, () -> {
+            storeService.updateStore(storeId, request);
+        });
+    }
+
+    @Test
+    @DisplayName("매장 삭제 성공 테스트")
+    public void deleteStore_success() {
+        // given
+        Long storeId = 1L;
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("Test Description")
+                .build();
+        // Builder로 생성한 후, id 필드는 ReflectionTestUtils로 주입합니다.
+        ReflectionTestUtils.setField(store, "id", storeId);
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+
+        // when
+        storeService.deleteStore(storeId);
+
+        // then
+        // storeRepository.delete()가 한 번 호출되었는지 검증
+        verify(storeRepository, times(1)).delete(store);
+    }
+
+    @Test
+    @DisplayName("매장 삭제 실패 테스트 - 매장이 존재하지 않는 경우")
+    public void deleteStore_storeNotFound() {
+        // given
+        Long storeId = 1L;
+        when(storeRepository.findById(storeId)).thenReturn(Optional.empty());
+
+        // when & then: 매장이 없으면 StoreException이 발생해야 함
+        assertThrows(StoreException.class, () -> storeService.deleteStore(storeId));
+
+        // 삭제 호출은 발생하지 않아야 합니다.
+        verify(storeRepository, never()).delete(any(Store.class));
+    }
+
+    @Test
+    @DisplayName("유저 매장 리스트 성공 테스트")
     public void testGetUserStores_whenStoresExist_returnsUserStoresResponse() {
         // given
         Long userId = 1L;
@@ -119,6 +191,7 @@ class StoreServiceImplTest {
     }
 
     @Test
+    @DisplayName("유저 매장 빈 리스트 반환 테스트")
     public void testGetUserStores_whenNoStoresExist_returnsEmptyUserStoresResponse() {
         // given
         Long userId = 1L;

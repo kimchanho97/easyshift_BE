@@ -1,10 +1,7 @@
 package com.burntoburn.easyshift.controller;
 
 import com.burntoburn.easyshift.common.response.ApiResponse;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateRequest;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateResponse;
-import com.burntoburn.easyshift.dto.store.use.StoreInfoResponse;
-import com.burntoburn.easyshift.dto.store.use.UserStoresResponse;
+import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.service.store.StoreServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +39,29 @@ public class StoreController {
         StoreCreateResponse response = storeService.createStore(request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    // ========================================
+
+    /**
+     * 매장 수정 API
+     */
+    @PatchMapping
+    public ResponseEntity<ApiResponse<Void>> updateStore(@RequestParam Long storeId, @RequestBody StoreUpdateRequest request) {
+        storeService.updateStore(storeId, request);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    // ========================================
+
+    /**
+     * 매장 삭제 API
+     */
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Void>> deleteStore(@RequestParam Long storeId) {
+        storeService.deleteStore(storeId);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
 
     // ========================================
 

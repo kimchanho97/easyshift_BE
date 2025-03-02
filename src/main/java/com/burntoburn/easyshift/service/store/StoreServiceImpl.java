@@ -1,10 +1,7 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.common.util.DateUtil;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateRequest;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateResponse;
-import com.burntoburn.easyshift.dto.store.use.StoreInfoResponse;
-import com.burntoburn.easyshift.dto.store.use.UserStoresResponse;
+import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
@@ -20,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,18 +29,31 @@ public class StoreServiceImpl {
     private final StoreRepository storeRepository;
 
 
-    public StoreCreateResponse createStore(StoreCreateRequest request){
-        Store store = Store.builder()
-                .storeName(request.getStoreName())
-                .storeCode(UUID.randomUUID())
-                .description(request.getDescription())
-                .build();
+    @Transactional
+    public StoreCreateResponse createStore(StoreCreateRequest request) {
+        Store store = StoreCreateRequest.toEntity(request.getStoreName(), request.getDescription());
 
         Store savedStore = storeRepository.save(store);
         return new StoreCreateResponse(savedStore.getId(), savedStore.getStoreName(), savedStore.getStoreCode());
     }
 
-    public UserStoresResponse getUserStores(Long userId){
+
+    @Transactional
+    public void updateStore(Long storeId, StoreUpdateRequest request) {
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+
+        store.setStoreName(request.getStoreName());
+        store.setDescription(request.getDescription());
+    }
+
+    @Transactional
+    public void deleteStore(Long storeId){
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+
+        storeRepository.delete(store);
+    }
+
+    public UserStoresResponse getUserStores(Long userId) {
         List<Store> userStores = userStoreRepository.findStoresByUserId(userId);
         return UserStoresResponse.fromEntity(userStores);
     }
