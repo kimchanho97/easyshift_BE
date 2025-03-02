@@ -112,6 +112,43 @@ class StoreServiceImplTest {
     }
 
     @Test
+    @DisplayName("매장 삭제 성공 테스트")
+    public void deleteStore_success() {
+        // given
+        Long storeId = 1L;
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("Test Description")
+                .build();
+        // Builder로 생성한 후, id 필드는 ReflectionTestUtils로 주입합니다.
+        ReflectionTestUtils.setField(store, "id", storeId);
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+
+        // when
+        storeService.deleteStore(storeId);
+
+        // then
+        // storeRepository.delete()가 한 번 호출되었는지 검증
+        verify(storeRepository, times(1)).delete(store);
+    }
+
+    @Test
+    @DisplayName("매장 삭제 실패 테스트 - 매장이 존재하지 않는 경우")
+    public void deleteStore_storeNotFound() {
+        // given
+        Long storeId = 1L;
+        when(storeRepository.findById(storeId)).thenReturn(Optional.empty());
+
+        // when & then: 매장이 없으면 StoreException이 발생해야 함
+        assertThrows(StoreException.class, () -> storeService.deleteStore(storeId));
+
+        // 삭제 호출은 발생하지 않아야 합니다.
+        verify(storeRepository, never()).delete(any(Store.class));
+    }
+
+    @Test
+    @DisplayName("유저 매장 리스트 성공 테스트")
     public void testGetUserStores_whenStoresExist_returnsUserStoresResponse() {
         // given
         Long userId = 1L;
@@ -154,6 +191,7 @@ class StoreServiceImplTest {
     }
 
     @Test
+    @DisplayName("유저 매장 빈 리스트 반환 테스트")
     public void testGetUserStores_whenNoStoresExist_returnsEmptyUserStoresResponse() {
         // given
         Long userId = 1L;
