@@ -1,11 +1,10 @@
 package com.burntoburn.easyshift.controller.template;
 
+import com.burntoburn.easyshift.common.response.ApiResponse;
 import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
-import com.burntoburn.easyshift.dto.template.res.AllScheduleTemplateResponse;
-import com.burntoburn.easyshift.dto.template.res.ScheduleTemplateResponse;
-import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
+import com.burntoburn.easyshift.dto.template.ScheduleTemplateResponse;
+import com.burntoburn.easyshift.dto.template.ScheduleTemplateWithShiftsResponse;
 import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,12 +28,11 @@ public class ScheduleTemplateController {
      * @return 생성된 스케줄 템플릿 정보를 포함한 DTO 응답
      */
     @PostMapping("/stores/{storeId}/schedule-templates")
-    public ResponseEntity<ScheduleTemplateResponse> createScheduleTemplate(
+    public ResponseEntity<ApiResponse<ScheduleTemplateResponse>> createScheduleTemplate(
             @PathVariable Long storeId,
             @RequestBody ScheduleTemplateRequest request) {
-        ScheduleTemplate createdTemplate = scheduleTemplateService.createScheduleTemplate(storeId, request);
-        ScheduleTemplateResponse dto = createdTemplate.toDTO();
-        return ResponseEntity.ok(dto);
+        ScheduleTemplateResponse response = scheduleTemplateService.createScheduleTemplate(storeId, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     /**
@@ -42,11 +40,11 @@ public class ScheduleTemplateController {
      * @return 해당 매장의 스케줄 템플릿 리스트 (DTO 변환 후 반환)
      **/
     @GetMapping("/stores/{storeId}/schedule-templates")
-    public ResponseEntity<AllScheduleTemplateResponse> getScheduleTemplate(@PathVariable Long storeId) {
-        AllScheduleTemplateResponse allScheduleTemplatesByStore = scheduleTemplateService
+    public ResponseEntity<ApiResponse<ScheduleTemplateWithShiftsResponse>> getScheduleTemplate(@PathVariable Long storeId) {
+        ScheduleTemplateWithShiftsResponse response = scheduleTemplateService
                 .getAllScheduleTemplatesByStore(storeId);
 
-        return ResponseEntity.ok(allScheduleTemplatesByStore);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     /**
@@ -54,13 +52,8 @@ public class ScheduleTemplateController {
      * @return 삭제 후 204 No Content 응답 반환
     **/
     @DeleteMapping("/schedule-templates/{scheduleTemplateId}")
-    public ResponseEntity<Void> deleteScheduleTemplate(@PathVariable Long scheduleTemplateId){
+    public ResponseEntity<ApiResponse<Void>> deleteScheduleTemplate(@PathVariable Long scheduleTemplateId){
         scheduleTemplateService.deleteScheduleTemplate(scheduleTemplateId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
-
-
-
-
-
 }
