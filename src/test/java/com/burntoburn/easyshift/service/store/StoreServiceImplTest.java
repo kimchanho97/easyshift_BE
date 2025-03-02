@@ -1,7 +1,7 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.dto.store.*;
-import com.burntoburn.easyshift.dto.store.StoreResponse;
+import com.burntoburn.easyshift.dto.store.use.StoreResponse;
 import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
@@ -304,6 +304,47 @@ class StoreServiceImplTest {
 
         verify(storeRepository, times(1)).findById(storeId);
         verify(userStoreRepository, times(1)).findUserDTOsByStoreId(storeId);
+    }
+
+    @Test
+    @DisplayName("매장 정보 조회 성공 테스트 (storeCode)")
+    void getStoreSimpleInfo_Success() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("This is a test store.")
+                .storeCode(storeCode)
+                .build();
+        ReflectionTestUtils.setField(store, "id", 1L);
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.of(store));
+
+        // when
+        StoreResponse response = storeService.getStoreSimpleInfo(storeCode);
+
+        // then
+        assertNotNull(response, "응답이 null이 아니어야 함");
+        assertEquals(1L, response.getStoreId());
+        assertEquals("Test Store", response.getStoreName());
+        assertEquals("This is a test store.", response.getDescription());
+
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
+    }
+
+    @Test
+    @DisplayName("매장 정보 조회 실패 테스트 - 매장 없음")
+    void getStoreSimpleInfo_StoreNotFound() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(StoreException.class, () -> storeService.getStoreSimpleInfo(storeCode));
+
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
     }
 
     @Test

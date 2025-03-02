@@ -4,7 +4,7 @@ import com.burntoburn.easyshift.dto.store.use.*;
 
 import java.util.UUID;
 
-public interface StoreSerivce {
+public interface StoreService {
     StoreCreateResponse createStore(StoreCreateRequest request);
 
     void updateStore(Long storeId, StoreUpdateRequest request);
@@ -15,7 +15,7 @@ public interface StoreSerivce {
 
     StoreUsersResponse getStoreUsers(Long storeId);
 
-    StoreResponse getStoresInfo(UUID storeCode);
+    StoreResponse getStoreSimpleInfo(UUID storeCode);
 
     StoreInfoResponse getStoreInfo(Long storeId, Long userId);
 }

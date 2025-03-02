@@ -23,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StoreServiceImpl implements StoreSerivce {
+public class StoreServiceImpl implements StoreService {
 
     private final UserStoreRepository userStoreRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
@@ -71,7 +71,7 @@ public class StoreServiceImpl implements StoreSerivce {
     }
 
     @Override
-    public StoreResponse getStoresInfo(UUID storeCode) {
+    public StoreResponse getStoreSimpleInfo(UUID storeCode) {
         Store store = storeRepository.findByStoreCode(storeCode).orElseThrow(StoreException::storeNotFound);
         return StoreResponse.fromEntity(store);
     }

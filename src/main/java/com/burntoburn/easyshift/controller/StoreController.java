@@ -2,10 +2,12 @@ package com.burntoburn.easyshift.controller;
 
 import com.burntoburn.easyshift.common.response.ApiResponse;
 import com.burntoburn.easyshift.dto.store.use.*;
-import com.burntoburn.easyshift.service.store.StoreServiceImpl;
+import com.burntoburn.easyshift.service.store.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 
 @RestController
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class StoreController {
 
-    private final StoreServiceImpl storeService;
+    private final StoreService storeService;
 
 
     // ========================================
@@ -84,6 +86,15 @@ public class StoreController {
     @GetMapping("/{storeId}/users")
     public ResponseEntity<ApiResponse<StoreUsersResponse>> getStoreUsers(@PathVariable Long storeId) {
         StoreUsersResponse response = storeService.getStoreUsers(storeId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 매장 정보 조회 API
+     */
+    @GetMapping("/info")
+    public ResponseEntity<ApiResponse<StoreResponse>> getStoreSimpleInfo(@RequestParam UUID storeCode) {
+        StoreResponse response = storeService.getStoreSimpleInfo(storeCode);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
