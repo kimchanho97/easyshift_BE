@@ -178,7 +178,7 @@ public class StoreService {
 
     private ScheduleDetailDTO mapToScheduleDetailDTO(Schedule schedule) {
         // Shifts 일급 컬렉션 내부의 Shift 리스트는 getList()를 통해 가져옵니다.
-        List<Shift> shifts = schedule.getShifts().getList();
+        List<Shift> shifts = schedule.getShifts();
         Map<ShiftKey, List<Shift>> groupedByKey = groupShiftsByKey(shifts);
 
         List<ShiftGroupDTO> shiftGroups = groupedByKey.entrySet().stream()

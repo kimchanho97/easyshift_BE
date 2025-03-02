@@ -36,7 +36,7 @@ public class ScheduleMapper {
 
     /** 개별 Schedule을 Shift와 함께 변환 */
     public ScheduleWithShiftsDto toScheduleWithShifts(Schedule schedule) {
-        List<ShiftsDto> shiftDtos = schedule.getShifts().getList().stream()
+        List<ShiftsDto> shiftDtos = schedule.getShifts().stream()
                 .map(this::toShiftDto)
                 .collect(Collectors.toList());
 

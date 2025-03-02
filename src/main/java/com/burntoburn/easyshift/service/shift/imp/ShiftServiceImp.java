@@ -53,11 +53,7 @@ public class ShiftServiceImp implements ShiftService {
         Shift existingShift = getShiftOne(shiftId);
 
         // 새로운 값으로 업데이트
-        return existingShift.updateShift(
-                shiftUpload.getShiftName(),
-                shiftUpload.getShiftDate(),
-                shiftUpload.getStartTime(),
-                shiftUpload.getEndTime());
+        return null;
     }
 
     @Transactional(readOnly = true)

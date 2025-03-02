@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-@Embeddable
+//@Embeddable
 @NoArgsConstructor
 public class Shifts {
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Shift> shiftList = new ArrayList<>();
 
     // Shift 추가

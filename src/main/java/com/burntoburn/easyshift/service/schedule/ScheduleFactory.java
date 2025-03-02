@@ -25,14 +25,14 @@ public class ScheduleFactory {
                 .scheduleName(request.getScheduleName())
                 .scheduleMonth(request.getScheduleMonth())
                 .scheduleStatus(ScheduleStatus.PENDING)
+                .scheduleTemplateId(scheduleTemplate.getId()) // Schedule 테이블에 scheduleTemplateId 저장
                 .store(store)
-                .shifts(new Shifts())
+                .shifts(new ArrayList<>())
                 .build();
 
         List<ShiftRequest> shiftDetails = request.getShiftDetails();
         List<Shift> shifts = createShifts(schedule, scheduleTemplate, shiftDetails);
-        schedule.addShift(shifts);
-
+        schedule.getShifts().addAll(shifts);
         return schedule;
     }
 
@@ -84,7 +84,7 @@ public class ScheduleFactory {
         schedule.updateSchedule(
                 request.getScheduleName(),
                 request.getScheduleMonth(),
-                schedule.getShifts().getList()
+                schedule.getShifts()
         );
         return schedule;
     }

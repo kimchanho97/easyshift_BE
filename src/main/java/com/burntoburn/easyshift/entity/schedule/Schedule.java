@@ -4,7 +4,9 @@ import com.burntoburn.easyshift.entity.BaseEntity;
 import com.burntoburn.easyshift.entity.schedule.collection.Shifts;
 import com.burntoburn.easyshift.entity.schedule.converter.YearMonthConverter;
 import com.burntoburn.easyshift.entity.store.Store;
+import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.*;
 
 import java.time.YearMonth;
@@ -40,21 +42,15 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
     private String description;
-    private Long scheduleTemplateId;
+    private Long scheduleTemplateId; // FK 아님
 
-    @Embedded
-    @Builder.Default // 기본값 설정
-    private Shifts shifts = new Shifts(); // 일급 컬렉션 적용
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Shift> shifts = new ArrayList<>(); // 일급 컬렉션 제거
 
     // 스케줄 업데이트 메서드
-    public void updateSchedule(String scheduleName, YearMonth scheduleMonth, List<Shift> newShifts) {
+    public void updateSchedule(String scheduleName, YearMonth scheduleMonth,  List<Shift> shifts) {
         this.scheduleName = scheduleName;
         this.scheduleMonth = scheduleMonth;
-        this.shifts.update(newShifts); // 일급 컬렉션 내부에서 관리
+        this.shifts = shifts;
     }
-
-    public void addShift(List<Shift> newShifts) {
-        this.shifts.addAll(newShifts);
-    }
-
 }
