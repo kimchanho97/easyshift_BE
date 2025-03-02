@@ -25,10 +25,10 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class TokenProvider {
-    
+
     private final JwtProperties jwtProperties;
     private Key signingKey;
-    
+
     @PostConstruct
     protected void init() {
         String secret = jwtProperties.getSecretKey();
@@ -36,28 +36,28 @@ public class TokenProvider {
             log.error("JWT secret key is missing. Please add it in application-oauth.yml");
             throw new IllegalStateException("Missing JWT secret key");
         }
+
         try {
             this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+            log.info("JWT signing key initialized successfully");
         } catch (WeakKeyException e) {
             int keyBits = secret.getBytes(StandardCharsets.UTF_8).length * 8;
-            log.error("The provided JWT secret key is too weak ({} bits). Please update your application-oauth.yml " +
-                    "with a secret_key that is at least 256 bits.", keyBits);
+            log.error("The provided JWT secret key is too weak ({} bits). Min requirement is 256 bits.", keyBits);
             throw e;
         }
     }
-    
+
     public String generateToken(User user, Duration expiresIn) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiresIn.toMillis());
         return makeToken(expiryDate, user);
     }
-    
+
     private String makeToken(Date expiry, User user) {
         Date now = new Date();
-        
+
         return Jwts.builder()
                 .header()
-                .empty()
                 .add("typ", "JWT")
                 .and()
                 .issuer(jwtProperties.getIssuer())
@@ -68,8 +68,12 @@ public class TokenProvider {
                 .signWith(signingKey)
                 .compact();
     }
-    
+
     public boolean validToken(String token) {
+        if (token == null) { // token이 null이면 유효하지 않은 토큰
+            return false;
+        }
+
         try {
             Jwts.parser()
                     .verifyWith((SecretKey) signingKey)
@@ -77,28 +81,31 @@ public class TokenProvider {
                     .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
+            log.debug("Invalid JWT token: {}", e.getMessage());
             return false;
         }
     }
-    
+
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
         Set<SimpleGrantedAuthority> authorities =
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+
         return new UsernamePasswordAuthenticationToken(
                 new org.springframework.security.core.userdetails.User(claims.getSubject(), "", authorities),
                 token,
                 authorities
         );
     }
-    
+
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith((SecretKey) signingKey)
-                .build().parseSignedClaims(token).getPayload();
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    // 토큰에서 사용자 ID를 추출하는 public 메서드
     public Long getUserIdFromToken(String token) {
         return getClaims(token).get("id", Long.class);
     }

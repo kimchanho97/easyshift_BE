@@ -28,7 +28,6 @@ public class OAuth2Config {
     @Bean
     public SecurityFilterChain oAuth2FilterChain(HttpSecurity http) throws Exception {
 
-
         http.securityMatcher("/oauth2/**", "/login/**") // OAuth2 관련 URL만 매칭
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
@@ -43,7 +42,7 @@ public class OAuth2Config {
                                             userInfoEndpointConfig.userService(
                                                     oAuth2UserCustomService));
                     // 인증 성공 시 실행할 핸들러
-                    oauth2.successHandler(oAuth2SuccessHanlder());
+                    oauth2.successHandler(oAuth2SuccessHandler());
                     oauth2.failureHandler(oAuth2FailureHandler());
                 }
         );
@@ -55,7 +54,7 @@ public class OAuth2Config {
 
 
     @Bean
-    public OAuth2SuccessHandler oAuth2SuccessHanlder() {
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
         return new OAuth2SuccessHandler(tokenProvider, refreshTokenRepository, oAuth2AuthorizationRequestRepository, userService);
     }
 
