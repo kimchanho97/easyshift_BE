@@ -5,12 +5,16 @@ import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
+import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
+import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.exception.store.StoreException;
+import com.burntoburn.easyshift.exception.user.UserException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +33,7 @@ public class StoreServiceImpl implements StoreService {
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final ShiftRepository shiftRepository;
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -104,5 +109,25 @@ public class StoreServiceImpl implements StoreService {
         );
 
         return StoreInfoResponse.fromEntity(storeId, scheduleTemplates, selectedTemplate, shifts);
+    }
+
+    @Transactional
+    @Override
+    public void joinUserStore(UUID storeCode, Long userId) {
+        Store store = storeRepository.findByStoreCode(storeCode).orElseThrow(StoreException::storeNotFound);
+
+        User user = userRepository.findById(userId).orElseThrow(UserException::userNotFound);
+
+        boolean alreadyJoined = userStoreRepository.existsByUserIdAndStoreId(userId, store.getId());
+        if(alreadyJoined){
+            throw StoreException.userAlreadyJoined();
+        }
+
+        UserStore userStore = UserStore.builder()
+                .user(user)
+                .store(store)
+                .build();
+
+        userStoreRepository.save(userStore);
     }
 }

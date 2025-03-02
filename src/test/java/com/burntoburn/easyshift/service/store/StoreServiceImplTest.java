@@ -6,14 +6,17 @@ import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
+import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.entity.user.Role;
+import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +42,8 @@ class StoreServiceImplTest {
     private StoreServiceImpl storeService;
     @Mock
     private UserStoreRepository userStoreRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private StoreRepository storeRepository;
     @Mock
@@ -437,6 +442,79 @@ class StoreServiceImplTest {
                         tuple(202L, "오후 근무", "15:00", "18:00"),
                         tuple(203L, "야간 근무", "18:00", "21:00")
                 );
+    }
+
+    @Test
+    @DisplayName("매장 입장 성공 테스트")
+    void joinUserStore_Success() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        Long userId = 1L;
+
+        Store store = Store.builder()
+                .id(10L)
+                .storeName("Test Store")
+                .storeCode(storeCode)
+                .description("테스트 매장")
+                .build();
+
+        User user = User.builder()
+                .id(userId)
+                .name("홍길동")
+                .email("hong@example.com")
+                .build();
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.of(store));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userStoreRepository.existsByUserIdAndStoreId(userId, store.getId())).thenReturn(false);
+        when(userStoreRepository.save(any(UserStore.class))).thenReturn(
+                UserStore.builder()
+                        .user(user)
+                        .store(store)
+                        .build()
+        );
+
+        // when
+        storeService.joinUserStore(storeCode, userId);
+
+        // then
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
+        verify(userRepository, times(1)).findById(userId);
+        verify(userStoreRepository, times(1)).existsByUserIdAndStoreId(userId, store.getId());
+        verify(userStoreRepository, times(1)).save(any(UserStore.class));
+    }
+
+    @Test
+    @DisplayName("매장 입장 실패 테스트 - 이미 가입된 경우")
+    void joinUserStore_AlreadyJoined() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        Long userId = 1L;
+
+        Store store = Store.builder()
+                .id(10L)
+                .storeName("Test Store")
+                .storeCode(storeCode)
+                .description("테스트 매장")
+                .build();
+
+        User user = User.builder()
+                .id(userId)
+                .name("홍길동")
+                .email("hong@example.com")
+                .build();
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.of(store));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userStoreRepository.existsByUserIdAndStoreId(userId, store.getId())).thenReturn(true);
+
+        // when & then
+        assertThrows(StoreException.class, () -> storeService.joinUserStore(storeCode, userId));
+
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
+        verify(userRepository, times(1)).findById(userId);
+        verify(userStoreRepository, times(1)).existsByUserIdAndStoreId(userId, store.getId());
+        verify(userStoreRepository, never()).save(any(UserStore.class));
     }
 
 }

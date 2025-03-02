@@ -89,6 +89,9 @@ public class StoreController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    // ========================================
+
+
     /**
      * 매장 정보 조회 API
      */
@@ -97,5 +100,23 @@ public class StoreController {
         StoreResponse response = storeService.getStoreSimpleInfo(storeCode);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+
+    // ========================================
+
+    /**
+     * 매장 입장 API
+     */
+    @GetMapping("/join")
+    public ResponseEntity<ApiResponse<Void>> getStore(@RequestParam UUID storeCode) {
+        // UserId는 spring security의 @AuthenticationPrincipal로 받아올 수 있음
+        // Long userId = userDetails.getUserId();
+        Long userId = 1L; // 여기서는 임의로 1로 설정
+        
+        storeService.joinUserStore(storeCode, userId);
+
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
 
 }

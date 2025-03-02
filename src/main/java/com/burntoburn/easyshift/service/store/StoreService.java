@@ -18,4 +18,6 @@ public interface StoreService {
     StoreResponse getStoreSimpleInfo(UUID storeCode);
 
     StoreInfoResponse getStoreInfo(Long storeId, Long userId);
+
+    void joinUserStore(UUID storeCode, Long userId);
 }
