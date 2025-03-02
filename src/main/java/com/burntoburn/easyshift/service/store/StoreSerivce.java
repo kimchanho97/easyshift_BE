@@ -11,5 +11,7 @@ public interface StoreSerivce {
 
     UserStoresResponse getUserStores(Long userId);
 
+    StoreUsersResponse getStoreUsers(Long storeId);
+
     StoreInfoResponse getStoreInfo(Long storeId, Long userId);
 }

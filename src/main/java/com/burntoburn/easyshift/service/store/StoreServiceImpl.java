@@ -2,8 +2,10 @@ package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.common.util.DateUtil;
 import com.burntoburn.easyshift.dto.store.use.*;
+import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
+import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
@@ -59,6 +61,13 @@ public class StoreServiceImpl implements StoreSerivce{
     public UserStoresResponse getUserStores(Long userId) {
         List<Store> userStores = userStoreRepository.findStoresByUserId(userId);
         return UserStoresResponse.fromEntity(userStores);
+    }
+
+    @Override
+    public StoreUsersResponse getStoreUsers(Long storeId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+        List<UserDTO> users = userStoreRepository.findUserDTOsByStoreId(store.getId());
+        return StoreUsersResponse.fromEntity(store, users);
     }
 
     @Override

@@ -2,10 +2,12 @@ package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.dto.store.*;
 import com.burntoburn.easyshift.dto.store.use.*;
+import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
+import com.burntoburn.easyshift.entity.user.Role;
 import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
@@ -203,6 +205,104 @@ class StoreServiceImplTest {
         // then
         assertNotNull(response, "Response should not be null even if no stores exist");
         assertTrue(response.getStores().isEmpty(), "Store list should be empty");
+    }
+
+    @Test
+    @DisplayName("매장 사용자 목록 조회 성공 테스트")
+    void getStoreUsers_Success() {
+        // given
+        Long storeId = 10L;
+
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("Test Description")
+                .build();
+        ReflectionTestUtils.setField(store, "id", storeId);
+        ReflectionTestUtils.setField(store, "storeCode", UUID.fromString("11111111-1111-1111-1111-111111111111"));
+
+
+        // UserDTO 목록 (userStoreRepository에서 반환할 가짜 데이터)
+        List<UserDTO> mockUserList = List.of(
+                new UserDTO(1L, "홍길동", "hong@example.com", "010-1111-2222", "http://avatar.com/1.png", Role.WORKER),
+                new UserDTO(2L, "김철수", "kim@example.com", "010-3333-4444", "http://avatar.com/2.png", Role.ADMINISTRATOR)
+        );
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(userStoreRepository.findUserDTOsByStoreId(storeId)).thenReturn(mockUserList);
+
+        // when
+        StoreUsersResponse response = storeService.getStoreUsers(storeId);
+
+        // then
+        assertNotNull(response, "Response는 null이 아니어야 함");
+        assertEquals(store.getStoreCode(), response.getStoreCode());
+        assertEquals(store.getId(), response.getStoreId());
+        assertEquals(store.getStoreName(), response.getStoreName());
+        assertEquals(store.getDescription(), response.getDescription());
+        assertEquals(2, response.getUsers().size(), "사용자 목록 크기는 2여야 함");
+
+        UserDTO firstUser = response.getUsers().get(0);
+        assertEquals(1L, firstUser.getId());
+        assertEquals("홍길동", firstUser.getName());
+        assertEquals("hong@example.com", firstUser.getEmail());
+        assertEquals("010-1111-2222", firstUser.getPhoneNumber());
+        assertEquals("http://avatar.com/1.png", firstUser.getAvatarUrl());
+        assertEquals(Role.WORKER, firstUser.getRole());
+
+        UserDTO secondUser = response.getUsers().get(1);
+        assertEquals(2L, secondUser.getId());
+        assertEquals("김철수", secondUser.getName());
+        assertEquals("kim@example.com", secondUser.getEmail());
+        assertEquals("010-3333-4444", secondUser.getPhoneNumber());
+        assertEquals("http://avatar.com/2.png", secondUser.getAvatarUrl());
+        assertEquals(Role.ADMINISTRATOR, secondUser.getRole());
+
+        // storeRepository와 userStoreRepository가 올바르게 호출되었는지 검증
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(userStoreRepository, times(1)).findUserDTOsByStoreId(storeId);
+    }
+
+    @Test
+    @DisplayName("매장 사용자 목록 조회 실패 테스트 - 매장 미존재")
+    void getStoreUsers_StoreNotFound() {
+        // given
+        Long storeId = 999L;
+        when(storeRepository.findById(storeId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(StoreException.class, () -> storeService.getStoreUsers(storeId));
+
+        // userStoreRepository는 호출되지 않아야 한다
+        verify(userStoreRepository, never()).findUserDTOsByStoreId(anyLong());
+    }
+
+    @Test
+    @DisplayName("매장 사용자 목록 조회 성공 테스트 - 사용자가 없는 경우")
+    void getStoreUsers_EmptyUserList() {
+        // given
+        Long storeId = 10L;
+
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("Test Description")
+                .build();
+        ReflectionTestUtils.setField(store, "id", storeId);
+        ReflectionTestUtils.setField(store, "storeCode", UUID.fromString("11111111-1111-1111-1111-111111111111"));
+
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(userStoreRepository.findUserDTOsByStoreId(storeId)).thenReturn(List.of()); // 빈 리스트 반환
+
+        // when
+        StoreUsersResponse response = storeService.getStoreUsers(storeId);
+
+        // then
+        assertNotNull(response);
+        assertEquals(store.getId(), response.getStoreId());
+        assertTrue(response.getUsers().isEmpty(), "사용자가 없는 경우 빈 리스트 반환해야 함");
+
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(userStoreRepository, times(1)).findUserDTOsByStoreId(storeId);
     }
 
     @Test
