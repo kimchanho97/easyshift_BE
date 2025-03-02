@@ -1,5 +1,7 @@
-package com.burntoburn.easyshift.dto.store.res;
+package com.burntoburn.easyshift.dto.store.use;
 
+import com.burntoburn.easyshift.dto.store.ScheduleTemplateDto;
+import com.burntoburn.easyshift.dto.store.SelectedScheduleTemplateDto;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import lombok.AllArgsConstructor;
