@@ -18,7 +18,6 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
-
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
@@ -32,7 +31,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
 
     // 유저가 있으면 업데이트, 없으면 유저 생성
     private void saveOrUpdate(OAuth2User oAuth2User) {
-       KakaoOAuth2User kakaoOAuth2User = new KakaoOAuth2User(oAuth2User.getAttributes());
+        KakaoOAuth2User kakaoOAuth2User = new KakaoOAuth2User(oAuth2User.getAttributes());
         String email = kakaoOAuth2User.getEmail();
 
         User user= userRepository.findByEmail(email)

@@ -120,4 +120,5 @@ public class TokenProvider {
     public Long getUserIdFromToken(String token) {
         return getClaims(token).get("id", Long.class);
     }
+
 }
