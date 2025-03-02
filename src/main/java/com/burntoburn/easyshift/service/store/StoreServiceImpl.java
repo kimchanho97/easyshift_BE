@@ -30,14 +30,23 @@ public class StoreServiceImpl {
 
 
     @Transactional
-    public StoreCreateResponse createStore(StoreCreateRequest request){
+    public StoreCreateResponse createStore(StoreCreateRequest request) {
         Store store = StoreCreateRequest.toEntity(request.getStoreName(), request.getDescription());
 
         Store savedStore = storeRepository.save(store);
         return new StoreCreateResponse(savedStore.getId(), savedStore.getStoreName(), savedStore.getStoreCode());
     }
 
-    public UserStoresResponse getUserStores(Long userId){
+
+    @Transactional
+    public void updateStore(Long storeId, StoreUpdateRequest request) {
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+
+        store.setStoreName(request.getStoreName());
+        store.setDescription(request.getDescription());
+    }
+
+    public UserStoresResponse getUserStores(Long userId) {
         List<Store> userStores = userStoreRepository.findStoresByUserId(userId);
         return UserStoresResponse.fromEntity(userStores);
     }
