@@ -18,4 +18,8 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> fail(ErrorResponse error) {
         return new ApiResponse<>(false, null, error);
     }
+
+    // 삭제 응답의 경우 ApiResponse.success() 에서 , response = null 일 경우 추가
+    public static ApiResponse<Void> success() {return new ApiResponse<>(true, null, null);
+    }
 }
