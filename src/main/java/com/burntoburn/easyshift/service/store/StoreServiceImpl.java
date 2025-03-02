@@ -5,7 +5,6 @@ import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
-import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
@@ -19,11 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StoreServiceImpl implements StoreSerivce{
+public class StoreServiceImpl implements StoreSerivce {
 
     private final UserStoreRepository userStoreRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
@@ -51,7 +51,7 @@ public class StoreServiceImpl implements StoreSerivce{
 
     @Override
     @Transactional
-    public void deleteStore(Long storeId){
+    public void deleteStore(Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
 
         storeRepository.delete(store);
@@ -68,6 +68,12 @@ public class StoreServiceImpl implements StoreSerivce{
         Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
         List<UserDTO> users = userStoreRepository.findUserDTOsByStoreId(store.getId());
         return StoreUsersResponse.fromEntity(store, users);
+    }
+
+    @Override
+    public StoreResponse getStoresInfo(UUID storeCode) {
+        Store store = storeRepository.findByStoreCode(storeCode).orElseThrow(StoreException::storeNotFound);
+        return StoreResponse.fromEntity(store);
     }
 
     @Override
