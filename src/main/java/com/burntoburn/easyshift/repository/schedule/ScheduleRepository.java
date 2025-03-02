@@ -17,7 +17,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     // 특정 매장의 특정 스케줄 조회 (storeId 검증 포함)
     Optional<Schedule> findByIdAndStoreId(Long scheduleId, Long storeId);
 
-    @Query("SELECT s FROM Schedule s LEFT JOIN FETCH s.shifts.shiftList WHERE s.id = :scheduleId")
+    // 일급 컬렉션 제거
+    @Query("SELECT s FROM Schedule s LEFT JOIN FETCH s.shifts WHERE s.id = :scheduleId")
     Optional<Schedule> findByIdWithShifts(@Param("scheduleId") Long scheduleId);
-    
+
 }

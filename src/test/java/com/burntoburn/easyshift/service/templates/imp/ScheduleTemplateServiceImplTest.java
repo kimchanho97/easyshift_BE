@@ -1,144 +1,179 @@
 package com.burntoburn.easyshift.service.templates.imp;
 
+import com.burntoburn.easyshift.dto.template.ScheduleTemplateResponse;
+import com.burntoburn.easyshift.dto.template.ScheduleTemplateWithShiftsResponse;
 import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.dto.template.req.ShiftTemplateRequest;
-import com.burntoburn.easyshift.dto.template.res.AllScheduleTemplateResponse;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
-import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
+import com.burntoburn.easyshift.exception.template.TemplateException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
-import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
-import org.junit.jupiter.api.BeforeEach;
+import com.burntoburn.easyshift.service.templates.ScheduleTemplateFactory;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ScheduleTemplateServiceImplTest {
 
-    @Autowired
-    private ScheduleTemplateService scheduleTemplateService;
-
-    @MockitoBean
+    @Mock
     private ScheduleTemplateRepository scheduleTemplateRepository;
 
-    @MockitoBean
+    @Mock
     private StoreRepository storeRepository;
 
-    private Store store;
-    private ScheduleTemplate existingTemplate;
+    @Mock
+    private ScheduleTemplateFactory scheduleTemplateFactory;
 
-    @BeforeEach
-    void setUp() {
-        // 매장(Store) 객체 생성
-        store = Store.builder().id(1L).build();
+    @InjectMocks
+    private ScheduleTemplateServiceImpl scheduleTemplateService;
 
-        // 기존 ShiftTemplate 2개 포함된 ScheduleTemplate 생성
-        ShiftTemplate shift1 = ShiftTemplate.builder()
-                .shiftTemplateName("Morning Shift")
-                .startTime(LocalTime.of(9, 0))
-                .endTime(LocalTime.of(17, 0))
-                .build();
-
-        ShiftTemplate shift2 = ShiftTemplate.builder()
-                .shiftTemplateName("Evening Shift")
-                .startTime(LocalTime.of(14, 0))
-                .endTime(LocalTime.of(22, 0))
-                .build();
-
-        existingTemplate = ScheduleTemplate.builder()
-                .id(1L)
-                .scheduleTemplateName("Old Schedule")
-                .store(store)
-                .build();
-
-        existingTemplate.getShiftTemplates().addAll(List.of(shift1, shift2)); // ✅ 일급 컬렉션 이용하여 추가
-    }
-
+    // ✅ 1. createScheduleTemplate() 테스트
     @Test
-    @DisplayName("스케줄 템플릿 생성")
-    void createScheduleTemplate() {
+    @DisplayName("Store가 존재하지 않으면 NoSuchElementException 발생")
+    void createScheduleTemplate_ShouldThrowException_WhenStoreNotFound() {
         // Given
+        Long storeId = 1L;
         ScheduleTemplateRequest request = ScheduleTemplateRequest.builder()
-                .scheduleTemplateName("New Schedule")
+                .scheduleTemplateName("야간 근무")
                 .shiftTemplates(List.of(
-                        new ShiftTemplateRequest("Morning Shift", LocalTime.of(8, 0), LocalTime.of(12, 0)),
-                        new ShiftTemplateRequest("Evening Shift", LocalTime.of(16, 0), LocalTime.of(20, 0))
+                        new ShiftTemplateRequest("1교대", LocalTime.of(12, 0), LocalTime.of(15, 0)),
+                        new ShiftTemplateRequest("2교대", LocalTime.of(15, 0), LocalTime.of(18, 0))
                 ))
                 .build();
 
-        // 새로운 ScheduleTemplate 객체 생성
-        ScheduleTemplate newTemplate = ScheduleTemplate.builder()
-                .scheduleTemplateName("New Schedule")
-                .store(store)
+        when(storeRepository.findById(storeId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(NoSuchElementException.class,
+                () -> scheduleTemplateService.createScheduleTemplate(storeId, request));
+
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(scheduleTemplateRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("정상적으로 ScheduleTemplate 생성 후 반환")
+    void createScheduleTemplate_ShouldReturnResponse_WhenSuccessful() {
+        // Given
+        Long storeId = 1L;
+        Store store = Store.builder()
+                .storeName("test")
+                .id(storeId)
+                .description("asd")
+                .storeCode(UUID.randomUUID())
                 .build();
 
-        when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
-        when(scheduleTemplateRepository.save(any(ScheduleTemplate.class))).thenReturn(newTemplate);
+        ScheduleTemplateRequest request = ScheduleTemplateRequest.builder()
+                .scheduleTemplateName("야간 근무")
+                .shiftTemplates(List.of(
+                        new ShiftTemplateRequest("1교대", LocalTime.of(12, 0), LocalTime.of(15, 0)),
+                        new ShiftTemplateRequest("2교대", LocalTime.of(15, 0), LocalTime.of(18, 0))
+                ))
+                .build();
+        ScheduleTemplate scheduleTemplate = new ScheduleTemplate(1L, "야간 근무", store);
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(scheduleTemplateFactory.createScheduleTemplate(store, request)).thenReturn(scheduleTemplate);
+        when(scheduleTemplateRepository.save(scheduleTemplate)).thenReturn(scheduleTemplate);
 
         // When
-        ScheduleTemplate createdTemplate = scheduleTemplateService.createScheduleTemplate(1L, request);
+        ScheduleTemplateResponse response = scheduleTemplateService.createScheduleTemplate(storeId, request);
 
         // Then
-        assertNotNull(createdTemplate);
-        assertEquals("New Schedule", createdTemplate.getScheduleTemplateName());
-        verify(scheduleTemplateRepository, times(1)).save(any(ScheduleTemplate.class));
+        assertNotNull(response);
+        assertEquals("야간 근무", response.getScheduleTemplateName());
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(scheduleTemplateRepository, times(1)).save(scheduleTemplate);
+    }
+
+    // ✅ 2. getAllScheduleTemplatesByStore() 테스트
+    @Test
+    @DisplayName("Store가 존재하지 않으면 NoSuchElementException 발생")
+    void getAllScheduleTemplatesByStore_ShouldThrowException_WhenStoreNotFound() {
+        // Given
+        Long storeId = 1L;
+        when(storeRepository.existsById(storeId)).thenReturn(false);
+
+        // When & Then
+        assertThrows(NoSuchElementException.class,
+                () -> scheduleTemplateService.getAllScheduleTemplatesByStore(storeId));
+
+        verify(scheduleTemplateRepository, never()).findAllByStoreId(any());
     }
 
     @Test
-    @DisplayName("스케줄 템플릿 단건 조회")
-    void getScheduleTemplateOne() {
+    @DisplayName("storeId에 해당하는 ScheduleTemplate이 없으면 TemplateException 발생")
+    void getAllScheduleTemplatesByStore_ShouldThrowException_WhenNoTemplatesFound() {
         // Given
-        when(scheduleTemplateRepository.findById(1L)).thenReturn(Optional.of(existingTemplate));
+        Long storeId = 1L;
+        when(storeRepository.existsById(storeId)).thenReturn(true);
+        when(scheduleTemplateRepository.findAllByStoreId(storeId)).thenReturn(List.of());
 
-        // When
-        ScheduleTemplate foundTemplate = scheduleTemplateService.getScheduleTemplateOne(1L);
+        // When & Then
+        assertThrows(TemplateException.class,
+                () -> scheduleTemplateService.getAllScheduleTemplatesByStore(storeId));
 
-        // Then
-        assertNotNull(foundTemplate);
-        assertEquals("Old Schedule", foundTemplate.getScheduleTemplateName());
-        verify(scheduleTemplateRepository, times(1)).findById(1L);
+        verify(scheduleTemplateRepository, times(1)).findAllByStoreId(storeId);
     }
 
     @Test
-    @DisplayName("특정 매장의 모든 스케줄 템플릿 조회")
-    void getAllScheduleTemplatesByStore() {
+    @DisplayName("storeId에 해당하는 ScheduleTemplate이 존재하면 정상 반환")
+    void getAllScheduleTemplatesByStore_ShouldReturnTemplates_WhenTemplatesExist() {
         // Given
-        List<ScheduleTemplate> templates = List.of(existingTemplate);
-        when(scheduleTemplateRepository.findAllByStoreId(1L)).thenReturn((templates));
+        Long storeId = 1L;
+        List<ScheduleTemplate> templates = List.of(new ScheduleTemplate(1L, "야간 근무", null));
+        when(storeRepository.existsById(storeId)).thenReturn(true);
+        when(scheduleTemplateRepository.findAllByStoreId(storeId)).thenReturn(templates);
 
         // When
-        AllScheduleTemplateResponse result = scheduleTemplateService.getAllScheduleTemplatesByStore(
-                1L);
+        ScheduleTemplateWithShiftsResponse response = scheduleTemplateService.getAllScheduleTemplatesByStore(storeId);
 
         // Then
-        assertNotNull(result);
-        assertEquals(1, result.getScheduleTemplateResponses().size());
-        verify(scheduleTemplateRepository, times(1)).findAllByStoreId(1L);
+        assertNotNull(response);
+        assertEquals(1, response.getScheduleTemplates().size());
+        verify(scheduleTemplateRepository, times(1)).findAllByStoreId(storeId);
+    }
+
+    // ✅ 3. deleteScheduleTemplate() 테스트
+    @Test
+    @DisplayName("삭제하려는 ScheduleTemplate이 없으면 TemplateException 발생")
+    void deleteScheduleTemplate_ShouldThrowException_WhenTemplateNotFound() {
+        // Given
+        Long scheduleTemplateId = 1L;
+        when(scheduleTemplateRepository.existsById(scheduleTemplateId)).thenReturn(false);
+
+        // When & Then
+        assertThrows(TemplateException.class,
+                () -> scheduleTemplateService.deleteScheduleTemplate(scheduleTemplateId));
+
+        verify(scheduleTemplateRepository, never()).deleteById(any());
     }
 
     @Test
-    @DisplayName("스케줄 템플릿 삭제")
-    void deleteScheduleTemplate() {
+    @DisplayName("ScheduleTemplate이 존재하면 정상 삭제")
+    void deleteScheduleTemplate_ShouldDeleteTemplate_WhenExists() {
         // Given
-        when(scheduleTemplateRepository.findById(1L)).thenReturn(Optional.of(existingTemplate));
-        doNothing().when(scheduleTemplateRepository).deleteById(1L);
+        Long scheduleTemplateId = 1L;
+        when(scheduleTemplateRepository.existsById(scheduleTemplateId)).thenReturn(true);
 
         // When
-        scheduleTemplateService.deleteScheduleTemplate(1L);
+        scheduleTemplateService.deleteScheduleTemplate(scheduleTemplateId);
 
         // Then
-        verify(scheduleTemplateRepository, times(1)).deleteById(1L);
+        verify(scheduleTemplateRepository, times(1)).deleteById(scheduleTemplateId);
     }
 }

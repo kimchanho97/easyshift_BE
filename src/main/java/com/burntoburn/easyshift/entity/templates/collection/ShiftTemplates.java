@@ -8,14 +8,13 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-@Embeddable
 public class ShiftTemplates {
 
     // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     // @JoinColumn(name = "schedule_template_id") // 단방향 연관관계 유지
     // -> OneToMany 쪽에서 연관관계의 주인이 되면 안 됩니다!!
 
-    @OneToMany(mappedBy = "scheduleTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
+   // @OneToMany(mappedBy = "scheduleTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ShiftTemplate> shiftTemplates = new ArrayList<>();
 
     // 새로운 ShiftTemplate 목록으로 업데이트

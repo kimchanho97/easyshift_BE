@@ -3,6 +3,7 @@ package com.burntoburn.easyshift.entity.schedule;
 import com.burntoburn.easyshift.entity.BaseEntity;
 import com.burntoburn.easyshift.entity.user.User;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -43,12 +44,11 @@ public class Shift extends BaseEntity {
     private User user;
     private Long shiftTemplateId;
 
-    public Shift updateShift(String shiftName, LocalDate shiftDate, LocalTime startTime, LocalTime endTime) {
+    public void updateShift(String shiftName, LocalDate shiftDate, LocalTime startTime, LocalTime endTime) {
         this.shiftName = shiftName;
         this.shiftDate = shiftDate;
         this.startTime = startTime;
         this.endTime = endTime;
-        return this;
     }
 
     public void assignUser(User user) {

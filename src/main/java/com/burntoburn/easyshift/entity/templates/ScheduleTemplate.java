@@ -1,7 +1,5 @@
 package com.burntoburn.easyshift.entity.templates;
 
-import com.burntoburn.easyshift.dto.template.res.ScheduleTemplateResponse;
-import com.burntoburn.easyshift.dto.template.res.ShiftTemplateResponse;
 import com.burntoburn.easyshift.entity.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,18 +30,6 @@ public class ScheduleTemplate {
 
     @OneToMany(mappedBy = "scheduleTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ShiftTemplate> shiftTemplates = new ArrayList<>();
-
-    // 엔티티 내부에 DTO 변환 로직이 있으면 안 됩니다!!
-    public ScheduleTemplateResponse toDTO() {
-        return ScheduleTemplateResponse.builder()
-                .ScheduleTemplateId(this.id)
-                .scheduleTemplateName(this.scheduleTemplateName)
-                .storeId(this.store.getId()) // ✅ Lazy Loading 문제 방지: ID만 반환
-                .shiftTemplates(this.shiftTemplates.stream()
-                        .map(ShiftTemplateResponse::fromEntity) // ✅ ShiftTemplate 변환
-                        .toList())
-                .build();
-    }
 
     public void addShiftTemplate(ShiftTemplate shiftTemplate) {
         this.shiftTemplates.add(shiftTemplate);
