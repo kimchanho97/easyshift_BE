@@ -16,10 +16,13 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.burntoburn.easyshift.util.CookieUtil;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 @Slf4j
@@ -36,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
     public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(2);
     // 프론트엔드 콜백 페이지 URL ( 추후 수정 예정 )
-    public static final String FRONTEND_CALLBACK_URL = "http://localhost:3000/auth/callback";
+    public static final String FRONTEND_CALLBACK_URL = "http://localhost:3000/";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -52,10 +55,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = userService.findByEmail(kakaoOAuth2User.getEmail());
 
         if (user != null) {
-            message = "로그인 성공";
+            message = URLEncoder.encode("로그인 성공", StandardCharsets.UTF_8);
         } else {
             // 신규 사용자는 추가 가입 페이지로 리다이렉트해서 역할 선택 (리다이렉트 URL은 추후 수정), 핸들러 종료..
-            String signupUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/user-info")
+            String signupUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/")
                     .queryParam("email", kakaoOAuth2User.getEmail())
                     .queryParam("name", kakaoOAuth2User.getName())
                     .queryParam("PhoneNumber", kakaoOAuth2User.getPhoneNumber())
@@ -70,7 +73,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
         // 리프레시 토큰 생성
         String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
-        saveToken(user.getId(), refreshToken);
+        saveToken(user, refreshToken);
         addRefreshTokenToCookie(request, response, refreshToken);
 
         // 로그인 성공 메시지와 access token 을 반환
@@ -95,11 +98,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
     // RefreshToken 이 DB에 있는지 확인하고 업데이트 하거나 저장
-    private void saveToken(Long userId, String newRefreshToken) {
-        RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId)
+    private void saveToken(User user, String newRefreshToken) {
+        RefreshToken refreshToken = refreshTokenRepository.findByUserId(user.getId())
                 .map(entity -> entity.update(newRefreshToken))
-                .orElse(RefreshToken.builder().refreshToken(newRefreshToken).id(userId).build());
-        refreshTokenRepository.save(refreshToken);
+                .orElse(RefreshToken.builder().refreshToken(newRefreshToken).user(user).build());
+        refreshTokenRepository.saveAndFlush(refreshToken);
     }
 
     // 인증 관련 설정값을 제거
