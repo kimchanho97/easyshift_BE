@@ -1,6 +1,5 @@
 package com.burntoburn.easyshift.dto.store.use;
 
-import com.burntoburn.easyshift.dto.store.StoreResponse;
 import com.burntoburn.easyshift.entity.store.Store;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

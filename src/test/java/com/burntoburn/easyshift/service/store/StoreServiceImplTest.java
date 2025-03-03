@@ -1,16 +1,22 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.dto.store.*;
+import com.burntoburn.easyshift.dto.store.use.StoreResponse;
 import com.burntoburn.easyshift.dto.store.use.*;
+import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
+import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
+import com.burntoburn.easyshift.entity.user.Role;
+import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +42,8 @@ class StoreServiceImplTest {
     private StoreServiceImpl storeService;
     @Mock
     private UserStoreRepository userStoreRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private StoreRepository storeRepository;
     @Mock
@@ -206,6 +214,159 @@ class StoreServiceImplTest {
     }
 
     @Test
+    @DisplayName("매장 사용자 목록 조회 성공 테스트")
+    void getStoreUsers_Success() {
+        // given
+        Long storeId = 10L;
+
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("Test Description")
+                .build();
+        ReflectionTestUtils.setField(store, "id", storeId);
+        ReflectionTestUtils.setField(store, "storeCode", UUID.fromString("11111111-1111-1111-1111-111111111111"));
+
+        // User 엔티티 목록 생성 (UserDTO가 아닌 User 엔티티)
+        List<User> mockUserEntities = List.of(
+                User.builder()
+                        .id(1L)
+                        .name("홍길동")
+                        .email("hong@example.com")
+                        .phoneNumber("010-1111-2222")
+                        .avatarUrl("http://avatar.com/1.png")
+                        .role(Role.WORKER)
+                        .build(),
+                User.builder()
+                        .id(2L)
+                        .name("김철수")
+                        .email("kim@example.com")
+                        .phoneNumber("010-3333-4444")
+                        .avatarUrl("http://avatar.com/2.png")
+                        .role(Role.ADMINISTRATOR)
+                        .build()
+        );
+
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(userStoreRepository.findUsersByStoreId(storeId)).thenReturn(mockUserEntities);
+
+        // when
+        StoreUsersResponse response = storeService.getStoreUsers(storeId);
+
+        // then
+        assertNotNull(response, "Response는 null이 아니어야 함");
+        assertEquals(store.getStoreCode(), response.getStoreCode());
+        assertEquals(store.getId(), response.getStoreId());
+        assertEquals(store.getStoreName(), response.getStoreName());
+        assertEquals(store.getDescription(), response.getDescription());
+        assertEquals(2, response.getUsers().size(), "사용자 목록 크기는 2여야 함");
+
+        // 내부적으로 User 엔티티를 UserDTO로 변환한 결과를 검증
+        UserDTO firstUser = response.getUsers().get(0);
+        assertEquals(1L, firstUser.getId());
+        assertEquals("홍길동", firstUser.getName());
+        assertEquals("hong@example.com", firstUser.getEmail());
+        assertEquals("010-1111-2222", firstUser.getPhoneNumber());
+        assertEquals("http://avatar.com/1.png", firstUser.getAvatarUrl());
+        assertEquals(Role.WORKER, firstUser.getRole());
+
+        UserDTO secondUser = response.getUsers().get(1);
+        assertEquals(2L, secondUser.getId());
+        assertEquals("김철수", secondUser.getName());
+        assertEquals("kim@example.com", secondUser.getEmail());
+        assertEquals("010-3333-4444", secondUser.getPhoneNumber());
+        assertEquals("http://avatar.com/2.png", secondUser.getAvatarUrl());
+        assertEquals(Role.ADMINISTRATOR, secondUser.getRole());
+
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(userStoreRepository, times(1)).findUsersByStoreId(storeId);
+    }
+
+    @Test
+    @DisplayName("매장 사용자 목록 조회 실패 테스트 - 매장 미존재")
+    void getStoreUsers_StoreNotFound() {
+        // given
+        Long storeId = 999L;
+        when(storeRepository.findById(storeId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(StoreException.class, () -> storeService.getStoreUsers(storeId));
+
+        // userStoreRepository는 호출되지 않아야 한다
+        verify(userStoreRepository, never()).findUsersByStoreId(anyLong());
+    }
+
+    @Test
+    @DisplayName("매장 사용자 목록 조회 성공 테스트 - 사용자가 없는 경우")
+    void getStoreUsers_EmptyUserList() {
+        // given
+        Long storeId = 10L;
+
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("Test Description")
+                .build();
+        ReflectionTestUtils.setField(store, "id", storeId);
+        ReflectionTestUtils.setField(store, "storeCode", UUID.fromString("11111111-1111-1111-1111-111111111111"));
+
+        // userStoreRepository에서 User 엔티티 리스트를 반환하도록 모킹 (빈 리스트)
+        when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+        when(userStoreRepository.findUsersByStoreId(storeId)).thenReturn(List.of());
+
+        // when
+        StoreUsersResponse response = storeService.getStoreUsers(storeId);
+
+        // then
+        assertNotNull(response);
+        assertEquals(store.getId(), response.getStoreId());
+        assertTrue(response.getUsers().isEmpty(), "사용자가 없는 경우 빈 리스트 반환해야 함");
+
+        verify(storeRepository, times(1)).findById(storeId);
+        verify(userStoreRepository, times(1)).findUsersByStoreId(storeId);
+    }
+
+
+    @Test
+    @DisplayName("매장 정보 조회 성공 테스트 (storeCode)")
+    void getStoreSimpleInfo_Success() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+
+        Store store = Store.builder()
+                .storeName("Test Store")
+                .description("This is a test store.")
+                .storeCode(storeCode)
+                .build();
+        ReflectionTestUtils.setField(store, "id", 1L);
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.of(store));
+
+        // when
+        StoreResponse response = storeService.getStoreSimpleInfo(storeCode);
+
+        // then
+        assertNotNull(response, "응답이 null이 아니어야 함");
+        assertEquals(1L, response.getStoreId());
+        assertEquals("Test Store", response.getStoreName());
+        assertEquals("This is a test store.", response.getDescription());
+
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
+    }
+
+    @Test
+    @DisplayName("매장 정보 조회 실패 테스트 - 매장 없음")
+    void getStoreSimpleInfo_StoreNotFound() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(StoreException.class, () -> storeService.getStoreSimpleInfo(storeCode));
+
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
+    }
+
+    @Test
     @DisplayName("스케줄 템플릿이 없는 경우 빈 응답 반환")
     void getStoreInfo_NoScheduleTemplate() {
         // Given
@@ -295,6 +456,79 @@ class StoreServiceImplTest {
                         tuple(202L, "오후 근무", "15:00", "18:00"),
                         tuple(203L, "야간 근무", "18:00", "21:00")
                 );
+    }
+
+    @Test
+    @DisplayName("매장 입장 성공 테스트")
+    void joinUserStore_Success() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        Long userId = 1L;
+
+        Store store = Store.builder()
+                .id(10L)
+                .storeName("Test Store")
+                .storeCode(storeCode)
+                .description("테스트 매장")
+                .build();
+
+        User user = User.builder()
+                .id(userId)
+                .name("홍길동")
+                .email("hong@example.com")
+                .build();
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.of(store));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userStoreRepository.existsByUserIdAndStoreId(userId, store.getId())).thenReturn(false);
+        when(userStoreRepository.save(any(UserStore.class))).thenReturn(
+                UserStore.builder()
+                        .user(user)
+                        .store(store)
+                        .build()
+        );
+
+        // when
+        storeService.joinUserStore(storeCode, userId);
+
+        // then
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
+        verify(userRepository, times(1)).findById(userId);
+        verify(userStoreRepository, times(1)).existsByUserIdAndStoreId(userId, store.getId());
+        verify(userStoreRepository, times(1)).save(any(UserStore.class));
+    }
+
+    @Test
+    @DisplayName("매장 입장 실패 테스트 - 이미 가입된 경우")
+    void joinUserStore_AlreadyJoined() {
+        // given
+        UUID storeCode = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        Long userId = 1L;
+
+        Store store = Store.builder()
+                .id(10L)
+                .storeName("Test Store")
+                .storeCode(storeCode)
+                .description("테스트 매장")
+                .build();
+
+        User user = User.builder()
+                .id(userId)
+                .name("홍길동")
+                .email("hong@example.com")
+                .build();
+
+        when(storeRepository.findByStoreCode(storeCode)).thenReturn(Optional.of(store));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userStoreRepository.existsByUserIdAndStoreId(userId, store.getId())).thenReturn(true);
+
+        // when & then
+        assertThrows(StoreException.class, () -> storeService.joinUserStore(storeCode, userId));
+
+        verify(storeRepository, times(1)).findByStoreCode(storeCode);
+        verify(userRepository, times(1)).findById(userId);
+        verify(userStoreRepository, times(1)).existsByUserIdAndStoreId(userId, store.getId());
+        verify(userStoreRepository, never()).save(any(UserStore.class));
     }
 
 }
