@@ -3,6 +3,7 @@ package com.burntoburn.easyshift.controller;
 import com.burntoburn.easyshift.common.response.ApiResponse;
 import com.burntoburn.easyshift.dto.store.use.*;
 import com.burntoburn.easyshift.service.store.StoreService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class StoreController {
      * 매장 생성 API
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<StoreCreateResponse>> createStore(@RequestBody StoreCreateRequest request) {
+    public ResponseEntity<ApiResponse<StoreCreateResponse>> createStore(@Valid @RequestBody StoreCreateRequest request) {
         StoreCreateResponse response = storeService.createStore(request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -63,7 +64,7 @@ public class StoreController {
      * 매장 정보 수정 API
      */
     @PatchMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> updateStore(@PathVariable Long storeId, @RequestBody StoreUpdateRequest request) {
+    public ResponseEntity<ApiResponse<Void>> updateStore(@PathVariable Long storeId, @Valid @RequestBody StoreUpdateRequest request) {
         storeService.updateStore(storeId, request);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
@@ -73,7 +74,7 @@ public class StoreController {
     /**
      * 매장 삭제 API
      */
-    @PostMapping("/{storeId}")
+    @DeleteMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> deleteStore(@PathVariable Long storeId) {
         storeService.deleteStore(storeId);
         return ResponseEntity.ok(ApiResponse.success(null));

@@ -226,15 +226,28 @@ class StoreServiceImplTest {
         ReflectionTestUtils.setField(store, "id", storeId);
         ReflectionTestUtils.setField(store, "storeCode", UUID.fromString("11111111-1111-1111-1111-111111111111"));
 
-
-        // UserDTO 목록 (userStoreRepository에서 반환할 가짜 데이터)
-        List<UserDTO> mockUserList = List.of(
-                new UserDTO(1L, "홍길동", "hong@example.com", "010-1111-2222", "http://avatar.com/1.png", Role.WORKER),
-                new UserDTO(2L, "김철수", "kim@example.com", "010-3333-4444", "http://avatar.com/2.png", Role.ADMINISTRATOR)
+        // User 엔티티 목록 생성 (UserDTO가 아닌 User 엔티티)
+        List<User> mockUserEntities = List.of(
+                User.builder()
+                        .id(1L)
+                        .name("홍길동")
+                        .email("hong@example.com")
+                        .phoneNumber("010-1111-2222")
+                        .avatarUrl("http://avatar.com/1.png")
+                        .role(Role.WORKER)
+                        .build(),
+                User.builder()
+                        .id(2L)
+                        .name("김철수")
+                        .email("kim@example.com")
+                        .phoneNumber("010-3333-4444")
+                        .avatarUrl("http://avatar.com/2.png")
+                        .role(Role.ADMINISTRATOR)
+                        .build()
         );
 
         when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
-        when(userStoreRepository.findUserDTOsByStoreId(storeId)).thenReturn(mockUserList);
+        when(userStoreRepository.findUsersByStoreId(storeId)).thenReturn(mockUserEntities);
 
         // when
         StoreUsersResponse response = storeService.getStoreUsers(storeId);
@@ -247,6 +260,7 @@ class StoreServiceImplTest {
         assertEquals(store.getDescription(), response.getDescription());
         assertEquals(2, response.getUsers().size(), "사용자 목록 크기는 2여야 함");
 
+        // 내부적으로 User 엔티티를 UserDTO로 변환한 결과를 검증
         UserDTO firstUser = response.getUsers().get(0);
         assertEquals(1L, firstUser.getId());
         assertEquals("홍길동", firstUser.getName());
@@ -263,9 +277,8 @@ class StoreServiceImplTest {
         assertEquals("http://avatar.com/2.png", secondUser.getAvatarUrl());
         assertEquals(Role.ADMINISTRATOR, secondUser.getRole());
 
-        // storeRepository와 userStoreRepository가 올바르게 호출되었는지 검증
         verify(storeRepository, times(1)).findById(storeId);
-        verify(userStoreRepository, times(1)).findUserDTOsByStoreId(storeId);
+        verify(userStoreRepository, times(1)).findUsersByStoreId(storeId);
     }
 
     @Test
@@ -279,7 +292,7 @@ class StoreServiceImplTest {
         assertThrows(StoreException.class, () -> storeService.getStoreUsers(storeId));
 
         // userStoreRepository는 호출되지 않아야 한다
-        verify(userStoreRepository, never()).findUserDTOsByStoreId(anyLong());
+        verify(userStoreRepository, never()).findUsersByStoreId(anyLong());
     }
 
     @Test
@@ -295,9 +308,9 @@ class StoreServiceImplTest {
         ReflectionTestUtils.setField(store, "id", storeId);
         ReflectionTestUtils.setField(store, "storeCode", UUID.fromString("11111111-1111-1111-1111-111111111111"));
 
-
+        // userStoreRepository에서 User 엔티티 리스트를 반환하도록 모킹 (빈 리스트)
         when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
-        when(userStoreRepository.findUserDTOsByStoreId(storeId)).thenReturn(List.of()); // 빈 리스트 반환
+        when(userStoreRepository.findUsersByStoreId(storeId)).thenReturn(List.of());
 
         // when
         StoreUsersResponse response = storeService.getStoreUsers(storeId);
@@ -308,8 +321,9 @@ class StoreServiceImplTest {
         assertTrue(response.getUsers().isEmpty(), "사용자가 없는 경우 빈 리스트 반환해야 함");
 
         verify(storeRepository, times(1)).findById(storeId);
-        verify(userStoreRepository, times(1)).findUserDTOsByStoreId(storeId);
+        verify(userStoreRepository, times(1)).findUsersByStoreId(storeId);
     }
+
 
     @Test
     @DisplayName("매장 정보 조회 성공 테스트 (storeCode)")

@@ -71,7 +71,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public StoreUsersResponse getStoreUsers(Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
-        List<UserDTO> users = userStoreRepository.findUserDTOsByStoreId(store.getId());
+        List<User> users = userStoreRepository.findUsersByStoreId(store.getId());
         return StoreUsersResponse.fromEntity(store, users);
     }
 
