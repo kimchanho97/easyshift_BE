@@ -29,7 +29,6 @@ public class User extends BaseEntity {
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
     private Role role; // WORKER, ADMINISTRATOR
 
     private String avatarUrl;
