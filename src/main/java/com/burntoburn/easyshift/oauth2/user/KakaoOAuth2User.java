@@ -11,7 +11,6 @@ public class KakaoOAuth2User {
         private final String id;
         private final String name;
         private final String email;
-        private final String phoneNumber;
         private final String profileImageUrl;
 
         public KakaoOAuth2User( Map<String, Object> attributes) {
@@ -22,9 +21,7 @@ public class KakaoOAuth2User {
 
             this.id = ((Long) attributes.get("id")).toString();
             this.email = (String) kakaoAccount.get("email");
-            this.name = (String)  kakaoAccount.get("name");
-            this.phoneNumber = (String) kakaoAccount.get("phone_number");
-
+            this.name = (String)  kakaoAccount.get("nickname");
             this.profileImageUrl = (String) kakaoProfile.get("profile_image_url");
         }
 

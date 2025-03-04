@@ -40,7 +40,6 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
                         .email(email)
                         .name(kakaoOAuth2User.getName())
                         .avatarUrl(kakaoOAuth2User.getProfileImageUrl())
-                        .phoneNumber(kakaoOAuth2User.getProfileImageUrl())
                         .build());
 
         userRepository.save(user);
