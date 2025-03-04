@@ -1,18 +1,20 @@
 package com.burntoburn.easyshift.service.store;
 
 import com.burntoburn.easyshift.common.util.DateUtil;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateRequest;
-import com.burntoburn.easyshift.dto.store.use.StoreCreateResponse;
-import com.burntoburn.easyshift.dto.store.use.StoreInfoResponse;
-import com.burntoburn.easyshift.dto.store.use.UserStoresResponse;
+import com.burntoburn.easyshift.dto.store.use.*;
+import com.burntoburn.easyshift.dto.user.UserDTO;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
+import com.burntoburn.easyshift.entity.store.UserStore;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
+import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.exception.store.StoreException;
+import com.burntoburn.easyshift.exception.user.UserException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,30 +27,61 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StoreServiceImpl {
+public class StoreServiceImpl implements StoreService {
 
     private final UserStoreRepository userStoreRepository;
     private final ScheduleTemplateRepository scheduleTemplateRepository;
     private final ShiftRepository shiftRepository;
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
 
-    public StoreCreateResponse createStore(StoreCreateRequest request){
-        Store store = Store.builder()
-                .storeName(request.getStoreName())
-                .storeCode(UUID.randomUUID())
-                .description(request.getDescription())
-                .build();
+    @Override
+    @Transactional
+    public StoreCreateResponse createStore(StoreCreateRequest request) {
+        Store store = StoreCreateRequest.toEntity(request.getStoreName(), request.getDescription());
 
         Store savedStore = storeRepository.save(store);
         return new StoreCreateResponse(savedStore.getId(), savedStore.getStoreName(), savedStore.getStoreCode());
     }
 
-    public UserStoresResponse getUserStores(Long userId){
+    @Override
+    @Transactional
+    public void updateStore(Long storeId, StoreUpdateRequest request) {
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+
+        store.setStoreName(request.getStoreName());
+        store.setDescription(request.getDescription());
+    }
+
+    @Override
+    @Transactional
+    public void deleteStore(Long storeId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+
+        storeRepository.delete(store);
+    }
+
+    @Override
+    public UserStoresResponse getUserStores(Long userId) {
         List<Store> userStores = userStoreRepository.findStoresByUserId(userId);
         return UserStoresResponse.fromEntity(userStores);
     }
 
+    @Override
+    public StoreUsersResponse getStoreUsers(Long storeId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
+        List<User> users = userStoreRepository.findUsersByStoreId(store.getId());
+        return StoreUsersResponse.fromEntity(store, users);
+    }
+
+    @Override
+    public StoreResponse getStoreSimpleInfo(UUID storeCode) {
+        Store store = storeRepository.findByStoreCode(storeCode).orElseThrow(StoreException::storeNotFound);
+        return StoreResponse.fromEntity(store);
+    }
+
+    @Override
     public StoreInfoResponse getStoreInfo(Long storeId, Long userId) {
         // 1. 사용자 매장 접근 권한 확인
         boolean isAuthorizedForStore = userStoreRepository.existsByUserIdAndStoreId(userId, storeId);
@@ -76,5 +109,25 @@ public class StoreServiceImpl {
         );
 
         return StoreInfoResponse.fromEntity(storeId, scheduleTemplates, selectedTemplate, shifts);
+    }
+
+    @Transactional
+    @Override
+    public void joinUserStore(UUID storeCode, Long userId) {
+        Store store = storeRepository.findByStoreCode(storeCode).orElseThrow(StoreException::storeNotFound);
+
+        User user = userRepository.findById(userId).orElseThrow(UserException::userNotFound);
+
+        boolean alreadyJoined = userStoreRepository.existsByUserIdAndStoreId(userId, store.getId());
+        if(alreadyJoined){
+            throw StoreException.userAlreadyJoined();
+        }
+
+        UserStore userStore = UserStore.builder()
+                .user(user)
+                .store(store)
+                .build();
+
+        userStoreRepository.save(userStore);
     }
 }
