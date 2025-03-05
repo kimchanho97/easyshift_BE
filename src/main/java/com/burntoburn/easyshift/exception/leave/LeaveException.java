@@ -13,4 +13,8 @@ public class LeaveException extends BusinessException {
     public static LeaveException leaveNotFound() {
         return new LeaveException(LeaveErrorCode.LEAVE_NOT_FOUND);
     }
+
+    public static LeaveException leaveDuplicated(){
+        return new LeaveException(LeaveErrorCode.DUPLICATE_LEAVE_REQUEST);
+    }
 }
