@@ -3,7 +3,6 @@ package com.burntoburn.easyshift.controller;
 import com.burntoburn.easyshift.common.response.ApiResponse;
 import com.burntoburn.easyshift.dto.leave.req.LeaveRequestDto;
 import com.burntoburn.easyshift.service.leave.LeaveRequestWorkerService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
