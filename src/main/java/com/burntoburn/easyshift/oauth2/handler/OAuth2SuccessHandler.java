@@ -2,6 +2,7 @@ package com.burntoburn.easyshift.oauth2.handler;
 
 import com.burntoburn.easyshift.config.jwt.TokenProvider;
 import com.burntoburn.easyshift.entity.user.RefreshToken;
+import com.burntoburn.easyshift.entity.user.Role;
 import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.oauth2.repository.OAuth2AuthorizationRequestRepository;
 import com.burntoburn.easyshift.oauth2.user.KakaoOAuth2User;
@@ -67,13 +68,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.setCharacterEncoding("UTF-8");
 
         String jsonResponse;
-        if (user.getRole() != null) {
+        if (user.getRole() != Role.GUEST) {
             // 기존 사용자 (회원가입 완료)
             jsonResponse = "{ " +
                     "\"success\": true, " +
                     "\"response\": { " +
                     "\"userId\": \"" + user.getId() + "\", " +
                     "\"email\": \"" + user.getEmail() + "\", " +
+                    "\"name\": \"" + user.getName() + "\", " +
                     "\"phoneNumber\": \"" + user.getPhoneNumber() + "\", " +
                     "\"role\": \"" + user.getRole() + "\", " +
                     "\"avatarUrl\": \"" + user.getAvatarUrl() + "\", " +
@@ -87,8 +89,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     "\"response\": { " +
                     "\"userId\": \"" + user.getId() + "\", " +
                     "\"email\": \"" + user.getEmail() + "\", " +
+                    "\"name\": \"" + user.getName() + "\", " +
                     "\"phoneNumber\": null, " +
-                    "\"role\": null, " +
+                    "\"role\": \"" + user.getRole() + "\", " +
                     "\"avatarUrl\": \"" + user.getAvatarUrl() + "\", " +
                     "\"needsSignup\": true }, " +
                     "\"error\": null " +
@@ -99,11 +102,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + accessToken); // 헤더에 토큰 추가
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(jsonResponse, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        // 프론트엔드의 post 방식을 json 데이터 전송.. (프론트엔드 엔드 포인트 필요)
-        restTemplate.postForEntity(FRONTEND_CALLBACK_URL, requestEntity, String.class);
+//        HttpEntity<String> requestEntity = new HttpEntity<>(jsonResponse, headers);
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//        // 프론트엔드의 post 방식을 json 데이터 전송.. (프론트엔드 엔드 포인트 필요)
+//        restTemplate.postForEntity(FRONTEND_CALLBACK_URL, requestEntity, String.class);
 
         // JSON 응답 전송
         response.getWriter().write(jsonResponse);

@@ -48,5 +48,4 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.debug("Setting authentication to security context is done. '{}'", authentication.getName());
     }
-
 }

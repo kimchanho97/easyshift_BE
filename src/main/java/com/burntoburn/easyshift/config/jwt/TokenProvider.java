@@ -1,5 +1,6 @@
 package com.burntoburn.easyshift.config.jwt;
 
+import com.burntoburn.easyshift.entity.user.CustomUserDetails;
 import com.burntoburn.easyshift.entity.user.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -69,6 +70,7 @@ public class TokenProvider {
                 .expiration(expiryDate)
                 .subject(user.getEmail())
                 .claim("id", user.getId())
+                .claim("role", user.getRole().getKey())
                 .signWith(signingKey)
                 .compact();
     }
@@ -100,10 +102,10 @@ public class TokenProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
         Set<SimpleGrantedAuthority> authorities = Collections.singleton(
-                new SimpleGrantedAuthority("ROLE_USER"));
+                new SimpleGrantedAuthority(claims.get("role").toString())); //null 값이어서 오류발생
 
         return new UsernamePasswordAuthenticationToken(
-                new org.springframework.security.core.userdetails.User(claims.getSubject(), "", authorities),
+                new CustomUserDetails(claims.get("id", Long.class), claims.getSubject(), authorities),
                 token,
                 authorities
         );
