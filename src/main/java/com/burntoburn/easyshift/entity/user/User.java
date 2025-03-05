@@ -23,13 +23,14 @@ public class User extends BaseEntity {
     private String email;
 
     // 사용자 이름 필드
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String name;
 
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    private Role role; // WORKER, ADMINISTRATOR
+    @Column(nullable = false)
+    private Role role = Role.GUEST; // GUEST, WORKER, ADMINISTRATOR
 
     private String avatarUrl;
 
@@ -38,9 +39,14 @@ public class User extends BaseEntity {
         return this;
     }
 
-    // 이름 변경하는 메서드
-    public void updateName(String newName) {
-        this.name = newName;
+    // 유저 정보변경하는 메서드
+    public User updateUser(User newUser) {
+        this.email = newUser.getEmail();
+        this.name = newUser.getName();
+        this.phoneNumber = newUser.getPhoneNumber();
+        this.role = newUser.getRole();
+        this.avatarUrl = newUser.getAvatarUrl();
+        return this;
     }
 
     @Override

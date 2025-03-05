@@ -1,5 +1,6 @@
 package com.burntoburn.easyshift.oauth2.service;
 
+import com.burntoburn.easyshift.entity.user.Role;
 import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.oauth2.user.KakaoOAuth2User;
 import com.burntoburn.easyshift.repository.user.UserRepository;
@@ -39,6 +40,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
                 .orElse(User.builder()
                         .email(email)
                         .name(kakaoOAuth2User.getName())
+                        .role(Role.GUEST)
                         .avatarUrl(kakaoOAuth2User.getProfileImageUrl())
                         .build());
 
