@@ -2,6 +2,7 @@ package com.burntoburn.easyshift.service.leave.imp;
 
 import com.burntoburn.easyshift.entity.leave.ApprovalStatus;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
+import com.burntoburn.easyshift.exception.leave.LeaveException;
 import com.burntoburn.easyshift.repository.leave.LeaveRequestRepository;
 import com.burntoburn.easyshift.service.leave.LeaveRequestAdminService;
 import com.burntoburn.easyshift.service.leave.LeaveRequestFactory;
@@ -15,7 +16,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -101,7 +101,7 @@ class LeaveRequestAdminServiceImpTest {
         when(leaveRequestRepository.findById(2L)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(NoSuchElementException.class, () -> leaveRequestAdminService.approveLeaveRequest(2L));
+        assertThrows(LeaveException.class, () -> leaveRequestAdminService.approveLeaveRequest(2L));
     }
 
     @Test
@@ -111,6 +111,6 @@ class LeaveRequestAdminServiceImpTest {
         when(leaveRequestRepository.findById(2L)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(NoSuchElementException.class, () -> leaveRequestAdminService.rejectLeaveRequest(2L));
+        assertThrows(LeaveException.class, () -> leaveRequestAdminService.rejectLeaveRequest(2L));
     }
 }

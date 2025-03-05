@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.service.leave.imp;
 
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
+import com.burntoburn.easyshift.exception.leave.LeaveException;
 import com.burntoburn.easyshift.repository.leave.LeaveRequestRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
 import com.burntoburn.easyshift.service.leave.LeaveRequestAdminService;
@@ -17,13 +18,12 @@ import org.springframework.stereotype.Service;
 public class LeaveRequestAdminServiceImp implements LeaveRequestAdminService {
     private final LeaveRequestRepository leaveRequestRepository;
     private final LeaveRequestFactory leaveRequestFactory;
-    private final UserRepository userRepository;
 
 
     @Override
     public LeaveRequest approveLeaveRequest(Long leaveRequestId) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
-                .orElseThrow(() -> new NoSuchElementException("not found leaveRequestId"));
+                .orElseThrow(LeaveException::leaveNotFound);
         leaveRequestFactory.approvedRequest(leaveRequest);
 
         return leaveRequest;
@@ -32,7 +32,7 @@ public class LeaveRequestAdminServiceImp implements LeaveRequestAdminService {
     @Override
     public LeaveRequest rejectLeaveRequest(Long leaveRequestId) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveRequestId)
-                .orElseThrow(() -> new NoSuchElementException("not found leaveRequestId"));
+                .orElseThrow(LeaveException::leaveNotFound);
         leaveRequestFactory.rejectRequest(leaveRequest);
         return leaveRequest;
     }
