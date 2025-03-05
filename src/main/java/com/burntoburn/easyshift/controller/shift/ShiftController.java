@@ -1,6 +1,7 @@
 package com.burntoburn.easyshift.controller.shift;
 
 import com.burntoburn.easyshift.common.response.ApiResponse;
+import com.burntoburn.easyshift.dto.shift.ShiftUpdateUser;
 import com.burntoburn.easyshift.dto.shift.req.ShiftUpload;
 import com.burntoburn.easyshift.dto.shift.res.ShiftInfoDTO;
 import com.burntoburn.easyshift.dto.shift.res.detailShift.ShiftDetailDto;
@@ -60,5 +61,12 @@ public class ShiftController {
         return ResponseEntity.ok(ApiResponse.success());
     }
 
+    // Shift 수정
+    @PatchMapping("/shifts/{shiftId}")
+    public ResponseEntity<ApiResponse<Void>> updateUserShift(@PathVariable Long shiftId, @RequestBody ShiftUpdateUser request) {
+        shiftService.updateUserShift(request.getUserId(), shiftId);
+
+        return ResponseEntity.ok(ApiResponse.success());
+    }
 
 }
