@@ -1,6 +1,6 @@
 package com.burntoburn.easyshift.service.user;
 
-import com.burntoburn.easyshift.dto.user.AddUserRequest;
+import com.burntoburn.easyshift.dto.user.UserInfoRequest;
 import com.burntoburn.easyshift.entity.user.User;
 import com.burntoburn.easyshift.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,19 +12,11 @@ public class UserService  {
 
     private final UserRepository userRepository;
 
-    public User save(AddUserRequest request) throws Exception{
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new Exception("이미 존재하는 계정 입니다.");
-        }
+    public User update(UserInfoRequest request) throws Exception{
+        User updatableUser = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 사용자가 없습니다."));
+        updatableUser.updateUser(request.toEntity());
 
-        User newUser = User.builder()
-                .email(request.getEmail())
-                .name(request.getName())
-                .phoneNumber(request.getPhoneNumber())
-                .role(request.getRole())
-                .avatarUrl(request.getAvatarUrl())
-                .build();
-        return userRepository.save(newUser);
+        return userRepository.save(updatableUser);
     }
 
     public User findByEmail(String email) {
