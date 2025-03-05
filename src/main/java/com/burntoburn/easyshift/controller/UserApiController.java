@@ -7,7 +7,6 @@ import com.burntoburn.easyshift.repository.user.UserRepository;
 import com.burntoburn.easyshift.service.user.UserService;
 import com.burntoburn.easyshift.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UserApiController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @PostMapping("/info")
     public ResponseEntity<User> signup(@RequestBody UserInfoRequest request) throws Exception{
