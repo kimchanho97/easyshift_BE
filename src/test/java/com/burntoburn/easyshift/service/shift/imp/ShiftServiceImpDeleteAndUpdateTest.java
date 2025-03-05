@@ -128,6 +128,15 @@ class ShiftServiceImpDeleteAndUpdateTest {
         Long shiftId = 1L;
         Long userId = 1L;
 
+        User user = User.builder()
+                .id(shiftId)
+                .name("test")
+                .role(Role.ADMINISTRATOR)
+                .email("asd@aasd.com")
+                .phoneNumber("100-1111-111")
+                .build();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(shiftRepository.findById(shiftId)).thenReturn(Optional.empty());
 
         //when & then
@@ -138,7 +147,7 @@ class ShiftServiceImpDeleteAndUpdateTest {
     }
 
     @Test
-    @DisplayName("Shift 근무자 변경 실패 테스트 - Shift 오류")
+    @DisplayName("Shift 근무자 변경 실패 테스트 - User 오류")
     void updateUserShift_userNotFound() {
         //given
         Long shiftId = 1L;
