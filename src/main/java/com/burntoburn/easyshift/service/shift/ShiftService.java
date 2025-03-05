@@ -19,4 +19,7 @@ public interface ShiftService{
 
     // Delete (Shift 삭제)
     void deleteShift(Long id);
+
+    // 근무자 변경
+    void updateUserShift(Long userId, Long shiftId);
 }
