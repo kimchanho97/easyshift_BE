@@ -51,4 +51,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     WHERE s.scheduleTemplateId = :scheduleTemplateId
     """)
     List<Schedule>findSchedulesWithTemplate(Long scheduleTemplateId);
+
+    boolean existsByStoreId(Long storeId);
 }
