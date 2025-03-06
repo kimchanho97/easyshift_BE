@@ -60,17 +60,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = userService.findByEmail(kakaoOAuth2User.getEmail());
 
 
-        // 자체 access token 생성
+        // 자체 access token 생성 후 cookie에 추가
         String accessToken = tokenProvider.generateAccessToken(user, ACCESS_TOKEN_DURATION);
         addAccessTokenToCookie(request, response, accessToken);
-        // 리프레시 토큰 생성
+        // 리프레시 토큰 생성 후 cookie에 추가
         String refreshToken = tokenProvider.generateRefreshToken(REFRESH_TOKEN_DURATION);
         saveToken(user, refreshToken);
         addRefreshTokenToCookie(request, response, refreshToken);
 
+        // Cookie에 저장한 frontend_redirect_url 값을 가져옴
         Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
-
+        // 없을 경우 설정 파일의 url을 적용
         String targetUrl = redirectUri.orElse(frontendRedirectUrl);
 
         String redirectPath;
