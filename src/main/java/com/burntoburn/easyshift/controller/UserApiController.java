@@ -1,15 +1,15 @@
 package com.burntoburn.easyshift.controller;
 
-import com.burntoburn.easyshift.dto.user.AddUserRequest;
+import com.burntoburn.easyshift.dto.user.UserInfoRequest;
+import com.burntoburn.easyshift.entity.user.CustomUserDetails;
 import com.burntoburn.easyshift.entity.user.User;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import com.burntoburn.easyshift.service.user.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.burntoburn.easyshift.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,14 +24,22 @@ public class UserApiController {
     private final UserService userService;
 
     @PostMapping("/info")
-    public ResponseEntity<User> signup(@RequestBody AddUserRequest request) throws Exception{
-        User newUser = userService.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+    public ResponseEntity<User> signup(@RequestBody UserInfoRequest request) throws Exception{
+        User newUser = userService.update(request);
+        return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        return "redirect:/login"; // frontend 경로로 리다렉트 수정?
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserDetails> getUserProfile() {
+        CustomUserDetails userDetails = SecurityUtil.getCurrentUser();
+        System.out.println("User ID: " + userDetails.getUserId() + ", Email: " + userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.OK).body(userDetails);
     }
+
+//    @GetMapping("/logout")
+//    public String logout(HttpServletRequest request, HttpServletResponse response) {
+//        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+//        return "redirect:/login"; // frontend 경로로 리다렉트 수정?
+//    }
 }
