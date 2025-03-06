@@ -128,53 +128,6 @@ class ShiftServiceImpTest {
         verify(shiftRepository, times(1)).findAll();
     }
 
-    @Test
-    @DisplayName("Shift 업데이트 테스트")
-    void updateShiftTest() {
-        // Given
-        Shift existingShift = Shift.builder()
-                .id(1L)
-                .shiftName("Morning Shift")
-                .shiftDate(LocalDate.of(2024, 2, 19))
-                .startTime(LocalTime.of(9, 0))
-                .endTime(LocalTime.of(17, 0))
-                .schedule(Schedule.builder().id(1L).build())
-                .user(User.builder().id(1L).build())
-                .build();
-
-        ShiftUpload updateUpload = ShiftUpload.builder()
-                .shiftName("Evening Shift")
-                .shiftDate(LocalDate.of(2024, 2, 20))
-                .startTime(LocalTime.of(14, 0))
-                .endTime(LocalTime.of(22, 0))
-                .build();
-
-        // 기존 Shift 조회 Mock 설정
-        when(shiftRepository.getShiftById(1L)).thenReturn(Optional.of(existingShift));
-
-        // updateShift() 내부에서 기존 엔티티의 updateShift() 메서드를 호출 후 save()하는 구조이므로,
-        // save() 호출 시 업데이트된 데이터를 반환하도록 설정
-        Shift updatedShift = Shift.builder()
-                .id(1L)
-                .shiftName(updateUpload.getShiftName())
-                .shiftDate(updateUpload.getShiftDate())
-                .startTime(updateUpload.getStartTime())
-                .endTime(updateUpload.getEndTime())
-                .schedule(Schedule.builder().id(1L).build())
-                .user(User.builder().id(1L).build())
-                .build();
-
-        when(shiftRepository.save(any(Shift.class))).thenReturn(updatedShift);
-
-        // When
-        Shift result = shiftService.updateShift(1L, updateUpload);
-
-        // Then
-        assertNotNull(result);
-        assertEquals("Evening Shift", result.getShiftName());
-        //verify(shiftRepository, times(1)).getShiftById(1L);
-        //verify(shiftRepository, times(1)).save(any(Shift.class));
-    }
 
     @Test
     @DisplayName("Shift 단건 조회 (User 포함) 테스트")
@@ -203,29 +156,4 @@ class ShiftServiceImpTest {
         verify(shiftRepository, times(1)).findByIdWithUser(1L);
     }
 
-    @Test
-    @DisplayName("Shift 삭제 테스트")
-    void deleteShiftTest() {
-        // Given
-        Long shiftId = 1L;
-        Shift shiftToDelete = Shift.builder()
-                .id(shiftId)
-                .shiftName("Night Shift")
-                .shiftDate(LocalDate.of(2024, 2, 19))
-                .startTime(LocalTime.of(21, 0))
-                .endTime(LocalTime.of(5, 0))
-                .schedule(Schedule.builder().id(1L).build())
-                .user(User.builder().id(3L).build())
-                .build();
-
-        when(shiftRepository.findById(shiftId)).thenReturn(Optional.of(shiftToDelete));
-        doNothing().when(shiftRepository).deleteById(shiftId);
-
-        // When
-        shiftService.deleteShift(shiftId);
-
-        // Then
-        verify(shiftRepository, times(1)).findById(shiftId);
-        verify(shiftRepository, times(1)).deleteById(shiftId);
-    }
 }

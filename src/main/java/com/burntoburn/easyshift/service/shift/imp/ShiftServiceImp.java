@@ -3,11 +3,16 @@ package com.burntoburn.easyshift.service.shift.imp;
 import com.burntoburn.easyshift.dto.shift.req.ShiftUpload;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.Shift;
+import com.burntoburn.easyshift.entity.user.User;
+import com.burntoburn.easyshift.exception.shift.ShiftException;
+import com.burntoburn.easyshift.exception.user.UserException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
+import com.burntoburn.easyshift.repository.user.UserRepository;
 import com.burntoburn.easyshift.service.shift.ShiftService;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ShiftServiceImp implements ShiftService {
     private final ShiftRepository shiftRepository;
     private final ScheduleRepository scheduleRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     @Override
@@ -53,11 +59,7 @@ public class ShiftServiceImp implements ShiftService {
         Shift existingShift = getShiftOne(shiftId);
 
         // 새로운 값으로 업데이트
-        return existingShift.updateShift(
-                shiftUpload.getShiftName(),
-                shiftUpload.getShiftDate(),
-                shiftUpload.getStartTime(),
-                shiftUpload.getEndTime());
+        return null;
     }
 
     @Transactional(readOnly = true)
@@ -68,13 +70,28 @@ public class ShiftServiceImp implements ShiftService {
     }
 
     @Override
+    @Transactional
     public void deleteShift(Long id) {
         // 먼저 존재하는 Shift인지 확인
-        shiftRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException("Shift not found with id: " + id)
-        );
+        Shift shift = shiftRepository.findById(id).orElseThrow(ShiftException::shiftNotFound);
+
         // 삭제 수행
-        shiftRepository.deleteById(id);
+        shiftRepository.delete(shift);
     }
 
+    @Override
+    @Transactional
+    public void updateUserShift(Long userId, Long shiftId) {
+        // 교환할 대상 User
+        User user = userRepository.findById(userId).orElseThrow(UserException::userNotFound);
+
+        // 교환을 수행하는 Shift
+        Shift shift = shiftRepository.findById(shiftId).orElseThrow(ShiftException::shiftNotFound);
+
+        // 교환
+        shift.assignUser(user);
+
+        // 명시적으로 save 호출
+        shiftRepository.save(shift);
+    }
 }

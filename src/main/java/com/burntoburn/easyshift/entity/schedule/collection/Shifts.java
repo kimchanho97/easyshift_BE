@@ -1,17 +1,19 @@
 package com.burntoburn.easyshift.entity.schedule.collection;
 
 import com.burntoburn.easyshift.entity.schedule.Shift;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Embeddable
+//@Embeddable
 @NoArgsConstructor
 public class Shifts {
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    //@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Shift> shiftList = new ArrayList<>();
 
     // Shift 추가

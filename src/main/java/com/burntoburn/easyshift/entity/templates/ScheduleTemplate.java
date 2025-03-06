@@ -1,12 +1,10 @@
 package com.burntoburn.easyshift.entity.templates;
 
-import com.burntoburn.easyshift.dto.template.res.ScheduleTemplateResponse;
-import com.burntoburn.easyshift.dto.template.res.ShiftTemplateResponse;
 import com.burntoburn.easyshift.entity.store.Store;
-import com.burntoburn.easyshift.entity.templates.collection.ShiftTemplates;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,6 +18,7 @@ public class ScheduleTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE) // ID는 자동 생성되므로 Builder에서 제외
+    @Column(name = "schedule_template_id")
     private Long id;
 
     @Column(nullable = false)
@@ -29,26 +28,10 @@ public class ScheduleTemplate {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @Embedded
-    @Builder.Default
-    private ShiftTemplates shiftTemplates = new ShiftTemplates(); // 일급 컬렉션 적용
+    @OneToMany(mappedBy = "scheduleTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ShiftTemplate> shiftTemplates = new ArrayList<>();
 
-    // 스케줄 템플릿 수정 메서드
-    public void updateScheduleTemplate(String scheduleTemplateName, List<ShiftTemplate> updatedShiftTemplates) {
-        this.scheduleTemplateName = scheduleTemplateName;
-        this.shiftTemplates.update(updatedShiftTemplates); // ✅ 일급 컬렉션 내부에서 관리
+    public void addShiftTemplate(ShiftTemplate shiftTemplate) {
+        this.shiftTemplates.add(shiftTemplate);
     }
-
-    public ScheduleTemplateResponse toDTO() {
-        return ScheduleTemplateResponse.builder()
-                .ScheduleTemplateId(this.id)
-                .scheduleTemplateName(this.scheduleTemplateName)
-                .storeId(this.store.getId()) // ✅ Lazy Loading 문제 방지: ID만 반환
-                .shiftTemplates(this.shiftTemplates.getList().stream()
-                        .map(ShiftTemplateResponse::fromEntity) // ✅ ShiftTemplate 변환
-                        .toList())
-                .build();
-    }
-
-
 }

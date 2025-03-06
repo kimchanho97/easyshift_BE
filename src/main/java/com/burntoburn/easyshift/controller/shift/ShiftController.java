@@ -1,5 +1,7 @@
 package com.burntoburn.easyshift.controller.shift;
 
+import com.burntoburn.easyshift.common.response.ApiResponse;
+import com.burntoburn.easyshift.dto.shift.ShiftUpdateUser;
 import com.burntoburn.easyshift.dto.shift.req.ShiftUpload;
 import com.burntoburn.easyshift.dto.shift.res.ShiftInfoDTO;
 import com.burntoburn.easyshift.dto.shift.res.detailShift.ShiftDetailDto;
@@ -22,7 +24,7 @@ public class ShiftController {
     private final ShiftMapper shiftMapper;
 
     // 특정 Shift 조회
-    @GetMapping("/shifts/{shiftId}")
+    // @GetMapping("/shifts/{shiftId}")
     public ResponseEntity<ShiftDetailDto> getShiftById(@PathVariable Long shiftId) {
         Shift shift = shiftService.getShiftOne(shiftId);
         ShiftDetailDto detailDto = shiftMapper.toDetailDto(shift);
@@ -31,7 +33,7 @@ public class ShiftController {
     }
 
     // Shift 생성
-    @PostMapping("/schedules/{scheduleId}/shifts")
+    // @PostMapping("/schedules/{scheduleId}/shifts")
     public ResponseEntity<ShiftInfoDTO> createShift(@PathVariable Long scheduleId,
                                                     @RequestBody ShiftUpload shiftUpload /* Shift 생성 DTO */) {
 
@@ -40,7 +42,7 @@ public class ShiftController {
     }
 
     // Shift 수정
-    @PatchMapping("/shifts/{shiftId}")
+    //@PatchMapping("/shifts/{shiftId}")
     public ResponseEntity<ShiftInfoDTO> updateShift(@PathVariable Long shiftId,
                                                     @RequestBody ShiftUpload updateRequest /* Shift 수정 DTO */) {
         Shift shift = shiftService.updateShift(shiftId, updateRequest);
@@ -54,9 +56,17 @@ public class ShiftController {
      */
     @DeleteMapping("/shifts/{shiftId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteShift(@PathVariable Long shiftId) {
+    public ResponseEntity<ApiResponse<Void>> deleteShift(@PathVariable Long shiftId) {
         shiftService.deleteShift(shiftId);
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success());
     }
+
+    // Shift 수정
+    @PatchMapping("/shifts/{shiftId}")
+    public ResponseEntity<ApiResponse<Void>> updateUserShift(@PathVariable Long shiftId, @RequestBody ShiftUpdateUser request) {
+        shiftService.updateUserShift(request.getUserId(), shiftId);
+
+        return ResponseEntity.ok(ApiResponse.success());
+    }
+
 }

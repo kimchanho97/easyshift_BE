@@ -4,6 +4,7 @@ import com.burntoburn.easyshift.dto.leave.req.LeaveRequestDto;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.user.User;
+import com.burntoburn.easyshift.exception.leave.LeaveException;
 import com.burntoburn.easyshift.repository.leave.LeaveRequestRepository;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
@@ -18,7 +19,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,21 +68,17 @@ class LeaveRequestWorkerServiceImpTest {
     @DisplayName("휴무 신청 생성 테스트")
     void createLeaveRequest() {
         // Given
-        LeaveRequestDto requestDto = new LeaveRequestDto(schedule.getId(), LocalDate.of(2024, 3, 10));
+        LeaveRequestDto requestDto = LeaveRequestDto.builder()
+                .dates(List.of(LocalDate.of(2024, 3, 10)))
+                .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(scheduleRepository.findById(1L)).thenReturn(Optional.of(schedule));
-        when(leaveRequestFactory.createLeaveRequest(user, schedule, requestDto.getDate())).thenReturn(leaveRequest);
+        when(leaveRequestFactory.createLeaveRequest(user, schedule, requestDto.getDates().get(0))).thenReturn(leaveRequest);
         when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(leaveRequest);
 
         // When
-        LeaveRequest createdLeaveRequest = leaveRequestWorkerService.createLeaveRequest(1L, requestDto);
-
-        // Then
-        assertNotNull(createdLeaveRequest);
-        assertEquals(user, createdLeaveRequest.getUser());
-        assertEquals(schedule, createdLeaveRequest.getSchedule());
-        assertEquals(requestDto.getDate(), createdLeaveRequest.getDate());
+        leaveRequestWorkerService.createLeaveRequest(1L, 1L, requestDto);
 
         verify(leaveRequestRepository, times(1)).save(any(LeaveRequest.class));
     }
@@ -136,7 +132,7 @@ class LeaveRequestWorkerServiceImpTest {
         when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(updatedLeaveRequest);
 
         // When
-        LeaveRequest result = leaveRequestWorkerService.updateLeaveRequest(1L, new LeaveRequestDto(1L, newDate));
+        LeaveRequest result = leaveRequestWorkerService.updateLeaveRequest(1L, newDate);
 
         // Then
         assertNotNull(result, "업데이트된 휴무 요청이 null이면 안 됩니다.");
@@ -168,7 +164,7 @@ class LeaveRequestWorkerServiceImpTest {
         when(leaveRequestRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(NoSuchElementException.class, () -> leaveRequestWorkerService.getLeaveRequest(1L));
+        assertThrows(LeaveException.class, () -> leaveRequestWorkerService.getLeaveRequest(1L));
     }
 
     @Test
@@ -178,6 +174,6 @@ class LeaveRequestWorkerServiceImpTest {
         when(leaveRequestRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(NoSuchElementException.class, () -> leaveRequestWorkerService.cancelLeaveRequest(1L, 1L));
+        assertThrows(LeaveException.class, () -> leaveRequestWorkerService.cancelLeaveRequest(1L, 1L));
     }
 }

@@ -16,6 +16,7 @@ public class ShiftTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
+    @Column(name = "shift_template_id")
     private Long id;
 
     @Column(nullable = false)
@@ -27,5 +28,7 @@ public class ShiftTemplate {
     @Column(nullable = false)
     private LocalTime endTime;
 
-    // scheduleTemplate 참조 제거 (단방향 관계)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_template_id", nullable = false)
+    private ScheduleTemplate scheduleTemplate;
 }
