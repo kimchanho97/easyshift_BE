@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -20,7 +19,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import com.burntoburn.easyshift.util.CookieUtil;
 import java.io.IOException;
 
@@ -101,12 +99,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + accessToken); // 헤더에 토큰 추가
-
-//        HttpEntity<String> requestEntity = new HttpEntity<>(jsonResponse, headers);
-//
-//        RestTemplate restTemplate = new RestTemplate();
-//        // 프론트엔드의 post 방식을 json 데이터 전송.. (프론트엔드 엔드 포인트 필요)
-//        restTemplate.postForEntity(FRONTEND_CALLBACK_URL, requestEntity, String.class);
 
         // JSON 응답 전송
         response.getWriter().write(jsonResponse);
