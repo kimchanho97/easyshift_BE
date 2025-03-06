@@ -57,7 +57,7 @@ public class TokenProvider {
         this.signingKey = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(User user, Duration expiresIn) {
+    public String generateAccessToken(User user, Duration expiresIn) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiresIn.toMillis());
 
@@ -71,6 +71,21 @@ public class TokenProvider {
                 .subject(user.getEmail())
                 .claim("id", user.getId())
                 .claim("role", user.getRole().getKey())
+                .signWith(signingKey)
+                .compact();
+    }
+
+    public String generateRefreshToken(Duration expiresIn){
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiresIn.toMillis());
+
+        return Jwts.builder()
+                .header()
+                .add("typ", "JWT")
+                .and()
+                .issuer(jwtProperties.getIssuer())
+                .issuedAt(now)
+                .expiration(expiryDate)
                 .signWith(signingKey)
                 .compact();
     }

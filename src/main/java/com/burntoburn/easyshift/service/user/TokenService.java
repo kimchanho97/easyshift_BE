@@ -23,6 +23,6 @@ public class TokenService {
         User user = refreshTokenService.findByRefreshToken(refreshToken).getUser();
 
 
-        return tokenProvider.generateToken(user, Duration.ofHours(2));
+        return tokenProvider.generateAccessToken(user, Duration.ofHours(2));
     }
 }
