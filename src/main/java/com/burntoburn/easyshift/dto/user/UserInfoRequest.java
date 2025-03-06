@@ -12,7 +12,7 @@ public class UserInfoRequest {
     private String email;
     private String name;
     private String phoneNumber;
-    private Role role;
+    private String role;
     private String avatarUrl;
 
     public User toEntity(){
@@ -21,7 +21,7 @@ public class UserInfoRequest {
                 .email(email)
                 .name(name)
                 .phoneNumber(phoneNumber)
-                .role(role)
+                .role(Enum.valueOf(Role.class, role))
                 .avatarUrl(avatarUrl)
                 .build();
     }

@@ -8,10 +8,12 @@ import com.burntoburn.easyshift.oauth2.repository.OAuth2AuthorizationRequestRepo
 import com.burntoburn.easyshift.oauth2.user.KakaoOAuth2User;
 import com.burntoburn.easyshift.repository.user.RefreshTokenRepository;
 import com.burntoburn.easyshift.service.user.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -20,9 +22,14 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import com.burntoburn.easyshift.util.CookieUtil;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.io.IOException;
 
 import java.time.Duration;
+import java.util.Optional;
+
+import static com.burntoburn.easyshift.oauth2.repository.OAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Slf4j
 @Component
@@ -37,8 +44,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
     public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(2);
-    // 프론트엔드 콜백 페이지 URL ( 추후 수정 예정 )
-    public static final String FRONTEND_CALLBACK_URL = "http://localhost:3000/";
+    @Value("${app.frontend.redirect-url}")
+    private String frontendRedirectUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -51,6 +58,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         KakaoOAuth2User kakaoOAuth2User = new KakaoOAuth2User(oAuth2User.getAttributes());
         User user = userService.findByEmail(kakaoOAuth2User.getEmail());
 
+
         // 자체 access token 생성
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
         // 리프레시 토큰 생성
@@ -58,50 +66,34 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         saveToken(user, refreshToken);
         addRefreshTokenToCookie(request, response, refreshToken);
 
-        //헤더에 Access Token 추가
-        response.setHeader("Authorization", "Bearer " + accessToken);
+        Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue);
 
-        // JSON 응답 생성
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        String targetUrl = redirectUri.orElse(frontendRedirectUrl);
 
-        String jsonResponse;
+        String redirectPath;
         if (user.getRole() != Role.GUEST) {
             // 기존 사용자 (회원가입 완료)
-            jsonResponse = "{ " +
-                    "\"success\": true, " +
-                    "\"response\": { " +
-                    "\"userId\": \"" + user.getId() + "\", " +
-                    "\"email\": \"" + user.getEmail() + "\", " +
-                    "\"name\": \"" + user.getName() + "\", " +
-                    "\"phoneNumber\": \"" + user.getPhoneNumber() + "\", " +
-                    "\"role\": \"" + user.getRole() + "\", " +
-                    "\"avatarUrl\": \"" + user.getAvatarUrl() + "\", " +
-                    "\"needsSignup\": false }, " +
-                    "\"error\": null " +
-                    "}";
+            redirectPath = UriComponentsBuilder.fromUriString(targetUrl)
+                    .queryParam("needSignUp", false)
+                    .queryParam("accessToken", accessToken)
+                    .build()
+                    .toUriString();
         } else {
             // 신규 사용자 (추가 회원가입 필요)
-            jsonResponse = "{ " +
-                    "\"success\": true, " +
-                    "\"response\": { " +
-                    "\"userId\": \"" + user.getId() + "\", " +
-                    "\"email\": \"" + user.getEmail() + "\", " +
-                    "\"name\": \"" + user.getName() + "\", " +
-                    "\"phoneNumber\": null, " +
-                    "\"role\": \"" + user.getRole() + "\", " +
-                    "\"avatarUrl\": \"" + user.getAvatarUrl() + "\", " +
-                    "\"needsSignup\": true }, " +
-                    "\"error\": null " +
-                    "}";
+            redirectPath = UriComponentsBuilder.fromUriString(targetUrl)
+                    .queryParam("needSignUp", true)
+                    .queryParam("userId", user.getId())
+                    .queryParam("email", user.getEmail())
+                    .queryParam("avatarUrl", user.getAvatarUrl())
+                    .queryParam("accessToken", accessToken)
+                    .build()
+                    .toUriString();
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + accessToken); // 헤더에 토큰 추가
+        //유저 정보를 리다이렉트
+        getRedirectStrategy().sendRedirect(request,response,redirectPath);
 
-        // JSON 응답 전송
-        response.getWriter().write(jsonResponse);
         // 인증 설정 값 삭제
         clearAuthenticationAttributes(request, response);
     }
@@ -126,6 +118,5 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         super.clearAuthenticationAttributes(request);
         oAuth2AuthorizationRequestRepository.removeAuthorizationRequest(request, response);
     }
-
 
 }
