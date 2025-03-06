@@ -42,6 +42,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final UserService userService;
 
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+    public static final String ACCESS_TOKEN_COOKIE_NAME = "access_token";
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
     public static final Duration ACCESS_TOKEN_DURATION = Duration.ofDays(2);
     @Value("${app.frontend.redirect-url}")
@@ -60,9 +61,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 
         // 자체 access token 생성
-        String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
+        String accessToken = tokenProvider.generateAccessToken(user, ACCESS_TOKEN_DURATION);
+        addAccessTokenToCookie(request, response, accessToken);
         // 리프레시 토큰 생성
-        String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
+        String refreshToken = tokenProvider.generateRefreshToken(REFRESH_TOKEN_DURATION);
         saveToken(user, refreshToken);
         addRefreshTokenToCookie(request, response, refreshToken);
 
@@ -76,7 +78,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 기존 사용자 (회원가입 완료)
             redirectPath = UriComponentsBuilder.fromUriString(targetUrl)
                     .queryParam("needSignUp", false)
-                    .queryParam("accessToken", accessToken)
                     .build()
                     .toUriString();
         } else {
@@ -86,7 +87,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .queryParam("userId", user.getId())
                     .queryParam("email", user.getEmail())
                     .queryParam("avatarUrl", user.getAvatarUrl())
-                    .queryParam("accessToken", accessToken)
                     .build()
                     .toUriString();
         }
@@ -103,6 +103,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         int cookieMaxAge = (int) REFRESH_TOKEN_DURATION.toSeconds();
         CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);
         CookieUtil.addCookie(response, REFRESH_TOKEN_COOKIE_NAME, refreshToken, cookieMaxAge);
+    }
+
+    // 생성된 엑세스 토큰 쿠키에 저장
+    private void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response,String accessToken) {
+        int cookieMaxAge = (int) ACCESS_TOKEN_DURATION.toSeconds();
+        CookieUtil.deleteCookie(request, response, ACCESS_TOKEN_COOKIE_NAME);
+        CookieUtil.addCookie(response, ACCESS_TOKEN_COOKIE_NAME, accessToken, cookieMaxAge);
     }
 
     // RefreshToken 이 DB에 있는지 확인하고 업데이트 하거나 저장
