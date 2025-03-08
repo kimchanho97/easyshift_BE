@@ -23,6 +23,8 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
             "WHERE s.scheduleMonth = :scheduleMonth")
     List<LeaveRequest> findAllByScheduleMonth(YearMonth scheduleMonth);
 
+    List<LeaveRequest> findByScheduleId(Long scheduleId);
+
     List<LeaveRequest> findAllByScheduleAndApprovalStatus(Schedule schedule, ApprovalStatus approvalStatus);
 
     boolean existsByUserIdAndScheduleIdAndDate(Long userId, Long scheduleId, LocalDate date);

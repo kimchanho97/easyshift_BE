@@ -1,5 +1,6 @@
 package com.burntoburn.easyshift.service.leave;
 
+import com.burntoburn.easyshift.dto.leave.res.LeaveCheckResponseDto;
 import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -17,5 +18,7 @@ public interface LeaveRequestAdminService {
 
     // 한 달 단위로 휴뮤 조회
     List<LeaveRequest> getLeaveRequestsByMonth(YearMonth scheduleMonth);
+
+    LeaveCheckResponseDto getLeaveRequestsForSchedule(Long scheduleId);
 
 }
