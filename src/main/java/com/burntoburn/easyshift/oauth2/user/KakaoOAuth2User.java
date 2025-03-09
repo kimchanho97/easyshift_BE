@@ -21,8 +21,8 @@ public class KakaoOAuth2User {
 
             this.id = ((Long) attributes.get("id")).toString();
             this.email = (String) kakaoAccount.get("email");
-            this.name = (String)  kakaoAccount.get("nickname");
-            this.profileImageUrl = (String) kakaoProfile.get("profile_image_url");
+            this.name = kakaoProfile != null ? (String) kakaoProfile.get("nickname") : "이름";
+            this.profileImageUrl = kakaoProfile != null ? (String) kakaoProfile.get("profile_image_url") : null;
         }
 
 }

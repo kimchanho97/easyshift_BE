@@ -34,7 +34,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
     private void saveOrUpdate(OAuth2User oAuth2User) {
         KakaoOAuth2User kakaoOAuth2User = new KakaoOAuth2User(oAuth2User.getAttributes());
         String email = kakaoOAuth2User.getEmail();
-        String name = kakaoOAuth2User.getName() == null ? " " : kakaoOAuth2User.getName();
+
         User user= userRepository.findByEmail(email)
                 .map(entity -> entity.update(email))
                 .orElse(User.builder()
