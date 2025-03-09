@@ -39,7 +39,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
                 .map(entity -> entity.update(email))
                 .orElse(User.builder()
                         .email(email)
-                        .name(name)
+                        .name(kakaoOAuth2User.getName())
                         .role(Role.GUEST)
                         .avatarUrl(kakaoOAuth2User.getProfileImageUrl())
                         .build());
