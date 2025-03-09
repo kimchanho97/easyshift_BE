@@ -30,5 +30,7 @@ public interface ScheduleTemplateRepository extends JpaRepository<ScheduleTempla
             WHERE st.id = :scheduleTemplateId
             """)
     Optional<ScheduleTemplate> findScheduleTemplateWithShiftsById(@Param("scheduleTemplateId") Long scheduleTemplateId);
+
+    List<ScheduleTemplate> findByIdIn(List<Long> scheduleId);
 }
 
