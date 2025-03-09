@@ -3,20 +3,15 @@ package com.burntoburn.easyshift.controller;
 import com.burntoburn.easyshift.dto.user.UserInfoRequest;
 import com.burntoburn.easyshift.entity.user.CustomUserDetails;
 import com.burntoburn.easyshift.entity.user.User;
-import com.burntoburn.easyshift.repository.user.UserRepository;
 import com.burntoburn.easyshift.service.user.UserService;
 import com.burntoburn.easyshift.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserApiController {
@@ -31,10 +26,11 @@ public class UserApiController {
 
 
     @GetMapping("/profile")
-    public ResponseEntity<UserDetails> getUserProfile() {
+    public ResponseEntity<User> getUserProfile() {
         CustomUserDetails userDetails = SecurityUtil.getCurrentUser();
         System.out.println("User ID: " + userDetails.getUserId() + ", Email: " + userDetails.getUsername());
-        return ResponseEntity.status(HttpStatus.OK).body(userDetails);
+        User user = userService.findById(userDetails.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
 //    @GetMapping("/logout")
