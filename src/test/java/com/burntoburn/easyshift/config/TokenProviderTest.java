@@ -12,9 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +46,7 @@ class TokenProviderTest {
         );
         
         // when
-        String token = tokenProvider.generateToken(testUser, Duration.ofDays(14));
+        String token = tokenProvider.generateAccessToken(testUser, Duration.ofDays(14));
         
         // then: parse using the modern parserBuilder() API
         Long userId = Jwts.parser()
@@ -92,8 +95,14 @@ class TokenProviderTest {
     void getAuthentication() {
         // given
         String userEmail = "user@gmail.com";
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("name", "홍길동");
+        claims.put("role", Role.WORKER);
+
         String token = JwtFactory.builder()
                 .subject(userEmail)
+                .claims(claims)
                 .build()
                 .createToken(jwtProperties);
         
@@ -101,8 +110,7 @@ class TokenProviderTest {
         Authentication authentication = tokenProvider.getAuthentication(token);
         
         // then
-        org.springframework.security.core.userdetails.User userDetails =
-                (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         assertThat(userDetails.getUsername()).isEqualTo(userEmail);
     }
     
