@@ -30,7 +30,7 @@ public class User extends BaseEntity {
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Role role = Role.GUEST; // GUEST, WORKER, ADMINISTRATOR
 
     private String avatarUrl;
