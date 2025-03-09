@@ -19,4 +19,7 @@ public class ScheduleException extends BusinessException {
     public static ScheduleException insufficientUsersForAssignment() {
         return new ScheduleException(INSUFFICIENT_USERS_FOR_ASSIGNMENT);
     }
+    public static ScheduleException schedulePageNotFound() {
+        return new ScheduleException(ScheduleErrorCode.SCHEDULE_PAGE_NOT_FOUND);
+    }
 }

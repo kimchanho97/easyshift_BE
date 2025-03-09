@@ -14,6 +14,7 @@ import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.exception.schedule.ScheduleException;
 import com.burntoburn.easyshift.exception.shift.ShiftException;
+import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.exception.template.TemplateException;
 import com.burntoburn.easyshift.repository.leave.LeaveRequestRepository;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
@@ -58,7 +59,7 @@ public class ScheduleServiceImp implements ScheduleService {
     @Override
     public void createSchedule(ScheduleUpload upload) {
         Store store = storeRepository.findById(upload.getStoreId())
-                .orElseThrow(ScheduleException::scheduleNotFound);
+                .orElseThrow(StoreException::storeNotFound);
 
         ScheduleTemplate scheduleTemplate = scheduleTemplateRepository.findById(upload.getScheduleTemplateId())
                 .orElseThrow(TemplateException::scheduleTemplateNotFound);
@@ -79,9 +80,14 @@ public class ScheduleServiceImp implements ScheduleService {
     // 매장 스케줄 목록 조회
     @Override
     public ScheduleInfoResponse getSchedulesByStore(Long storeId, Pageable pageable) {
-        Page<Schedule> schedulePage = Optional.of(scheduleRepository.findByStoreIdOrderByCreatedAtDesc(storeId, pageable))
-                .filter(page -> !page.isEmpty())
-                .orElseThrow(ScheduleException::scheduleNotFound);
+        Page<Schedule> schedulePage = scheduleRepository.findByStoreIdOrderByCreatedAtDesc(storeId, pageable);
+
+        if (schedulePage.isEmpty()) {
+            if (!scheduleRepository.existsByStoreId(storeId)) {
+                throw ScheduleException.scheduleNotFound();  // 스토어에 대한 스케줄이 없음
+            }
+            throw ScheduleException.schedulePageNotFound(); // 요청한 페이지에 데이터 없음
+        }
 
         return ScheduleInfoResponse.formEntity(schedulePage, schedulePage.isLast());
     }
@@ -96,9 +102,7 @@ public class ScheduleServiceImp implements ScheduleService {
             throw ScheduleException.scheduleNotFound();
         }
 
-        Store store = workerSchedules.stream().findFirst()
-                .map(Schedule::getStore)
-                .orElseThrow(ScheduleException::scheduleNotFound);
+        Store store = workerSchedules.getFirst().getStore(); // 첫 번째 스케줄에서 store 가져오기
 
         return WorkerScheduleResponse.fromEntity(store, workerSchedules);
     }
@@ -121,7 +125,7 @@ public class ScheduleServiceImp implements ScheduleService {
         }
         List<Shift> shifts = shiftRepository.findShiftsByScheduleIdWithUser(scheduleIds, monday, endDate);
         if (shifts.isEmpty()) {
-            throw ShiftException.shiftNotFound();
+            throw ShiftException.shiftNotFoundInPeriod();
         }
 
 
@@ -133,7 +137,6 @@ public class ScheduleServiceImp implements ScheduleService {
     }
 
     // 스케줄 조회(all)
-    @Transactional
     @Override
     public ScheduleDetailDTO getAllSchedules(Long scheduleId) {
         Schedule schedule = scheduleRepository.findScheduleWithShifts(scheduleId)
@@ -144,17 +147,8 @@ public class ScheduleServiceImp implements ScheduleService {
                 .orElseThrow(TemplateException::scheduleTemplateNotFound);
 
         List<ShiftTemplate> shiftTemplates = scheduleTemplate.getShiftTemplates();
-        if (shiftTemplates == null) {
-            throw new IllegalStateException("Shift templates list is unexpectedly null");
-        }
-        if (shiftTemplates.isEmpty()) {
-            throw TemplateException.shiftTemplateNotFound();
-        }
 
         List<Shift> shifts = schedule.getShifts();
-        if (shifts == null || shifts.isEmpty()) {
-            throw ShiftException.shiftNotFound();
-        }
 
         return ScheduleDetailDTO.fromEntity(scheduleId, schedule.getScheduleName(), shiftTemplates, shifts);
     }
