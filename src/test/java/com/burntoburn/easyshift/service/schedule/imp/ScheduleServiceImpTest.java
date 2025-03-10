@@ -11,6 +11,7 @@ import com.burntoburn.easyshift.dto.schedule.req.ScheduleUpload;
 import com.burntoburn.easyshift.dto.schedule.req.ShiftDetail;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleInfoResponse;
+import com.burntoburn.easyshift.dto.schedule.res.WorkerSchedule;
 import com.burntoburn.easyshift.dto.schedule.res.WorkerScheduleResponse;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import com.burntoburn.easyshift.entity.schedule.ScheduleStatus;
@@ -271,28 +272,60 @@ class ScheduleServiceImpTest {
 
 
     @Test
-    @DisplayName("worker 의 스케줄 조회 성공")
-    void getSchedulesByWorker_success(){
+    @DisplayName("worker 의 스케줄 조회 성공 - scheduleTemplateName 포함")
+    void getSchedulesByWorker_success_withScheduleTemplateName() {
         // given
         Long storeId = 1L;
         Long userId = 10L;
         String date = "2025-03";
         YearMonth scheduleMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
 
-        Store store = Store.builder().id(storeId).storeName("Test Store").build();
-        Schedule schedule = Schedule.builder().id(100L).store(store).scheduleMonth(scheduleMonth).build();
+        // 매핑할 scheduleTemplateId 및 name
+        Long scheduleTemplateId = 1001L;
+        String scheduleTemplateName = "Morning Shift";
+
+        Store store = Store.builder()
+                .id(storeId)
+                .storeName("Test Store")
+                .build();
+
+        // 스케줄 객체 생성 (scheduleTemplateId 포함)
+        Schedule schedule = Schedule.builder()
+                .id(100L)
+                .store(store)
+                .scheduleMonth(scheduleMonth)
+                .scheduleTemplateId(scheduleTemplateId) // scheduleTemplateId 추가
+                .build();
+
         List<Schedule> schedules = List.of(schedule);
 
+        ScheduleTemplate scheduleTemplate = ScheduleTemplate.builder()
+                .id(1001L)
+                .scheduleTemplateName(scheduleTemplateName)
+                .build();
+
+        // scheduleRepository에서 스케줄 반환하도록 Mock 설정
         when(scheduleRepository.findWorkerSchedules(storeId, scheduleMonth, userId)).thenReturn(schedules);
+
+        // scheduleTemplateRepository에서 scheduleTemplateName 반환하도록 Mock 설정
+        when(scheduleTemplateRepository.findByIdIn(List.of(scheduleTemplateId)))
+                .thenReturn(List.of(scheduleTemplate));
 
         // when
         WorkerScheduleResponse response = scheduleService.getSchedulesByWorker(storeId, userId, date);
 
         // then
         verify(scheduleRepository, times(1)).findWorkerSchedules(storeId, scheduleMonth, userId);
+        verify(scheduleTemplateRepository, times(1)).findByIdIn(List.of(scheduleTemplateId));
+
         assertThat(response).isNotNull();
         assertThat(response.getSchedules()).hasSize(1);
+
+        WorkerSchedule workerSchedule = response.getSchedules().get(0);
+        assertThat(workerSchedule.getScheduleId()).isEqualTo(100L);
+        assertThat(workerSchedule.getScheduleTemplateName()).isEqualTo(scheduleTemplateName); // scheduleTemplateName 검증
     }
+
 
 
     @Test
