@@ -31,10 +31,14 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -104,7 +108,9 @@ public class ScheduleServiceImp implements ScheduleService {
 
         Store store = workerSchedules.getFirst().getStore(); // 첫 번째 스케줄에서 store 가져오기
 
-        return WorkerScheduleResponse.fromEntity(store, workerSchedules);
+        Map<Long, String> scheduleIdToTemplateNameMap = getScheduleIdToTemplateNameMap(workerSchedules);
+
+        return WorkerScheduleResponse.fromEntity(store, workerSchedules, scheduleIdToTemplateNameMap);
     }
 
     // 스케줄 조회(일주일치)
@@ -172,5 +178,25 @@ public class ScheduleServiceImp implements ScheduleService {
         }
 
         autoAssignmentScheduler.assignShifts(assignmentData);
+    }
+
+    private Map<Long, String> getScheduleIdToTemplateNameMap(List<Schedule> workerSchedules) {
+        // 1. scheduleId -> scheduleTemplateId 매핑
+        Map<Long, Long> scheduleToTemplateMap = workerSchedules.stream()
+                .collect(Collectors.toMap(Schedule::getId, Schedule::getScheduleTemplateId));
+
+        // 2. 중복 제거된 scheduleTemplateId 리스트 추출
+        List<Long> uniqueTemplateIds = new ArrayList<>(new HashSet<>(scheduleToTemplateMap.values()));
+
+        // 3. scheduleTemplateId -> scheduleTemplateName 매핑 (한 번의 DB 조회)
+        Map<Long, String> templateIdToNameMap = scheduleTemplateRepository.findByIdIn(uniqueTemplateIds).stream()
+                .collect(Collectors.toMap(ScheduleTemplate::getId, ScheduleTemplate::getScheduleTemplateName));
+
+        // 4. scheduleId -> scheduleTemplateName 매핑 생성 후 반환
+        return workerSchedules.stream()
+                .collect(Collectors.toMap(
+                        Schedule::getId,
+                        schedule -> templateIdToNameMap.get(schedule.getScheduleTemplateId())
+                ));
     }
 }

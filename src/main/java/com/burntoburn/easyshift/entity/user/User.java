@@ -17,20 +17,20 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE) // id는 Builder에서 설정 불가
-    @Column(name = "iuser_d")
+    @Column(name = "Id")
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String email;
 
     // 사용자 이름 필드
-//    @Column(nullable = false)
+    @Column(nullable = false)
     private String name;
 
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Role role = Role.GUEST; // GUEST, WORKER, ADMINISTRATOR
 
     private String avatarUrl;
