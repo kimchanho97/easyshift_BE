@@ -39,11 +39,11 @@ public class UserApiController {
 
 
     @GetMapping("/profile")
-    public ResponseEntity<ApiResponse<User>> getUserProfile() {
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserProfile() {
         CustomUserDetails userDetails = SecurityUtil.getCurrentUser();
-        User user = userService.findById(userDetails.getUserId());
+        UserInfoResponse response = new UserInfoResponse(userService.findById(userDetails.getUserId()));
 
-        return ResponseEntity.ok(ApiResponse.success(user));
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
 //    @GetMapping("/logout")
