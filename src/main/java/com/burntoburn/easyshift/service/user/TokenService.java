@@ -13,9 +13,8 @@ public class TokenService {
 
     private final TokenProvider tokenProvider;
     private final RefreshTokenService refreshTokenService;
-    private final UserService userService;
 
-    public String createNewAccessToken(String refreshToken) {
+    public String createNewAccessTokenByRefreshToken(String refreshToken) {
         if (!tokenProvider.validToken(refreshToken)) {
             throw new IllegalArgumentException("유효하지 않은 토큰 입니다.");
         }
@@ -25,4 +24,11 @@ public class TokenService {
 
         return tokenProvider.generateAccessToken(user, Duration.ofHours(2));
     }
+
+    public String createNewAccessToken(User user) {
+
+        return tokenProvider.generateAccessToken(user, Duration.ofHours(2));
+    }
+
+
 }

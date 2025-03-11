@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(("/login"))
+@RequestMapping()
 @RequiredArgsConstructor
 @Slf4j
 public class TokenApiController {
@@ -19,7 +19,7 @@ public class TokenApiController {
 
     @PostMapping("/token")
     public ResponseEntity<CreateAccessTokenResponse> createAccessToken(@RequestBody CreateAccessTokenRequest request){
-        String newToken = tokenService.createNewAccessToken(request.getRefreshToken());
+        String newToken = tokenService.createNewAccessTokenByRefreshToken(request.getRefreshToken());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateAccessTokenResponse(newToken));
     }
 
