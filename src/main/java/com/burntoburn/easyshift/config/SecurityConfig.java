@@ -42,7 +42,7 @@ public class SecurityConfig {
             "/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**"
     };
     private static final String[] PUBLIC_API_ENDPOINTS = {
-            "/api/user/info", "/api/user/login", "/api/public/**", "/api/auth/**", "/oauth2/**", "/login/**"
+            "/api/user/login", "/api/public/**", "/api/auth/**", "/oauth2/**", "/login/**"
     };
 
     @Bean
