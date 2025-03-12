@@ -29,8 +29,9 @@ public class User extends BaseEntity {
 
     private String phoneNumber;
 
+    @Column(length = 20)
+    nullabe
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
     private Role role = Role.GUEST; // GUEST, WORKER, ADMINISTRATOR
 
     private String avatarUrl;
