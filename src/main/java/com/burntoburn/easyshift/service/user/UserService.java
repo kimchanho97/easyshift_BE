@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService  {
+public class UserService {
 
     private final UserRepository userRepository;
 
-    public User update(UserInfoRequest request) throws Exception{
+    public User update(UserInfoRequest request) throws Exception {
         User updatableUser = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 사용자가 없습니다."));
         updatableUser.updateUser(request.toEntity());
 

@@ -12,4 +12,13 @@ public enum Role {
     ADMINISTRATOR("ROLE_ADMIN");
 
     private final String key;
+
+    public static Role fromString(String key) {
+        for (Role role : Role.values()) {
+            if (role.getKey().equals(key)) {
+                return role;
+            }
+        }
+        return null;
+    }
 }

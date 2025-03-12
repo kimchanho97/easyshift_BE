@@ -40,6 +40,12 @@ public class User extends BaseEntity {
         return this;
     }
 
+    public void updateProfile(String name, String phoneNumber, Role role) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+    }
+
     // 유저 정보변경하는 메서드
     public void updateUser(User newUser) {
         this.email = newUser.getEmail();
