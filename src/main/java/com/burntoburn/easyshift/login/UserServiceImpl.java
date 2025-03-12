@@ -28,8 +28,7 @@ public class UserServiceImpl {
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
     private String clientSecret;
 
-    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
-    private String redirectUri;
+    private String redirectUri = "https://api.easyshift.tech:8443/login/oauth2/code/kakao";
 
     @Transactional
     public UserLoginResult login(String code) {
