@@ -5,6 +5,8 @@ import com.burntoburn.easyshift.dto.template.req.ShiftTemplateRequest;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ScheduleTemplateFactory {
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     public ScheduleTemplate createScheduleTemplate(Store store, ScheduleTemplateRequest request) {
         // ShiftTemplates 객체를 미리 초기화하여 null 방지
@@ -38,8 +41,8 @@ public class ScheduleTemplateFactory {
                 .map(shiftRequest -> ShiftTemplate.builder()
                         .scheduleTemplate(scheduleTemplate)
                         .shiftTemplateName(shiftRequest.getShiftName())
-                        .startTime(shiftRequest.getStartTime())
-                        .endTime(shiftRequest.getEndTime())
+                        .startTime(LocalTime.parse(shiftRequest.getStartTime(), TIME_FORMATTER))
+                        .endTime(LocalTime.parse(shiftRequest.getEndTime(),TIME_FORMATTER))
                         .build())
                 .collect(Collectors.toList());
     }
