@@ -55,7 +55,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
         User user = tokenEntity.getUser();
         Long userId = user.getId();
-        String role = user.getRole().name(); // 예: "ROLE_USER", "ROLE_ADMIN"
+        String role = user.getRole().getKey();
 
         // 5. SecurityContextHolder에 인증 객체 저장
         Authentication authentication = createAuthentication(userId, role);

@@ -14,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
+import static com.burntoburn.easyshift.entity.user.Role.GUEST;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl {
@@ -51,6 +53,7 @@ public class UserServiceImpl {
                 .email(kakaoUser.getEmail())
                 .name(kakaoUser.getNickname())
                 .avatarUrl(kakaoUser.getProfileImage())
+                .role(GUEST)
                 .build();
         userRepository.save(newUser);
         Token token = new Token(newUser, accessToken);
