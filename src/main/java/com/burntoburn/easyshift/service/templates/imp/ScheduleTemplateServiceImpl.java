@@ -5,6 +5,7 @@ import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.dto.template.ScheduleTemplateWithShiftsResponse;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
+import com.burntoburn.easyshift.exception.store.StoreException;
 import com.burntoburn.easyshift.exception.template.TemplateException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
@@ -28,8 +29,7 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
     @Transactional
     public ScheduleTemplateResponse createScheduleTemplate(Long storeId, ScheduleTemplateRequest request) {
         // Store 조회
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(()->new NoSuchElementException("not found store"));
+        Store store = storeRepository.findById(storeId).orElseThrow(StoreException::storeNotFound);
 
         // ScheduleTemplate 생성
         ScheduleTemplate scheduleTemplate = scheduleTemplateFactory.createScheduleTemplate(store, request);
