@@ -14,8 +14,7 @@ public class ScheduleUpload {
     private String scheduleName;
     private Long storeId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM")
-    private YearMonth scheduleMonth;
+    private String scheduleMonth;
     private Long scheduleTemplateId;
     private String description;
     private List<ShiftDetail> shiftDetails;
