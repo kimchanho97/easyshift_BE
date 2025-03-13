@@ -6,6 +6,7 @@ import com.burntoburn.easyshift.dto.store.ShiftTemplateDto;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
+import java.util.Collections;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,9 @@ public class ScheduleDetailDTO {
                 .toList();
 
         return new ScheduleDetailDTO(scheduleId, scheduleName, templateDtos);
+    }
+    public static ScheduleDetailDTO emptyResponse(Long scheduleId) {
+        return new ScheduleDetailDTO(scheduleId, "", Collections.emptyList());
     }
 
 }
