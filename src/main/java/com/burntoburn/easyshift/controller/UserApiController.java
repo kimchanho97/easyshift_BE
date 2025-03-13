@@ -11,11 +11,15 @@ import com.burntoburn.easyshift.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class UserApiController {
 
     private final UserService userService;
@@ -34,11 +38,9 @@ public class UserApiController {
     }
 
 
-    //    @GetMapping("/profile")
-    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserProfile() {
-        CustomUserDetails userDetails = SecurityUtil.getCurrentUser();
-        UserInfoResponse response = new UserInfoResponse(userService.findById(userDetails.getUserId()));
-
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserProfile(@AuthenticationPrincipal Long userId) {
+        UserInfoResponse response = new UserInfoResponse(userService.findById(userId));
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

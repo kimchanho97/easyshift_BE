@@ -20,7 +20,7 @@ public class UserInfoResponse {
         this.name = user.getName();
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
-        this.avatarUrl = user.getAvatarUrl();
         this.role = user.getRole();
+        this.avatarUrl = user.getAvatarUrl();
     }
 }
