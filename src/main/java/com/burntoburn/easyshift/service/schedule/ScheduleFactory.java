@@ -8,6 +8,7 @@ import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
+import java.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
 import java.time.YearMonth;
@@ -22,7 +23,7 @@ public class ScheduleFactory {
     public Schedule createSchedule(Store store, ScheduleTemplate scheduleTemplate, ScheduleUpload request) {
         Schedule schedule = Schedule.builder()
                 .scheduleName(request.getScheduleName())
-                .scheduleMonth(request.getScheduleMonth())
+                .scheduleMonth(YearMonth.parse(request.getScheduleMonth(), DateTimeFormatter.ofPattern("yyyy-MM")))
                 .scheduleStatus(ScheduleStatus.PENDING)
                 .scheduleTemplateId(scheduleTemplate.getId()) // Schedule 테이블에 scheduleTemplateId 저장
                 .description(request.getDescription())

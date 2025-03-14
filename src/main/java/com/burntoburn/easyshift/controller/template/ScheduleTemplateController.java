@@ -5,6 +5,7 @@ import com.burntoburn.easyshift.dto.template.req.ScheduleTemplateRequest;
 import com.burntoburn.easyshift.dto.template.ScheduleTemplateResponse;
 import com.burntoburn.easyshift.dto.template.ScheduleTemplateWithShiftsResponse;
 import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

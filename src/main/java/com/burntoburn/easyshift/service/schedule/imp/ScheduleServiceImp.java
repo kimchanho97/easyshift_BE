@@ -121,18 +121,12 @@ public class ScheduleServiceImp implements ScheduleService {
         LocalDate endDate = monday.plusDays(6);
 
         List<Schedule> schedules = scheduleRepository.findSchedulesWithTemplate(scheduleTemplateId);
-        if (schedules.isEmpty()) {
-            throw ScheduleException.scheduleNotFound();
-        }
+
 
         List<Long> scheduleIds = schedules.stream().map(Schedule::getId).toList();
-        if (scheduleIds.isEmpty()) {
-            throw ScheduleException.scheduleNotFound();
-        }
+
         List<Shift> shifts = shiftRepository.findShiftsByScheduleIdWithUser(scheduleIds, monday, endDate);
-        if (shifts.isEmpty()) {
-            throw ShiftException.shiftNotFoundInPeriod();
-        }
+
 
 
         ScheduleTemplate scheduleTemplate = scheduleTemplateRepository
@@ -145,15 +139,19 @@ public class ScheduleServiceImp implements ScheduleService {
     // 스케줄 조회(all)
     @Override
     public ScheduleDetailDTO getAllSchedules(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findScheduleWithShifts(scheduleId)
-                .orElseThrow(ScheduleException::scheduleNotFound);
+        Optional<Schedule> optionalSchedule = scheduleRepository.findScheduleWithShifts(scheduleId);
+
+        if (optionalSchedule.isEmpty()) {
+            return ScheduleDetailDTO.emptyResponse(scheduleId);
+        }
+
+        Schedule schedule = optionalSchedule.get();
 
         ScheduleTemplate scheduleTemplate = scheduleTemplateRepository
                 .findScheduleTemplateWithShiftsById(schedule.getScheduleTemplateId())
                 .orElseThrow(TemplateException::scheduleTemplateNotFound);
 
         List<ShiftTemplate> shiftTemplates = scheduleTemplate.getShiftTemplates();
-
         List<Shift> shifts = schedule.getShifts();
 
         return ScheduleDetailDTO.fromEntity(scheduleId, schedule.getScheduleName(), shiftTemplates, shifts);

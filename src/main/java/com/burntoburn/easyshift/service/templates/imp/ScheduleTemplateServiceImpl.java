@@ -11,6 +11,7 @@ import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.service.templates.ScheduleTemplateFactory;
 import com.burntoburn.easyshift.service.templates.ScheduleTemplateService;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,20 +44,12 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
     @Transactional(readOnly = true)
     @Override
     public ScheduleTemplateWithShiftsResponse getAllScheduleTemplatesByStore(Long storeId) {
-        boolean exists = storeRepository.existsById(storeId);
-        if (!exists){
-            throw new NoSuchElementException("not found store");
-        }
-
+        // storeId가 존재하지 않으면 빈 리스트 반환
         List<ScheduleTemplate> scheduleTemplateList = scheduleTemplateRepository.findAllByStoreId(storeId);
-
-        // 찾는 스케줄이 비어 있을 때 예외 발생
-        if(scheduleTemplateList.isEmpty()){
-            throw TemplateException.scheduleTemplateNotFound();
-        }
 
         return ScheduleTemplateWithShiftsResponse.fromEntities(scheduleTemplateList);
     }
+
 
     @Override
     public void deleteScheduleTemplate(Long scheduleTemplateId) {
