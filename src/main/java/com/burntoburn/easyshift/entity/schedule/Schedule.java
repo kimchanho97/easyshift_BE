@@ -1,6 +1,5 @@
 package com.burntoburn.easyshift.entity.schedule;
 
-import com.burntoburn.easyshift.entity.BaseEntity;
 import com.burntoburn.easyshift.entity.schedule.converter.YearMonthConverter;
 import com.burntoburn.easyshift.entity.store.Store;
 import jakarta.persistence.*;
@@ -16,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자 (protected)
 @AllArgsConstructor // 모든 필드를 포함한 생성자 자동 생성
 @Builder // Lombok Builder 적용
-public class Schedule extends BaseEntity {
+public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
