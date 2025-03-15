@@ -17,7 +17,7 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE) // id는 Builder에서 설정 불가
-    @Column(name = "Id")
+    @Column(name = "user_id")
     private Long id;
 
     @Column(unique = true, nullable = false)

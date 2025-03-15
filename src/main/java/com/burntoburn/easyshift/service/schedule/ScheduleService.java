@@ -3,10 +3,8 @@ package com.burntoburn.easyshift.service.schedule;
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleUpload;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleInfoResponse;
-
 import com.burntoburn.easyshift.dto.schedule.res.WorkerScheduleResponse;
 import com.burntoburn.easyshift.dto.store.SelectedScheduleTemplateDto;
-import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface ScheduleService {
@@ -28,7 +26,6 @@ public interface ScheduleService {
 
     // 스케줄 조회 (all)
     ScheduleDetailDTO getAllSchedules(Long scheduleId);
-
 
     // 스케줄 자동 배정
     void autoAssignSchedule(Long scheduleId);
