@@ -167,6 +167,7 @@ public class ScheduleServiceImp implements ScheduleService {
         }
 
         autoAssignmentScheduler.assignShifts(assignmentData);
+        schedule.markAsCompleted();
     }
 
     private Map<Long, String> getScheduleIdToTemplateNameMap(List<Schedule> workerSchedules) {
