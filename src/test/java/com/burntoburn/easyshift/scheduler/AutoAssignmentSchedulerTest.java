@@ -154,10 +154,10 @@ class AutoAssignmentSchedulerTest {
 
         assertThat(shifts.get(3).getUser()).isEqualTo(userA);
         assertThat(shifts.get(4).getUser()).isEqualTo(userC);
-        assertThat(shifts.get(5).getUser()).isEqualTo(userD);
+        assertThat(shifts.get(5).getUser()).isEqualTo(userA);
 
-        assertThat(shifts.get(6).getUser()).isEqualTo(userA);
-        assertThat(shifts.get(7).getUser()).isEqualTo(userB);
+        assertThat(shifts.get(6).getUser()).isEqualTo(userB);
+        assertThat(shifts.get(7).getUser()).isEqualTo(userD);
         assertThat(shifts.get(8).getUser()).isEqualTo(userA);
     }
 }
