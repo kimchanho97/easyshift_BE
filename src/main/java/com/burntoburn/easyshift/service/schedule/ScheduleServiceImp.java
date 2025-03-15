@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.service.schedule.imp;
+package com.burntoburn.easyshift.service.schedule;
 
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleUpload;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
@@ -24,26 +24,18 @@ import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.scheduler.AutoAssignmentScheduler;
 import com.burntoburn.easyshift.scheduler.ShiftAssignmentData;
 import com.burntoburn.easyshift.scheduler.ShiftAssignmentProcessor;
-import com.burntoburn.easyshift.service.schedule.ScheduleFactory;
-import com.burntoburn.easyshift.service.schedule.ScheduleService;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,20 +49,6 @@ public class ScheduleServiceImp implements ScheduleService {
     private final LeaveRequestRepository leaveRequestRepository;
     private final ShiftAssignmentProcessor shiftAssignmentProcessor;
     private final AutoAssignmentScheduler autoAssignmentScheduler;
-
-    // 스케줄 생성
-    @Transactional
-    @Override
-    public void createSchedule(ScheduleUpload upload) {
-        Store store = storeRepository.findById(upload.getStoreId())
-                .orElseThrow(StoreException::storeNotFound);
-
-        ScheduleTemplate scheduleTemplate = scheduleTemplateRepository.findById(upload.getScheduleTemplateId())
-                .orElseThrow(TemplateException::scheduleTemplateNotFound);
-
-        Schedule schedule = scheduleFactory.createSchedule(store, scheduleTemplate, upload);
-        scheduleRepository.save(schedule);
-    }
 
     // 스케줄 삭제
     @Transactional
@@ -128,7 +106,6 @@ public class ScheduleServiceImp implements ScheduleService {
         List<Shift> shifts = shiftRepository.findShiftsByScheduleIdWithUser(scheduleIds, monday, endDate);
 
 
-
         ScheduleTemplate scheduleTemplate = scheduleTemplateRepository
                 .findScheduleTemplateWithShiftsById(schedules.get(0).getScheduleTemplateId())
                 .orElseThrow(TemplateException::scheduleTemplateNotFound);
@@ -155,6 +132,20 @@ public class ScheduleServiceImp implements ScheduleService {
         List<Shift> shifts = schedule.getShifts();
 
         return ScheduleDetailDTO.fromEntity(scheduleId, schedule.getScheduleName(), shiftTemplates, shifts);
+    }
+
+    // 스케줄 생성
+    @Transactional
+    @Override
+    public void createSchedule(ScheduleUpload upload) {
+        Store store = storeRepository.findById(upload.getStoreId())
+                .orElseThrow(StoreException::storeNotFound);
+
+        ScheduleTemplate scheduleTemplate = scheduleTemplateRepository.findById(upload.getScheduleTemplateId())
+                .orElseThrow(TemplateException::scheduleTemplateNotFound);
+
+        Schedule schedule = scheduleFactory.createSchedule(store, scheduleTemplate, upload);
+        scheduleRepository.save(schedule);
     }
 
     @Override

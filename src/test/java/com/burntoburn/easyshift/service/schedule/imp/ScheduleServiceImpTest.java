@@ -1,12 +1,5 @@
 package com.burntoburn.easyshift.service.schedule.imp;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.burntoburn.easyshift.dto.schedule.req.ScheduleUpload;
 import com.burntoburn.easyshift.dto.schedule.req.ShiftDetail;
 import com.burntoburn.easyshift.dto.schedule.res.ScheduleDetailDTO;
@@ -18,7 +11,6 @@ import com.burntoburn.easyshift.entity.schedule.ScheduleStatus;
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.store.Store;
 import com.burntoburn.easyshift.entity.templates.ScheduleTemplate;
-
 import com.burntoburn.easyshift.entity.templates.ShiftTemplate;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.schedule.ScheduleTemplateRepository;
@@ -27,17 +19,7 @@ import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.repository.store.UserStoreRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
 import com.burntoburn.easyshift.service.schedule.ScheduleFactory;
-
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import com.burntoburn.easyshift.service.schedule.ScheduleServiceImp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +31,20 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import static org.assertj.core.api.Assertions.*;
+
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduleServiceImpTest {
@@ -75,7 +70,7 @@ class ScheduleServiceImpTest {
 
     @Test
     @DisplayName("스케줄 생성 성공")
-    void createSchedule_success(){
+    void createSchedule_success() {
         // given: 요청 객체 설정
         ScheduleUpload request = new ScheduleUpload();
         ReflectionTestUtils.setField(request, "scheduleName", "Test Schedule");
@@ -209,10 +204,10 @@ class ScheduleServiceImpTest {
 
     @Test
     @DisplayName("매장 스케줄 목록 조회 성공")
-    void getSchedulesByStore_success(){
+    void getSchedulesByStore_success() {
         // given
         Long storeId = 1L;
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
 
         Store store = Store.builder()
                 .id(storeId)
@@ -235,7 +230,7 @@ class ScheduleServiceImpTest {
         Page<Schedule> schedulePage = new PageImpl<>(schedules, pageable, schedules.size()); // Page 객체 생성
 
         // Mock 설정
-        when(scheduleRepository.findByStoreIdOrderByCreatedAtDesc(1L,pageable)).thenReturn(schedulePage);
+        when(scheduleRepository.findByStoreIdOrderByCreatedAtDesc(1L, pageable)).thenReturn(schedulePage);
 
         // when
         ScheduleInfoResponse response = scheduleService.getSchedulesByStore(storeId, pageable);
@@ -249,10 +244,9 @@ class ScheduleServiceImpTest {
     }
 
 
-
     @Test
     @DisplayName("스케줄 삭제 성공")
-    void deleteSchedule_success(){
+    void deleteSchedule_success() {
         // given
         Long scheduleId = 100L;
         Schedule schedule = Schedule.builder()
@@ -325,7 +319,6 @@ class ScheduleServiceImpTest {
         assertThat(workerSchedule.getScheduleId()).isEqualTo(100L);
         assertThat(workerSchedule.getScheduleTemplateName()).isEqualTo(scheduleTemplateName); // scheduleTemplateName 검증
     }
-
 
 
     @Test

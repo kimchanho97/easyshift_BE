@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.controller;
+package com.burntoburn.easyshift.controller.store;
 
 import com.burntoburn.easyshift.common.response.ApiResponse;
 import com.burntoburn.easyshift.dto.store.use.*;
@@ -113,7 +113,7 @@ public class StoreController {
         // UserId는 spring security의 @AuthenticationPrincipal로 받아올 수 있음
         // Long userId = userDetails.getUserId();
         Long userId = 1L; // 여기서는 임의로 1로 설정
-        
+
         storeService.joinUserStore(storeCode, userId);
 
         return ResponseEntity.ok(ApiResponse.success(null));

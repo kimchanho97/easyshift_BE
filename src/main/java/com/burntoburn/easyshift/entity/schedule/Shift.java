@@ -3,7 +3,6 @@ package com.burntoburn.easyshift.entity.schedule;
 import com.burntoburn.easyshift.entity.BaseEntity;
 import com.burntoburn.easyshift.entity.user.User;
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -43,13 +42,6 @@ public class Shift extends BaseEntity {
     @JoinColumn(name = "user_id") // 초기 스케줄 생성시 user 정보는 음
     private User user;
     private Long shiftTemplateId;
-
-    public void updateShift(String shiftName, LocalDate shiftDate, LocalTime startTime, LocalTime endTime) {
-        this.shiftName = shiftName;
-        this.shiftDate = shiftDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
 
     public void assignUser(User user) {
         this.user = user;

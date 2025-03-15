@@ -1,12 +1,5 @@
 package com.burntoburn.easyshift.service.shift.imp;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.user.Role;
 import com.burntoburn.easyshift.entity.user.User;
@@ -14,9 +7,7 @@ import com.burntoburn.easyshift.exception.shift.ShiftException;
 import com.burntoburn.easyshift.exception.user.UserException;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Optional;
+import com.burntoburn.easyshift.service.shift.ShiftServiceImp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +15,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ShiftServiceImpDeleteAndUpdateTest {
@@ -115,7 +115,7 @@ class ShiftServiceImpDeleteAndUpdateTest {
         when(shiftRepository.findById(shiftId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(ShiftException.class, ()->shiftService.deleteShift(shiftId));
+        assertThrows(ShiftException.class, () -> shiftService.deleteShift(shiftId));
 
         // 삭제 호출 발생 X
         verify(shiftRepository, never()).delete(any(Shift.class));
@@ -140,7 +140,7 @@ class ShiftServiceImpDeleteAndUpdateTest {
         when(shiftRepository.findById(shiftId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(ShiftException.class, ()->shiftService.updateUserShift(userId, shiftId));
+        assertThrows(ShiftException.class, () -> shiftService.updateUserShift(userId, shiftId));
 
         // 저장 호출 발생 X
         verify(shiftRepository, never()).save(any(Shift.class));
@@ -157,7 +157,7 @@ class ShiftServiceImpDeleteAndUpdateTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(UserException.class, ()->shiftService.updateUserShift(userId, shiftId));
+        assertThrows(UserException.class, () -> shiftService.updateUserShift(userId, shiftId));
 
         // 저장 호출 발생 X
         verify(shiftRepository, never()).save(any(Shift.class));

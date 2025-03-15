@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class ShiftTemplateDto {
 
     public static ShiftTemplateDto fromEntity(ShiftTemplate shiftTemplate, List<Shift> shifts) {
         List<ShiftDateDto> shiftDateDtos = shifts.stream()
-                .collect(Collectors.groupingBy(Shift::getShiftDate))
+                .collect(Collectors.groupingBy(Shift::getShiftDate, LinkedHashMap::new, Collectors.toList()))
                 .entrySet().stream()
                 .map(entry -> ShiftDateDto.fromEntity(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());

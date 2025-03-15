@@ -1,4 +1,4 @@
-package com.burntoburn.easyshift.service.shift.imp;
+package com.burntoburn.easyshift.service.shift;
 
 import com.burntoburn.easyshift.dto.shift.req.ShiftUpload;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
@@ -9,13 +9,12 @@ import com.burntoburn.easyshift.exception.user.UserException;
 import com.burntoburn.easyshift.repository.schedule.ScheduleRepository;
 import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.user.UserRepository;
-import com.burntoburn.easyshift.service.shift.ShiftService;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
