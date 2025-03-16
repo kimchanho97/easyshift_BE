@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
@@ -172,9 +173,15 @@ public class ScheduleServiceImp implements ScheduleService {
         // 배정 결과 받아오기
         List<Pair<Long, Long>> assignments = autoAssignmentScheduler.assignShifts(assignmentData);
 
-        // 배치 업데이트 실행
-        shiftAssignmentJdbcRepository.batchUpdateShiftAssignments(assignments);
+        // 🔥 트랜잭션을 분리하여 실행 (배치 업데이트만 별도 트랜잭션)
+        updateShifts(assignments);
         schedule.markAsCompleted();
+    }
+
+    // 🔥 배치 업데이트를 별도 트랜잭션에서 실행하도록 분리
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateShifts(List<Pair<Long, Long>> assignments) {
+        shiftAssignmentJdbcRepository.batchUpdateShiftAssignments(assignments);
     }
 
     private Map<Long, String> getScheduleIdToTemplateNameMap(List<Schedule> workerSchedules) {
