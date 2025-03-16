@@ -51,8 +51,8 @@ public class AutoAssignmentScheduler {
             if (assignedUser == null) {
                 assignedUser = forceAssignUser(waitingPool);
             }
-            // shift.assignUser(assignedUser);
-            assignments.add(Pair.of(assignedUser.getId(), shift.getId())); // (User ID, Shift ID) 쌍 추가
+            shift.assignUser(assignedUser);
+//            assignments.add(Pair.of(assignedUser.getId(), shift.getId())); // (User ID, Shift ID) 쌍 추가
             lastAssignedUser = assignedUser;
 
             // 2-d. waitingPool에 있던 후보들을 후보 큐로 복구 (ArrayList 사용 시 remove(0))

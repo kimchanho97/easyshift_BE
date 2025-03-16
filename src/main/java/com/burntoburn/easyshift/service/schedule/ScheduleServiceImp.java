@@ -171,10 +171,11 @@ public class ScheduleServiceImp implements ScheduleService {
         }
 
         // 배정 결과 받아오기
-        List<Pair<Long, Long>> assignments = autoAssignmentScheduler.assignShifts(assignmentData);
+//        List<Pair<Long, Long>> assignments = autoAssignmentScheduler.assignShifts(assignmentData);
+        autoAssignmentScheduler.assignShifts(assignmentData);
 
         // 🔥 트랜잭션을 분리하여 실행 (배치 업데이트만 별도 트랜잭션)
-        updateShifts(assignments);
+//        updateShifts(assignments);
         schedule.markAsCompleted();
     }
 
