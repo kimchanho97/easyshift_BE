@@ -2,6 +2,7 @@ package com.burntoburn.easyshift.scheduler;
 
 import com.burntoburn.easyshift.entity.schedule.Shift;
 import com.burntoburn.easyshift.entity.user.User;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -23,10 +24,13 @@ public class AutoAssignmentScheduler {
      * c. 조건에 맞는 유저가 있으면 배정하고, 없으면 waitingPool에서 강제 배정합니다.
      * d. waitingPool에 있던 후보들을 후보 큐로 복구합니다.
      */
-    public void assignShifts(ShiftAssignmentData assignmentData) {
+    public List<Pair<Long, Long>> assignShifts(ShiftAssignmentData assignmentData) {
         List<Shift> shifts = assignmentData.shifts();
         List<User> users = assignmentData.users();
         Map<User, Set<LocalDate>> userLeaveDates = assignmentData.userLeaveDates();
+
+        // 배정 결과 저장 리스트 (Shift ID, User ID)
+        List<Pair<Long, Long>> assignments = new ArrayList<>();
 
         // (1) 후보 큐 초기화 (초기 순서를 유지)
         PriorityQueue<UserPair> candidateQueue = initializeCandidateQueue(users);
@@ -45,15 +49,16 @@ public class AutoAssignmentScheduler {
 
             // 2-c. 가능한 유저가 없으면 waitingPool에서 강제 배정
             if (assignedUser == null) {
-                assignedUser = forceAssignUser(shift, waitingPool);
-            } else {
-                shift.assignUser(assignedUser);
+                assignedUser = forceAssignUser(waitingPool);
             }
+            // shift.assignUser(assignedUser);
+            assignments.add(Pair.of(assignedUser.getId(), shift.getId())); // (User ID, Shift ID) 쌍 추가
             lastAssignedUser = assignedUser;
 
             // 2-d. waitingPool에 있던 후보들을 후보 큐로 복구 (ArrayList 사용 시 remove(0))
             reinsertWaitingPool(candidateQueue, waitingPool);
         }
+        return assignments; // 배정 결과 반환
     }
 
     /**
@@ -108,14 +113,10 @@ public class AutoAssignmentScheduler {
      * (2-c) waitingPool에 있는 유저 중에서 강제 배정을 수행합니다.
      * waitingPool의 첫 번째 유저를 꺼내 강제 배정합니다.
      */
-    private User forceAssignUser(Shift shift, List<UserPair> waitingPool) {
-        if (!waitingPool.isEmpty()) {
-            UserPair forcedCandidatePair = waitingPool.remove(0); // ArrayList에서는 remove(0) 사용
-            User forcedCandidate = forcedCandidatePair.getUser();
-            shift.assignUser(forcedCandidate);
-            return forcedCandidate;
-        }
-        return null;
+    private User forceAssignUser(List<UserPair> waitingPool) {
+        UserPair forcedCandidatePair = waitingPool.removeFirst();
+        User forcedCandidate = forcedCandidatePair.getUser();
+        return forcedCandidate;
     }
 
     /**

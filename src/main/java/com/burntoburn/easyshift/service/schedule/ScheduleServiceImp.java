@@ -23,10 +23,12 @@ import com.burntoburn.easyshift.repository.schedule.ShiftRepository;
 import com.burntoburn.easyshift.repository.store.StoreRepository;
 import com.burntoburn.easyshift.scheduler.AutoAssignmentScheduler;
 import com.burntoburn.easyshift.scheduler.ShiftAssignmentData;
+import com.burntoburn.easyshift.scheduler.ShiftAssignmentJdbcRepository;
 import com.burntoburn.easyshift.scheduler.ShiftAssignmentProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +51,7 @@ public class ScheduleServiceImp implements ScheduleService {
     private final LeaveRequestRepository leaveRequestRepository;
     private final ShiftAssignmentProcessor shiftAssignmentProcessor;
     private final AutoAssignmentScheduler autoAssignmentScheduler;
+    private final ShiftAssignmentJdbcRepository shiftAssignmentJdbcRepository;
 
     // 스케줄 삭제
     @Transactional
@@ -166,7 +169,11 @@ public class ScheduleServiceImp implements ScheduleService {
             throw ScheduleException.insufficientUsersForAssignment();
         }
 
-        autoAssignmentScheduler.assignShifts(assignmentData);
+        // 배정 결과 받아오기
+        List<Pair<Long, Long>> assignments = autoAssignmentScheduler.assignShifts(assignmentData);
+
+        // 배치 업데이트 실행
+        shiftAssignmentJdbcRepository.batchUpdateShiftAssignments(assignments);
         schedule.markAsCompleted();
     }
 
