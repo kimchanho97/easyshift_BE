@@ -1,5 +1,6 @@
 package com.burntoburn.easyshift.scheduler;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,12 +19,14 @@ public class ShiftAssignmentJdbcRepository {
      * (User ID, Shift ID) 쌍
      */
     public void batchUpdateShiftAssignments(List<Pair<Long, Long>> assignments) {
-        if (assignments == null || assignments.isEmpty()) {
+        if (CollectionUtils.isEmpty(assignments)) {
             return;
         }
 
         String sql = "UPDATE shift SET user_id = ? WHERE shift_id = ?";
-        jdbcTemplate.batchUpdate(sql, assignments, assignments.size(), (ps, assignment) -> {
+        int batchSize = 500;  // ✅ 배치 크기 조정
+
+        jdbcTemplate.batchUpdate(sql, assignments, batchSize, (ps, assignment) -> {
             ps.setLong(1, assignment.getFirst());  // user_id
             ps.setLong(2, assignment.getSecond()); // shift_id
         });

@@ -31,6 +31,11 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // 마이크로미터 프로메테우스 구현체
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
     // JMH
     implementation 'org.openjdk.jmh:jmh-core:1.35'
     jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.35'
