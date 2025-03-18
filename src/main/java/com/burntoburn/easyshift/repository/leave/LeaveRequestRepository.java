@@ -5,6 +5,7 @@ import com.burntoburn.easyshift.entity.leave.LeaveRequest;
 import com.burntoburn.easyshift.entity.schedule.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -25,7 +26,9 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
 
     List<LeaveRequest> findByScheduleId(Long scheduleId);
 
-    List<LeaveRequest> findAllByScheduleAndApprovalStatus(Schedule schedule, ApprovalStatus approvalStatus);
+    @Query("SELECT lr FROM LeaveRequest lr JOIN FETCH lr.user " +
+            "WHERE lr.schedule = :schedule AND lr.approvalStatus = :approvalStatus")
+    List<LeaveRequest> findAllByScheduleAndApprovalStatus(@Param("schedule") Schedule schedule, @Param("approvalStatus") ApprovalStatus approvalStatus);
 
     boolean existsByUserIdAndScheduleIdAndDate(Long userId, Long scheduleId, LocalDate date);
 }
