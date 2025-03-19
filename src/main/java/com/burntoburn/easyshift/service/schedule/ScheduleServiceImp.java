@@ -30,7 +30,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
@@ -152,39 +151,6 @@ public class ScheduleServiceImp implements ScheduleService {
         scheduleRepository.save(schedule);
     }
 
-    @Override
-    @Transactional
-    public void autoAssignSchedule(Long scheduleId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(ScheduleException::scheduleNotFound);
-
-        List<Shift> shifts = shiftRepository.findAllBySchedule(schedule);
-        if (shifts == null || shifts.isEmpty()) {
-            throw ShiftException.shiftNotFound();
-        }
-
-        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAllByScheduleAndApprovalStatus(schedule, ApprovalStatus.APPROVED);
-
-        ShiftAssignmentData assignmentData = shiftAssignmentProcessor.processData(shifts, leaveRequests);
-        if (assignmentData.users().size() < assignmentData.maxRequired()) {
-            throw ScheduleException.insufficientUsersForAssignment();
-        }
-
-        // 배정 결과 받아오기
-//        List<Pair<Long, Long>> assignments = autoAssignmentScheduler.assignShifts(assignmentData);
-        autoAssignmentScheduler.assignShifts(assignmentData);
-
-        // 🔥 트랜잭션을 분리하여 실행 (배치 업데이트만 별도 트랜잭션)
-//        updateShifts(assignments);
-        schedule.markAsCompleted();
-    }
-
-    // 🔥 배치 업데이트를 별도 트랜잭션에서 실행하도록 분리
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateShifts(List<Pair<Long, Long>> assignments) {
-        shiftAssignmentJdbcRepository.batchUpdateShiftAssignments(assignments);
-    }
-
     private Map<Long, String> getScheduleIdToTemplateNameMap(List<Schedule> workerSchedules) {
         // 1. scheduleId -> scheduleTemplateId 매핑
         Map<Long, Long> scheduleToTemplateMap = workerSchedules.stream()
@@ -204,4 +170,28 @@ public class ScheduleServiceImp implements ScheduleService {
                         schedule -> templateIdToNameMap.get(schedule.getScheduleTemplateId())
                 ));
     }
+
+    @Override
+    @Transactional
+    public void autoAssignSchedule(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(ScheduleException::scheduleNotFound);
+
+        List<Shift> shifts = shiftRepository.findAllBySchedule(schedule);
+        if (shifts == null || shifts.isEmpty()) {
+            throw ShiftException.shiftNotFound();
+        }
+
+        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAllByScheduleAndApprovalStatus(schedule, ApprovalStatus.APPROVED);
+
+        ShiftAssignmentData assignmentData = shiftAssignmentProcessor.processData(shifts, leaveRequests);
+        if (assignmentData.users().size() < assignmentData.maxRequired()) {
+            throw ScheduleException.insufficientUsersForAssignment();
+        }
+
+        List<Pair<Long, Long>> assignments = autoAssignmentScheduler.assignShifts(assignmentData);
+        shiftAssignmentJdbcRepository.batchUpdateShiftAssignments(assignments);
+        schedule.markAsCompleted();
+    }
+
 }

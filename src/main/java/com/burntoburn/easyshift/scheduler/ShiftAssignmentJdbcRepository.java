@@ -24,9 +24,7 @@ public class ShiftAssignmentJdbcRepository {
         }
 
         String sql = "UPDATE shift SET user_id = ? WHERE shift_id = ?";
-        int batchSize = 100;  // ✅ 배치 크기 조정
-
-        jdbcTemplate.batchUpdate(sql, assignments, batchSize, (ps, assignment) -> {
+        jdbcTemplate.batchUpdate(sql, assignments, assignments.size(), (ps, assignment) -> {
             ps.setLong(1, assignment.getFirst());  // user_id
             ps.setLong(2, assignment.getSecond()); // shift_id
         });
