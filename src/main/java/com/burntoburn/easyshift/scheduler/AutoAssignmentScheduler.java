@@ -31,7 +31,7 @@ public class AutoAssignmentScheduler {
             if (assignedUser == null) {
                 assignedUser = forceAssignUser(waitingPool);
             }
-//            shift.assignUser(assignedUser);
+            //shift.assignUser(assignedUser);
             assignments.add(Pair.of(assignedUser.getId(), shift.getId())); // (User ID, Shift ID) 쌍 추가
             lastAssignedUser = assignedUser;
             reinsertWaitingPool(candidateQueue, waitingPool);
