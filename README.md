@@ -2,6 +2,17 @@
 
 > 근무 일정 관리와 자동 배정을 지원하는 스마트 스케줄링 플랫폼
 
+### 목차
+
+1. [프로젝트 소개](#-프로젝트-소개)
+2. [팀원 소개](#-팀원-소개)
+3. [스케줄링 알고리즘](#-스케줄링-알고리즘)
+4. [화면 구성](#-화면-구성)
+5. [시작 가이드](#-시작-가이드)
+6. [ERD](#-erd)
+
+<br>
+
 ## 🚀 프로젝트 소개
 
 ### 개발 동기 및 목적
@@ -170,6 +181,6 @@ java -jar build/libs/easyshift-0.0.1-SNAPSHOT.jar
 
 <br> 
 
-## ERD
+## 🗺️ ERD
 
 <img alt="Image" src="https://github.com/user-attachments/assets/8c70313d-c7ae-4ee1-9dab-41b3bcda0921" />
