@@ -7,7 +7,7 @@
 ### 개발 동기 및 목적
 
 매월 반복되는 교대 근무 스케줄을 작성하는 과정은 많은 시간과 노력이 필요합니다. 관리자는 근무 배치와 휴무 반영, 변경 요청 처리까지 많은 요소를 고려해야 합니다. 반면, 근로자는 근무표 확인이 어렵고, 변경
-요청이 즉시 반영되지 않는 불편함을 겪습니다
+요청이 즉시 반영되지 않는 불편함을 겪습니다.
 
 📌 **이지시프트(EasyShift)는 이러한 문제를 해결하기 위해 개발되었습니다.**
 
@@ -133,7 +133,7 @@ Robin) 방식을 결합한 알고리즘**을 사용합니다.
 |:------------------:|:---------------------------------------------------------------------------------------------------------------------:|
 |     **메인 페이지**     | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/96517f43-a320-4025-b5e5-899523e6dcbd" /> |
 |     **설정 페이지**     | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/b3573b12-62ae-4779-8310-2355b7b6e67f" /> |
-|   **스케줄템플릿 등록**    | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/33e2d63f-f674-43b0-b101-5acf194b14d7" /> |
+|   **스케줄 템플릿 등록**   | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/33e2d63f-f674-43b0-b101-5acf194b14d7" /> |
 |     **스케줄 등록**     | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/94525081-8ec1-4824-bb6d-7f8209a57cc1" /> | 
 |     **휴무 신청**      | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/573194d1-2996-4711-9793-028343bba63a" /> | 
 |   **스케줄 자동 배정**    | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/6e2ddb15-3edb-4b5c-b394-a26f82f27a92" /> | 
