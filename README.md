@@ -127,6 +127,23 @@ Robin) 방식을 결합한 알고리즘**을 사용합니다.
 
 <br>
 
+## 📷 화면 구성
+
+|       **이름**       |                                                        **이미지**                                                        |
+|:------------------:|:---------------------------------------------------------------------------------------------------------------------:|
+|     **메인 페이지**     | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/96517f43-a320-4025-b5e5-899523e6dcbd" /> |
+|     **설정 페이지**     | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/b3573b12-62ae-4779-8310-2355b7b6e67f" /> |
+|   **스케줄템플릿 등록**    | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/33e2d63f-f674-43b0-b101-5acf194b14d7" /> |
+|     **스케줄 등록**     | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/94525081-8ec1-4824-bb6d-7f8209a57cc1" /> | 
+|     **휴무 신청**      | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/573194d1-2996-4711-9793-028343bba63a" /> | 
+|   **스케줄 자동 배정**    | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/6e2ddb15-3edb-4b5c-b394-a26f82f27a92" /> | 
+|   **스케줄 확인 페이지**   | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/71133c81-8fd4-4774-b7c2-47d6ed014ab9" /> | 
+|   **나의 스케줄 확인**    | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/13895646-b7bd-43d3-86f6-17ab31a71a20" /> | 
+|     **근무 교환**      | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/3db3d6f1-a0a3-488a-a3c0-fe56fa8b2fe1" /> | 
+| **근로자의 월별 스케줄 확인** | <img width="700" alt="Image" src="https://github.com/user-attachments/assets/6dafb05e-a1f4-4b3f-8325-df3b420f9ba1" /> | 
+
+<br>
+
 ## ⚙️ 시작 가이드
 
 ### 기술 스택
