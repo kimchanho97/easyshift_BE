@@ -118,7 +118,7 @@ Robin) 방식을 결합한 알고리즘**을 사용합니다.
 2. *동일한 시간대에 같은 유저가 중복 배정되지 않도록 처리*
 3. *휴무 신청을 최우선으로 반영하고, 근무 로테이션 텀을 유지*
 
-<img width="700" alt="Image" src="https://github.com/user-attachments/assets/36db9f8f-668a-483a-9eb5-a58b978a87a8" />
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/bde8b997-063b-4f5f-8bee-7b4bdb0435e6" />
 
 📂 [상세 알고리즘 설명 보기(Notion)](https://kimchanho.notion.site/1bba1b1b004180d49f2be9af805d81a4)
 
@@ -165,7 +165,6 @@ Robin) 방식을 결합한 알고리즘**을 사용합니다.
 
 - **기존 방식**: `FIFO 큐` 기반 → 휴무 유저는 단순히 뒤로 밀려 **배정 순서가 무너짐**
 - **개선 방식**: `우선순위 큐 + 대기 풀(waiting pool)` 도입
-
     - 초기 인덱스를 기준으로 우선순위 유지
     - 조건 미충족 유저는 `waiting pool`로 이동
     - 배정 완료 후 `waiting pool`을 복구하여 **공정한 순환 구조 유지**
