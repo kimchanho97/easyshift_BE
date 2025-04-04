@@ -7,9 +7,10 @@
 1. [프로젝트 소개](#-프로젝트-소개)
 2. [팀원 소개](#%EF%B8%8F-팀원-소개)
 3. [스케줄링 알고리즘](#-스케줄링-알고리즘)
-4. [화면 구성](#-화면-구성)
-5. [시작 가이드](#%EF%B8%8F-시작-가이드)
-6. [ERD](#%EF%B8%8F-erd)
+4. [트러블 슈팅](#-트러블-슈팅)
+5. [화면 구성](#-화면-구성)
+6. [시작 가이드](#%EF%B8%8F-시작-가이드)
+7. [ERD](#%EF%B8%8F-erd)
 
 <br>
 
@@ -97,18 +98,13 @@
 - 근무 스케줄 자동 배정 알고리즘 설계 및 구현
 - 자동 배정 과정의 성능 최적화 (변경 감지 → 배치 처리 개선)
 
-📁 [개발 문서(Notion)](https://kimchanho.notion.site/1b7a1b1b004180fd82abee68dcf58917?pvs=4)
-
-- API 명세서
-- ERD 및 테이블 설계 과정
-- 주요 트러블 슈팅 & DEEP DIVE
-- 스케줄링 알고리즘 개선 및 성능 최적화 과정
+📁 [프로젝트 개발 문서 바로가기(Notion)](https://kimchanho.notion.site/1b7a1b1b004180fd82abee68dcf58917?pvs=4)
 
 <br>
 
 ## 📅 스케줄링 알고리즘
 
-### 자동 근무 배정 알고리즘 개요
+### 🤖 자동 근무 배정 알고리즘
 
 이지시프트의 스케줄링 알고리즘은 **모든 유저에게 균등한 근무를 배정하고, 휴무 신청을 반영하며, 연속 근무를 최소화하는 것**을 목표로 합니다. 이를 위해 **그리디(Greedy) 기법과 라운드 로빈(Round
 Robin) 방식을 결합한 알고리즘**을 사용합니다.
@@ -122,21 +118,60 @@ Robin) 방식을 결합한 알고리즘**을 사용합니다.
 2. *동일한 시간대에 같은 유저가 중복 배정되지 않도록 처리*
 3. *휴무 신청을 최우선으로 반영하고, 근무 로테이션 텀을 유지*
 
-📂 [상세 알고리즘 설명(Notion)](https://kimchanho.notion.site/1bba1b1b004180d49f2be9af805d81a4)
+<img width="700" alt="Image" src="https://github.com/user-attachments/assets/36db9f8f-668a-483a-9eb5-a58b978a87a8" />
+
+📂 [상세 알고리즘 설명 보기(Notion)](https://kimchanho.notion.site/1bba1b1b004180d49f2be9af805d81a4)
 
 <br>
 
-### 성능 최적화: Batch Update 적용
+### 🔥 개별 UPDATE → Batch Update로 성능 5배 개선하기
 
 초기에는 자동 배정 시 **JPA 변경 감지(Dirty Checking)로 인해 근무(Shift) 개수만큼 개별 UPDATE 쿼리가 발생하는 문제**가 있었습니다.
 예를 들어, 한 달 동안 할당해야 할 근무 개수가 900개라면, 900개의 UPDATE 쿼리가 개별적으로 실행됩니다.
 
-이를 해결하기 위해 **JdbcTemplate의 `batchUpdate()`** 를 활용하여 한 번에 처리하도록 개선하였습니다.
+이를 해결하기 위해, **JdbcTemplate의 `batchUpdate()`** 를 활용하여 유저 배정 정보를 `(user_id, shift_id)` 쌍으로 모은 뒤,
+한 번의 배치 쿼리로 일괄 처리하는 구조로 리팩토링했습니다.
 
 - ✅ **Batch Update 적용 후, 자동 배정 성능이 5배 이상 개선됨**
-- ✅ **네트워크 및 DB 부담 감소 → 빠른 스케줄링 처리 가능**
+- ✅ **900개 근무에 단 1번의 쿼리로 처리 → 네트워크/DB 부담 최소화**
 
-📂 [성능 최적화 과정(Notion)](https://kimchanho.notion.site/DEEP-DIVE-1bba1b1b00418033a387fab64473a941)
+📂 [성능 최적화 과정 보기(Notion)](https://kimchanho.notion.site/DEEP-DIVE-1bba1b1b00418033a387fab64473a941)
+
+<br>
+
+## 🔫 트러블 슈팅
+
+### 📌 스케줄 템플릿 수정 시 실제 운영 스케줄 보호하기
+
+스케줄 생성 시 `ScheduleTemplate`을 참조하도록 설계된 초기 구조는,  
+**템플릿 수정/삭제 시 실제 운영 데이터까지 변경되는 문제**를 유발했습니다.
+
+- 스케줄 생성 시점에 템플릿 정보를 **복사하여 저장하는 구조로 리팩토링**
+- `(FK 참조 → 값 복사 + 참조 ID만 남김)` 형태로 **역정규화 전략 적용**
+- 템플릿 변경이 운영 데이터에 영향을 주지 않으며, 조회 시 템플릿 기준 필터링도 가능
+- **쿼리 성능 개선 + 과거 데이터 정합성 보장 + UX 기반 필터링 요구사항까지 반영**
+
+설계 유연성과 데이터 보호를 동시에 만족하는 구조로 개선하였으며,  
+**템플릿 기반 스케줄 관리 UX 흐름에 최적화된 테이블 모델링을 달성했습니다.**
+
+📂 [문제 분석과 테이블 리팩토링 과정 보기(Notion)](https://kimchanho.notion.site/1bba1b1b00418097b82cd83fa1e99574)
+
+<br>
+
+### 🔄 자동 근무 배정 알고리즘 개선: FIFO 큐 → 우선순위 큐
+
+자동 근무 배정 로직에서 **라운드 로빈 기반의 균등 배정**을 유지하면서도,  
+**휴무 신청 반영**과 **연속 근무 방지**를 충족시키기 위해 알고리즘을 리팩토링했습니다.
+
+- **기존 방식**: `FIFO 큐` 기반 → 휴무 유저는 단순히 뒤로 밀려 **배정 순서가 무너짐**
+- **개선 방식**: `우선순위 큐 + 대기 풀(waiting pool)` 도입
+
+    - 초기 인덱스를 기준으로 우선순위 유지
+    - 조건 미충족 유저는 `waiting pool`로 이동
+    - 배정 완료 후 `waiting pool`을 복구하여 **공정한 순환 구조 유지**
+
+📂 [문제 정의 및 개선 과정 보기(Notion)](https://kimchanho.notion.site/1bba1b1b004180d49f2be9af805d81a4)  
+📂 [전체 코드 보기(GitHub)](https://github.com/kimchanho97/easyshift_BE/blob/main/src/main/java/com/burntoburn/easyshift/scheduler/AutoAssignmentScheduler.java)
 
 <br>
 
