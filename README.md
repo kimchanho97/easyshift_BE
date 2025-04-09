@@ -169,7 +169,7 @@ Robin) 방식을 결합한 알고리즘**을 사용합니다.
     - 조건 미충족 유저는 `waiting pool`로 이동
     - 배정 완료 후 `waiting pool`을 복구하여 **공정한 순환 구조 유지**
 
-📂 [문제 정의 및 개선 과정 보기(Notion)](https://kimchanho.notion.site/1bba1b1b004180d49f2be9af805d81a4)  
+📂 [문제 정의 및 개선 과정 보기(Notion)](https://kimchanho.notion.site/FIFO-1bba1b1b00418013a475fded2eb9c309)  
 📂 [전체 코드 보기(GitHub)](https://github.com/kimchanho97/easyshift_BE/blob/main/src/main/java/com/burntoburn/easyshift/scheduler/AutoAssignmentScheduler.java)
 
 <br>
